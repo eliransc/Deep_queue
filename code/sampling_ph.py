@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 import sys
 sys.path.append(r'C:\Users\elira\Google Drive\butools2\Python')
+sys.path.append('/home/eliransc/projects/def-dkrass/eliransc/butools/Python')
 import pandas as pd
 import argparse
 
@@ -703,26 +704,24 @@ def main(args):
     # data_path = r'C:\Users\elira\workspace\Research\data\ph_data\'
     max_ph_size = 100
     ratio_size = 10
-    data_path = r'C:\Users\elira\workspace\Research\data\ph_data'
+    # data_path = r'C:\Users\elira\workspace\Research\data\ph_data'
+    data_path = '/home/eliransc/projects/def-dkrass/eliransc/data/phasetype_data'
     data_type = 'mix_Erlang_tail_service_ratios_' + str(ratio_size) + '_ph_size_' + str(max_ph_size) + '_'
     num_exmaples = args.num_examples
 
     if args.data_type == 'Mix_erlang':
         mix_erlang = [create_erlang_exmaples(df_1, data_path, data_type, max_ph_size, max_num_groups=10) for example in tqdm(range(num_exmaples))]
-        print('stop')
 
     if args.data_type == 'Gen_ph':
         pkl_name = 'gen_ph_sample_size_' + 'max_ph_size_' + str(max_ph_size)
         gen_ph = [create_gewn_ph(max_ph_size, pkl_name, data_path) for example in tqdm(range(num_exmaples))]
 
-        print('stop')
 
     if args.data_type == 'mix_Erlang_first':
 
         file_name = 'mix_Erlang_UB_rates_1_LB_rates_0.1_max_ph_20_service_ratios_1_200_ph_size_' + str(max_ph_size)
         finlis = [combine_erlangs_lists(data_path, file_name, [1, 300], max_ph_size) for exampl in tqdm(range(num_exmaples))][0]
 
-        print('Stop!')
 
 
 def parse_arguments(argv):
