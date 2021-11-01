@@ -9,8 +9,8 @@ import argparse
 
 
 from tqdm import tqdm
-from butools.ph import *
 from butools.map import *
+from butools.ph import *
 from butools.queues import *
 import time
 from butools.mam import *
@@ -19,7 +19,6 @@ from scipy.linalg import expm, sinm, cosm
 
 from numpy.linalg import matrix_power
 from scipy.stats import rv_discrete
-# import seaborn as sns
 import random
 from scipy.stats import loguniform
 from butools.fitting import *
