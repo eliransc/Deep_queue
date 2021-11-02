@@ -694,8 +694,8 @@ def create_erlang_exmaples(df_1, data_path, data_type, max_ph_size,  max_num_gro
 
 def main(args):
 
-    vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
-
+    # vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
+    vals_bounds_dict = pkl.load(open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/vals_bounds.pkl', 'rb'))
     ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 16., 32, 64, 100.])
 
     df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
