@@ -701,7 +701,6 @@ def main(args):
     # df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
     df_1 = pkl.load(open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-    # data_path = r'C:\Users\elira\workspace\Research\data\ph_data\'
     max_ph_size = 100
     ratio_size = 10
     # data_path = r'C:\Users\elira\workspace\Research\data\ph_data'
@@ -728,7 +727,7 @@ def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Mix_erlang')
-    parser.add_argument('--num_examples', type=int, help='number of ph examples', default = 2)
+    parser.add_argument('--num_examples', type=int, help='number of ph examples', default = 200000)
     args = parser.parse_args(argv)
 
     return args
