@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH -t 1-00:00
+#SBATCH -t 0-03:00
 #SBATCH -A def-dkrass
-source /home/d/dkrass/eliransc/queues/bin/activate
-python /scratch/d/dkrass/eliransc/redirected_call/code/main_accuracy.py
+source /home/eliransc/.virtualenvs/deep_queue/bin/activate
+python /home/eliransc/projects/def-dkrass/eliransc/Deep_queue/code/sampling_ph.py
 
