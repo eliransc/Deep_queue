@@ -698,7 +698,8 @@ def main(args):
     vals_bounds_dict = pkl.load(open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/vals_bounds.pkl', 'rb'))
     ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 16., 32, 64, 100.])
 
-    df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
+    # df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
+    df_1 = pkl.load(open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
     # data_path = r'C:\Users\elira\workspace\Research\data\ph_data\'
     max_ph_size = 100
