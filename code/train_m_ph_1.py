@@ -190,10 +190,6 @@ def main():
     print('finish')
 
 
-
-
-
-
 if __name__ == "__main__":
     main()
 
