@@ -120,7 +120,7 @@ def compute_pdf_within_range(x_vals, s, A):
     return pdf_list
 
 
-def getX(pkl_path, sample_path):
+def getX(pkl_path, device, sample_path):
     curr_data = pkl.load(open(os.path.join(pkl_path, sample_path),'rb'))
     data = torch.from_numpy(curr_data[0])#.cuda()
     data = data.unsqueeze(0)
@@ -128,7 +128,7 @@ def getX(pkl_path, sample_path):
     data = data.to(device)
     return data
 
-def getY(pkl_path, sample_path):
+def getY(pkl_path, device, sample_path):
     curr_data = pkl.load(open(os.path.join(pkl_path, sample_path),'rb'))
     data = torch.from_numpy(curr_data[1])#.cuda()
     data = data.unsqueeze(0)
@@ -152,10 +152,11 @@ def queue_loss(predictions, targes):
 def main():
 
     data_path = '/home/eliransc/projects/def-dkrass/eliransc/data/phasetype_data'
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     dblock = DataBlock(get_items=get_item,
-                       get_x=lambda x: getX(data_path, x),
-                       get_y=lambda x: getY(data_path, x))
+                       get_x=lambda x: getX(data_path,device,  x),
+                       get_y=lambda x: getY(data_path, device,x))
 
     dsets = dblock.datasets(data_path)
     dls = dblock.dataloaders(data_path, batch_size=256, num_workers=0)
@@ -179,7 +180,6 @@ def main():
 
     learn = Learner(dls, simple_cnn, loss_func=queue_loss, metrics=queue_loss)
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     print(learn.model.to(device))
 
