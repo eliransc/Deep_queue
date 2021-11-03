@@ -179,13 +179,13 @@ def main():
     )
 
     learn = Learner(dls, simple_cnn, loss_func=queue_loss, metrics=queue_loss)
-
-
     print(learn.model.to(device))
 
     print(next(learn.model.parameters()).is_cuda )
 
     lr__ = learn.lr_find()
+
+    pkl.dump(lr__, open('lr.pkl', 'wb'))
 
     print('finish')
 
