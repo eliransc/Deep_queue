@@ -253,10 +253,34 @@ def main():
 
     learn.model.to(device)
     now = time.time()
-    learn.fit_one_cycle(2, 0.01)
-    print('Ten epochs took took: ', time.time() - now)
+    learn.fit_one_cycle(20, 0.01)
+    print('Twenty epochs took took: ', time.time() - now)
 
     print('finish')
+
+    xb,yb = first(dl_valid)
+    a = learn.get_preds(dl=[(xb, yb)])
+    output_size = 70
+    import matplotlib.pyplot as plt
+    exmaple = torch.randint(0, xb.shape[0], (1,))[0].item()
+    max_number = 10
+    fig = plt.figure()
+    ax = fig.add_axes([0, 0, 1, 1])
+    with torch.no_grad():
+        y_hat = np.array(m(a[0][exmaple, :].reshape(1, output_size)))[0][:max_number]
+        y = yb[exmaple, :max_number]
+        ax.bar(torch.arange(max_number), y_hat, alpha=0.5, color='red')
+        ax.bar(torch.arange(max_number), y, alpha=0.5, color='blue')
+    plt.show()
+
+    x_vals = np.linspace(0, 1, 300)
+    ph_shape = xb[0, :, :].shape[-1] - 1
+    s = xb[exmaple, :, :].squeeze()[ph_shape, :ph_shape]
+    A = xb[exmaple, :, :].squeeze()[:ph_shape, :ph_shape]
+    pdf_vals = compute_pdf_within_range(x_vals, np.array(s), np.array(A))
+    plt.figure()
+    plt.plot(x_vals, pdf_vals)
+    plt.show()
 
 
 if __name__ == "__main__":
