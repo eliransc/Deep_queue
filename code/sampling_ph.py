@@ -492,11 +492,16 @@ def create_final_x_data(s, A, ph_size_max):
         return np.append(np.append(A, s1, axis=0), lam_arr, axis=1).astype(np.float32)
 
 
-def create_gewn_ph(ph_size_max, pkl_name, data_path):
+def create_gen_ph(ph_size_max, data_path, curr_folder, data_sample_name):
+
     now = datetime.now()
 
-    current_time = now.strftime("%H_%M_%S") + str(np.random.randint(1, 1000000, 1)[0]) + '.pkl'
-    pkl_name = pkl_name + current_time
+    current_time = now.strftime("%H_%M_%S") + str(np.random.randint(1, 1000000, 1)[0])
+    pkl_name_xdat = 'xdat_' + data_sample_name + current_time
+    pkl_name_ydat = 'ydat_' + data_sample_name + current_time
+
+    pkl_full_path_x = os.path.join(data_path, str(curr_folder), pkl_name_xdat)
+    pkl_full_path_y = os.path.join(data_path, str(curr_folder), pkl_name_ydat)
 
     A_s_lists = [give_A_s_given_size(np.random.randint(2, ph_size_max)) for ind in range(1)]
     mom_lists = [compute_first_n_moments(tupl[1], tupl[0]) for tupl in A_s_lists]
@@ -507,14 +512,15 @@ def create_gewn_ph(ph_size_max, pkl_name, data_path):
     max_size_ph_1 = [increase_size_of_matrix(ph_dist[1], ph_dist[0], ph_size_max) for ph_dist in normmat_ph_1a]
     fin_data_reg = [create_final_x_data(ph_dist[0], ph_dist[1], ph_size_max) for ph_dist in max_size_ph_1]
     if len(fin_data_reg) > 0:
-        x_y_data = compute_y_data_given_folder(fin_data_reg[0], ph_size_max, tot_prob=70)
-        if type(x_y_data) == np.ndarray:
-            pkl_full_path = os.path.join(data_path, pkl_name)
+        y_data = compute_y_data_given_folder(fin_data_reg[0], ph_size_max, tot_prob=70)
+        if type(y_data) == np.ndarray:
 
-            if type(x_y_data) == np.ndarray:
-                pkl.dump((fin_data_reg[0], x_y_data), open(pkl_full_path, 'wb'))
+            if type(y_data) == np.ndarray:
+                np.save(pkl_full_path_x, fin_data_reg[0])
+                np.save(pkl_full_path_y, y_data)
+                # pkl.dump((fin_data_reg[0], x_y_data), open(pkl_full_path, 'wb'))
             else:
-                print(type(x_y_data))
+                print(type(y_data))
 
             # return 1
 
@@ -641,9 +647,8 @@ def create_mix_erlang_data_steady(s, A, data_path, data_sample_name, curr_folder
 
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
 
-    pkl_name_xdat = 'xdat_' + data_sample_name + current_time + '.pkl'
-
-    pkl_name_ydat = 'ydat_' + data_sample_name + current_time + '.pkl'
+    pkl_name_xdat = 'xdat_' + data_sample_name + current_time
+    pkl_name_ydat = 'ydat_' + data_sample_name + current_time
 
     pkl_full_path_x = os.path.join(data_path, str(curr_folder), pkl_name_xdat)
     pkl_full_path_y = os.path.join(data_path, str(curr_folder), pkl_name_ydat)
@@ -701,12 +706,24 @@ def create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, curr_
     if not os.path.exists(folder_path):
         os.mkdir(folder_path)
 
-    while 2*len(os.listdir(folder_path)) < folder_size: #*2 becuase there is x and y np.array
+    while len(os.listdir(folder_path)) < 2*folder_size: #*2 becuase there is x and y np.array
         s_A_list = [create_mix_erlang_data(df_1,max_ph_size, max_num_groups ) for ind in range(1)]
         x_y_data = [create_mix_erlang_data_steady(s_A[0], s_A[1], data_path, data_sample_name,curr_folder_name, max_ph_size) for s_A in s_A_list]
 
 
+def monitor_gen_ph(data_path, data_sample_name, max_ph_size, curr_folder_name, folder_size):
+
+    folder_path = os.path.join(data_path, str(curr_folder_name))
+
+    if not os.path.exists(folder_path):
+        os.mkdir(folder_path)
+
+    while len(os.listdir(folder_path)) < 2 * folder_size:  # *2 becuase there is x and y np.array
+        create_gen_ph(max_ph_size, data_path, curr_folder_name, data_sample_name)
+
+
 def main(args):
+
     ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 16., 32, 64, 100.])
 
     if sys.platform =='linux':
@@ -730,7 +747,7 @@ def main(args):
     num_exmaples = args.num_examples
 
     try:
-        max_value_folder = int(max(os.listdir(data_path)))
+        max_value_folder =  np.max(np.array(os.listdir(data_path)).astype(int))
     except:
         print('Data folder it empty')
         max_value_folder = 0
@@ -743,7 +760,7 @@ def main(args):
 
     if args.data_type == 'Gen_ph':
         pkl_name = 'gen_ph_sample_size_' + 'max_ph_size_' + str(max_ph_size)
-        gen_ph = [create_gewn_ph(max_ph_size, pkl_name, data_path) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))]
+        gen_ph = [monitor_gen_ph(data_path, data_sample_name, max_ph_size, example,  folder_size = 64) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))]
 
     if args.data_type == 'mix_Erlang_first':
 
@@ -755,8 +772,8 @@ def main(args):
 def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Mix_erlang')
-    parser.add_argument('--num_examples', type=int, help='number of ph examples', default = 500)
+    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
+    parser.add_argument('--num_examples', type=int, help='number of ph examples', default = 20)
     args = parser.parse_args(argv)
 
     return args
