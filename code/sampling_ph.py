@@ -424,18 +424,20 @@ def ser_mean(alph, T):
         return False
 
 
-def combine_erlangs_lists(data_path, pkl_name, UB_ratios_limits, ph_size_max, UB_rates=1, LB_rates=0.1,
-                          num_examples_each_settings=500):
+def combine_erlangs_lists(data_path, data_sample_name, curr_folder, UB_ratios_limits, ph_size_max, UB_rates, LB_rates):
     now = datetime.now()
 
-    current_time = now.strftime("%H_%M_%S") + str(np.random.randint(1, 1000000, 1)[0]) + '.pkl'
-    pkl_name = pkl_name + current_time
+    current_time = now.strftime("%H_%M_%S") + str(np.random.randint(1, 1000000, 1)[0])
+    pkl_name_xdat = 'xdat_' + data_sample_name + current_time
+    pkl_name_ydat = 'ydat_' + data_sample_name + current_time
 
-    pkl_full_path = os.path.join(data_path, pkl_name)
+    pkl_full_path_x = os.path.join(data_path, str(curr_folder), pkl_name_xdat)
+    pkl_full_path_y = os.path.join(data_path, str(curr_folder), pkl_name_ydat)
 
     UB_ratios = np.random.randint(UB_ratios_limits[0], UB_ratios_limits[1])
-    UB_rates = 1
-    LB_rates = 0.1
+    # UB_rates = 1
+    # LB_rates = 0.1
+
     num_groups_max = int(ph_size_max / 2)
 
     x = generate_mix_ph(ph_size_max, np.random.randint(max(3, int(UB_ratios / 2)), max(4, UB_ratios)),
@@ -445,8 +447,10 @@ def combine_erlangs_lists(data_path, pkl_name, UB_ratios_limits, ph_size_max, UB
     y_data = compute_y_data_given_folder(x, ph_size_max, tot_prob=70)
 
     if type(y_data) == np.ndarray:
-        x_y_data = (x, y_data)
-        pkl.dump(x_y_data, open(pkl_full_path, 'wb'))
+        np.save(pkl_full_path_x, x)
+        np.save(pkl_full_path_y, y_data)
+        # x_y_data = (x, y_data)
+        # pkl.dump(x_y_data, open(pkl_full_path, 'wb'))
     else:
         print(type(y_data))
 
@@ -721,6 +725,19 @@ def monitor_gen_ph(data_path, data_sample_name, max_ph_size, curr_folder_name, f
     while len(os.listdir(folder_path)) < 2 * folder_size:  # *2 becuase there is x and y np.array
         create_gen_ph(max_ph_size, data_path, curr_folder_name, data_sample_name)
 
+def monitor_erlang_first_edition(data_path, data_sample_name, max_ph_size, curr_folder_name, folder_size):
+
+    folder_path = os.path.join(data_path, str(curr_folder_name))
+
+    if not os.path.exists(folder_path):
+        os.mkdir(folder_path)
+
+    while len(os.listdir(folder_path)) < 2 * folder_size:  # *2 becuase there is x and y np.array
+        combine_erlangs_lists(data_path, data_sample_name, curr_folder_name,  [1, 300], max_ph_size, UB_rates=1, LB_rates=0.1)
+
+
+
+
 
 def main(args):
 
@@ -755,25 +772,27 @@ def main(args):
     if args.data_type == 'Mix_erlang':
         mix_erlang = [
             create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, example, max_num_groups=10,
-                                   folder_size=64) for example in tqdm(range(num_exmaples))]
+                                   folder_size=args.folder_size) for example in tqdm(range(num_exmaples))]
         # mix_erlang = [create_erlang_exmaples(df_1, data_path, data_type, max_ph_size, max_num_groups=10) for example in tqdm(range(num_exmaples))]
 
     if args.data_type == 'Gen_ph':
         pkl_name = 'gen_ph_sample_size_' + 'max_ph_size_' + str(max_ph_size)
-        gen_ph = [monitor_gen_ph(data_path, data_sample_name, max_ph_size, example,  folder_size = 64) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))]
+        gen_ph = [monitor_gen_ph(data_path, data_sample_name, max_ph_size, example,  folder_size = args.folder_size) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))]
 
     if args.data_type == 'mix_Erlang_first':
 
         file_name = 'mix_Erlang_UB_rates_1_LB_rates_0.1_max_ph_20_service_ratios_1_200_ph_size_' + str(max_ph_size)
-        finlis = [combine_erlangs_lists(data_path, file_name, [1, 300], max_ph_size) for exampl in tqdm(range(num_exmaples))][0]
+        finlis = [monitor_erlang_first_edition(data_path, data_sample_name, max_ph_size, example, folder_size = args.folder_size) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))][0]
 
 
 
 def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph examples', default = 20)
+    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='mix_Erlang_first')
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default = 20)
+    parser.add_argument('--folder_size', type=int, help='number of ph examples in one folder', default=64)
+
     args = parser.parse_args(argv)
 
     return args
