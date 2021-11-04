@@ -221,7 +221,7 @@ def main():
     #
     # pkl.dump(lr__, open('lr.pkl', 'wb'))
 
-    data_set = PH_data('/home/eliransc/projects/def-dkrass/eliransc/training_data/valid')
+    data_set = PH_data('/home/eliransc/projects/def-dkrass/eliransc/training_data/train')
     dl = DataLoader(data_set, 256)
     data_set_valid = PH_data('/home/eliransc/projects/def-dkrass/eliransc/training_data/valid')
     dl_valid = DataLoader(data_set_valid, 256)
