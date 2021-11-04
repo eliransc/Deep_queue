@@ -257,7 +257,7 @@ def main():
     print('120 epochs took took: ', time.time() - now)
 
     print('finish')
-
+    m = nn.Softmax(dim=1)
     xb,yb = first(dl_valid)
     a = learn.get_preds(dl=[(xb, yb)])
     output_size = 70
@@ -280,7 +280,7 @@ def main():
     pdf_vals = compute_pdf_within_range(x_vals, np.array(s), np.array(A))
     plt.figure()
     plt.plot(x_vals, pdf_vals)
-    plt.show()
+    plt.savefig('100_ph_train.png')
 
 
 if __name__ == "__main__":
