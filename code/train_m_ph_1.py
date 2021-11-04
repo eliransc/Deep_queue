@@ -11,6 +11,7 @@ import torch
 from numpy.linalg import matrix_power
 from scipy.stats import rv_discrete
 from scipy.linalg import expm, sinm, cosm
+import time
 
 def compute_R(lam, alph, T):
     e = torch.ones((T.shape[0],1))
@@ -149,19 +150,83 @@ def queue_loss(predictions, targes):
     predictions = m(predictions)
     return ((predictions-targes)**2).mean()
 
+
+class PH_data(torch.utils.data.Dataset):
+    def __init__(self, data_path):
+        self.data = {}
+        file_ind = 0
+        for folder in os.listdir(data_path):
+            for pkl_name in os.listdir(os.path.join(data_path, folder)):
+                if pkl_name.startswith('x'):
+                    curr_x_path = os.path.join(data_path, folder, pkl_name)
+                    pkl_name_y = pkl_name.replace('xdat', 'ydat')
+                    curr_y_path = os.path.join(data_path, folder, pkl_name_y)
+                    self.data[file_ind] = (curr_x_path, curr_y_path)
+                    file_ind += 1
+
+    def __len__(self):
+        return len(self.data.keys())
+
+    def __getitem__(self, idx):
+        sample_path_x, sample_path_y = self.data[idx]
+        X_data = torch.from_numpy(np.load(sample_path_x)).cuda()
+        Y_data = torch.from_numpy(np.load(sample_path_y)).cuda()
+        X_data = X_data.unsqueeze(0)
+        X_data = X_data.float()
+        Y_data = Y_data.float()
+
+        #         X_data = X[0].astype(np.float32)#.cuda()
+        #         Y_data = X[1].astype(np.float32)#.cuda()
+        #         X_data = X_data[np.newaxis,...]
+        #         X_data = X_data.float()
+        #         Y_data = Y_data.float()
+        return (X_data, Y_data)  # , idx
+
+
 def main():
 
-    data_path = '/home/eliransc/projects/def-dkrass/eliransc/data/phasetype_data'
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # data_path = '/home/eliransc/projects/def-dkrass/eliransc/data/phasetype_data'
+    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    #
+    # dblock = DataBlock(get_items=get_item,
+    #                    get_x=lambda x: getX(data_path,device,  x),
+    #                    get_y=lambda x: getY(data_path, device,x))
+    #
+    # dsets = dblock.datasets(data_path)
+    # dls = dblock.dataloaders(data_path, batch_size=256, num_workers=0)
+    #
+    # print(torch.cuda.is_available())
+    #
+    # simple_cnn = sequential(
+    #     conv(1, 4),
+    #     conv(4, 8),
+    #     conv(8, 16),
+    #     conv(16, 32),
+    #     conv(32, 16),
+    #     conv(16, 8),
+    #     Flatten(),
+    #     nn.Linear(32, 70),
+    #     #     nn.ReLU(),
+    #     #     nn.Linear(72,50),
+    #     #     nn.ReLU(),
+    #     #     nn.Linear(50,70),
+    # )
+    #
+    # learn = Learner(dls, simple_cnn, loss_func=queue_loss, metrics=queue_loss)
+    # print(learn.model.to(device))
+    #
+    # print(next(learn.model.parameters()).is_cuda )
+    #
+    # lr__ = learn.lr_find()
+    #
+    # pkl.dump(lr__, open('lr.pkl', 'wb'))
 
-    dblock = DataBlock(get_items=get_item,
-                       get_x=lambda x: getX(data_path,device,  x),
-                       get_y=lambda x: getY(data_path, device,x))
+    data_set = PH_data('/home/eliransc/projects/def-dkrass/eliransc/training_data/valid')
+    dl = DataLoader(data_set, 256)
+    data_set_valid = PH_data('/home/eliransc/projects/def-dkrass/eliransc/training_data/valid')
+    dl_valid = DataLoader(data_set_valid, 256)
 
-    dsets = dblock.datasets(data_path)
-    dls = dblock.dataloaders(data_path, batch_size=256, num_workers=0)
-
-    print(torch.cuda.is_available())
+    dls = DataLoaders(dl, dl_valid)
 
     simple_cnn = sequential(
         conv(1, 4),
@@ -173,19 +238,23 @@ def main():
         Flatten(),
         nn.Linear(32, 70),
         #     nn.ReLU(),
-        #     nn.Linear(72,50),
+        #     nn.Linear(70,50),
         #     nn.ReLU(),
         #     nn.Linear(50,70),
     )
 
+    now = time.time()
+    x, y = dl.one_batch()
+    print('One batch took: ', time.time() - now)
+
     learn = Learner(dls, simple_cnn, loss_func=queue_loss, metrics=queue_loss)
-    print(learn.model.to(device))
 
-    print(next(learn.model.parameters()).is_cuda )
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    lr__ = learn.lr_find()
-
-    pkl.dump(lr__, open('lr.pkl', 'wb'))
+    learn.model.to(device)
+    now = time.time()
+    learn.fit_one_cycle(2, 0.01)
+    print('Ten epochs took took: ', time.time() - now)
 
     print('finish')
 
