@@ -738,12 +738,12 @@ def main(args):
     if args.data_type == 'Mix_erlang':
         mix_erlang = [
             create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, example, max_num_groups=10,
-                                   folder_size=32) for example in tqdm(range(num_exmaples))]
+                                   folder_size=64) for example in tqdm(range(num_exmaples))]
         # mix_erlang = [create_erlang_exmaples(df_1, data_path, data_type, max_ph_size, max_num_groups=10) for example in tqdm(range(num_exmaples))]
 
     if args.data_type == 'Gen_ph':
         pkl_name = 'gen_ph_sample_size_' + 'max_ph_size_' + str(max_ph_size)
-        gen_ph = [create_gewn_ph(max_ph_size, pkl_name, data_path) for example in tqdm(range(num_exmaples))]
+        gen_ph = [create_gewn_ph(max_ph_size, pkl_name, data_path) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))]
 
     if args.data_type == 'mix_Erlang_first':
 
@@ -756,7 +756,7 @@ def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Mix_erlang')
-    parser.add_argument('--num_examples', type=int, help='number of ph examples', default = 2)
+    parser.add_argument('--num_examples', type=int, help='number of ph examples', default = 500)
     args = parser.parse_args(argv)
 
     return args
