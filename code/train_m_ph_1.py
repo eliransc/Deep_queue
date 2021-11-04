@@ -253,8 +253,8 @@ def main():
 
     learn.model.to(device)
     now = time.time()
-    learn.fit_one_cycle(20, 0.01)
-    print('Twenty epochs took took: ', time.time() - now)
+    learn.fit_one_cycle(120, 0.01)
+    print('120 epochs took took: ', time.time() - now)
 
     print('finish')
 
