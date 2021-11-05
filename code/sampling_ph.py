@@ -444,7 +444,15 @@ def combine_erlangs_lists(data_path, data_sample_name, curr_folder, UB_ratios_li
                         np.random.uniform(UB_rates, 2 * UB_rates), LB_rates,
                         np.random.randint(3, num_groups_max + 1))
 
+    t_0 = time.time()
+    ten_mom = compute_first_n_moments(x[ph_size_max,:ph_size_max], x[:ph_size_max,:], 2)
+    print('To compute two moments it took:',  time.time()-t_0)
+    print(ten_mom)
+
+
     y_data = compute_y_data_given_folder(x, ph_size_max, tot_prob=70)
+
+
 
     if type(y_data) == np.ndarray:
         np.save(pkl_full_path_x, x)
@@ -646,18 +654,18 @@ def create_mix_erlang_data(df_1, max_ph_size,  max_num_groups=10, ratio_size = 1
     return (s, A)
 
 
-def create_mix_erlang_data_steady(s, A, data_path, data_sample_name, curr_folder, max_ph_size):
+def create_mix_erlang_data_steady(s, A, data_path, data_sample_name, curr_folder, max_ph_size, num_moms):
     now = datetime.now()
 
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
 
     pkl_name_xdat = 'xdat_' + data_sample_name + current_time
     pkl_name_ydat = 'ydat_' + data_sample_name + current_time
+    pkl_name_moms = 'moms_' +str(num_moms) + data_sample_name + current_time
 
     pkl_full_path_x = os.path.join(data_path, str(curr_folder), pkl_name_xdat)
     pkl_full_path_y = os.path.join(data_path, str(curr_folder), pkl_name_ydat)
-
-
+    pkl_full_path_moms = os.path.join(data_path, str(curr_folder), pkl_name_moms)
 
     A, s = normalize_matrix(s, A)
 
@@ -665,14 +673,25 @@ def create_mix_erlang_data_steady(s, A, data_path, data_sample_name, curr_folder
 
     final_data = create_final_x_data(s, A, max_ph_size)
 
+    t_0 = time.time()
+    moms = compute_first_n_moments(s , A,  num_moms)
+    mom_arr = np.concatenate(moms, axis=0)
+
     y_dat = compute_y_data_given_folder(final_data, max_ph_size, tot_prob=70)
 
     if type(y_dat) == bool:
         return False
         print('not dumping')
     else:
+
         np.save(pkl_full_path_x, final_data) # saving x data
         np.save(pkl_full_path_y, y_dat) # saving y data
+
+        np.save(pkl_full_path_moms, mom_arr)  # saving x data
+        np.save(pkl_full_path_y, y_dat)  # saving y data
+
+
+
 
         # pkl.dump((final_data, y_dat), open(pkl_full_path, 'wb'))
         return True
@@ -703,7 +722,7 @@ def create_df_ph_bounds(vals_bounds_dict, ratios_rates):
 
     pkl.dump(df_1, open('df_bound_ph.pkl', 'wb'))
 
-def create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, curr_folder_name, max_num_groups, folder_size ):
+def create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, curr_folder_name, max_num_groups, folder_size, num_moms ):
 
     folder_path = os.path.join(data_path,str(curr_folder_name))
 
@@ -712,7 +731,9 @@ def create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, curr_
 
     while len(os.listdir(folder_path)) < 2*folder_size: #*2 becuase there is x and y np.array
         s_A_list = [create_mix_erlang_data(df_1,max_ph_size, max_num_groups ) for ind in range(1)]
-        x_y_data = [create_mix_erlang_data_steady(s_A[0], s_A[1], data_path, data_sample_name,curr_folder_name, max_ph_size) for s_A in s_A_list]
+        x_y_data = [create_mix_erlang_data_steady(s_A[0], s_A[1], data_path,
+                                                  data_sample_name,curr_folder_name, max_ph_size,
+                                                   num_moms) for s_A in s_A_list]
 
 
 def monitor_gen_ph(data_path, data_sample_name, max_ph_size, curr_folder_name, folder_size):
@@ -749,7 +770,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/projects/def-dkrass/eliransc/training_data/train'
+        data_path = '/home/eliransc/projects/def-dkrass/eliransc/training_data/moms_data'
 
 
     else:
@@ -772,7 +793,7 @@ def main(args):
     if args.data_type == 'Mix_erlang':
         mix_erlang = [
             create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, example, max_num_groups=10,
-                                   folder_size=args.folder_size) for example in tqdm(range(num_exmaples))]
+                                   folder_size=args.folder_size,  num_moms=20) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))]
         # mix_erlang = [create_erlang_exmaples(df_1, data_path, data_type, max_ph_size, max_num_groups=10) for example in tqdm(range(num_exmaples))]
 
     if args.data_type == 'Gen_ph':
@@ -789,8 +810,8 @@ def main(args):
 def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='mix_Erlang_first')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default = 20)
+    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Mix_erlang')
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default = 3)
     parser.add_argument('--folder_size', type=int, help='number of ph examples in one folder', default=64)
 
     args = parser.parse_args(argv)
