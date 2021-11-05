@@ -811,9 +811,8 @@ def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Mix_erlang')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default = 3)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default = 300)
     parser.add_argument('--folder_size', type=int, help='number of ph examples in one folder', default=64)
-
     args = parser.parse_args(argv)
 
     return args
