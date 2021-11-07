@@ -12,6 +12,8 @@ from numpy.linalg import matrix_power
 from scipy.stats import rv_discrete
 from scipy.linalg import expm, sinm, cosm
 import time
+import GPUtil
+
 
 def compute_R(lam, alph, T):
     e = torch.ones((T.shape[0],1))
@@ -222,7 +224,7 @@ def main():
     # pkl.dump(lr__, open('lr.pkl', 'wb'))
 
     print('begin')
-    data_set = PH_data('/home/eliransc/projects/def-dkrass/eliransc/training_data/train')
+    data_set = PH_data('/home/eliransc/projects/def-dkrass/eliransc/training_data/valid')
     dl = DataLoader(data_set, 256)
     data_set_valid = PH_data('/home/eliransc/projects/def-dkrass/eliransc/training_data/valid')
     dl_valid = DataLoader(data_set_valid, 256)
@@ -257,14 +259,14 @@ def main():
     print('using GPU')
     now = time.time()
 
-
+    print(GPUtil.showUtilization())
 
     learn.fit_one_cycle(3, 0.01)
     print('3 epochs took took: ', time.time() - now)
-
+    print(GPUtil.showUtilization())
     print('finish')
     m = nn.Softmax(dim=1)
-    xb,yb = first(dl_valid)
+    xb, yb = first(dl_valid)
     a = learn.get_preds(dl=[(xb, yb)])
     output_size = 70
     import matplotlib.pyplot as plt
