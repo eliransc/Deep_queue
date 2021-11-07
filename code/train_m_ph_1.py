@@ -243,18 +243,22 @@ def main():
         #     nn.Linear(50,70),
     )
 
-    now = time.time()
-    x, y = dl.one_batch()
-    print('One batch took: ', time.time() - now)
+    # now = time.time()
+    # x, y = dl.one_batch()
+    # print('One batch took: ', time.time() - now)
 
     learn = Learner(dls, simple_cnn, loss_func=queue_loss, metrics=queue_loss)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     learn.model.to(device)
+
     now = time.time()
-    learn.fit_one_cycle(120, 0.01)
-    print('120 epochs took took: ', time.time() - now)
+
+
+
+    learn.fit_one_cycle(3, 0.01)
+    print('3 epochs took took: ', time.time() - now)
 
     print('finish')
     m = nn.Softmax(dim=1)
