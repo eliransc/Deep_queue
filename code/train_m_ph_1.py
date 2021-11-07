@@ -221,12 +221,14 @@ def main():
     #
     # pkl.dump(lr__, open('lr.pkl', 'wb'))
 
+    print('begin')
     data_set = PH_data('/home/eliransc/projects/def-dkrass/eliransc/training_data/train')
     dl = DataLoader(data_set, 256)
     data_set_valid = PH_data('/home/eliransc/projects/def-dkrass/eliransc/training_data/valid')
     dl_valid = DataLoader(data_set_valid, 256)
 
     dls = DataLoaders(dl, dl_valid)
+    print('dls defined')
 
     simple_cnn = sequential(
         conv(1, 4),
@@ -246,13 +248,13 @@ def main():
     # now = time.time()
     # x, y = dl.one_batch()
     # print('One batch took: ', time.time() - now)
-
+    print('CNN defined')
     learn = Learner(dls, simple_cnn, loss_func=queue_loss, metrics=queue_loss)
-
+    print('learn defined')
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+    print('before using GPU')
     learn.model.to(device)
-
+    print('using GPU')
     now = time.time()
 
 
