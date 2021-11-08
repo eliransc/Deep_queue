@@ -29,6 +29,9 @@ def KL(preds, trgs):
     return (preds*torch.log(preds/trgs)).mean()
 
 def main():
+
+
+    print('begin')
     path_train = '../data/deep_queue_mm1_train.pkl'
     path_valid = '../data/deep_queue_mm1_valid.pkl'
 
@@ -67,10 +70,13 @@ def main():
     valid_dset = list(zip(x_test, y_test))
     x, y = dset[0]
 
+    print('dataloaders')
+
     dl = DataLoader(dset, batch_size=256)
     valid_dl = DataLoader(valid_dset, batch_size=256)
     m = nn.Softmax(dim=1)
 
+    print('defining a net')
     simple_net = nn.Sequential(
         nn.Linear(2, 10),
         nn.ReLU(),
@@ -84,10 +90,10 @@ def main():
     )
 
     dls = DataLoaders(dl, valid_dl)
-
+    print('Defining learner')
     learn = Learner(dls, simple_net, opt_func=SGD,
                     loss_func=queue_loss, metrics=queue_loss)
-
+    print('Before Cuda')
     learn.dls.to('cuda')
 
     learn.fit(150, lr=0.1)
