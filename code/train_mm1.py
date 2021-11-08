@@ -1,3 +1,4 @@
+print('Starting imports')
 from fastai.vision.all import *
 from fastbook import *
 from sklearn.model_selection import train_test_split
@@ -7,6 +8,12 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import pickle as pkl
+import torch
+from numpy.linalg import matrix_power
+from scipy.stats import rv_discrete
+from scipy.linalg import expm, sinm, cosm
+import time
+import GPUtil
 
 def give_steady_mm1(lam, mu, max_stead = 100):
     rho = lam/mu
