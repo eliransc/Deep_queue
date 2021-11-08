@@ -691,8 +691,6 @@ def create_mix_erlang_data_steady(s, A, data_path, data_sample_name, curr_folder
         np.save(pkl_full_path_y, y_dat)  # saving y data
 
 
-
-
         # pkl.dump((final_data, y_dat), open(pkl_full_path, 'wb'))
         return True
 
