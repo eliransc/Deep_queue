@@ -768,7 +768,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/projects/def-dkrass/eliransc/training_data/moms_data'
+        data_path = '/home/eliransc/scratch/training_data/train'
 
 
     else:
@@ -786,7 +786,7 @@ def main(args):
         max_value_folder =  np.max(np.array(os.listdir(data_path)).astype(int))
     except:
         print('Data folder it empty')
-        max_value_folder = 0
+        max_value_folder = 3000
 
     if args.data_type == 'Mix_erlang':
         mix_erlang = [
@@ -808,7 +808,7 @@ def main(args):
 def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
+    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Mix_erlang')
     parser.add_argument('--num_examples', type=int, help='number of ph folders', default = 1000)
     parser.add_argument('--folder_size', type=int, help='number of ph examples in one folder', default=64)
     args = parser.parse_args(argv)
