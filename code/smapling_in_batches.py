@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import sys
+
 sys.path.append(r'C:\Users\elira\Google Drive\butools2\Python')
 sys.path.append('/home/eliransc/projects/def-dkrass/eliransc/butools/Python')
 import pandas as pd
 import argparse
-
 
 from tqdm import tqdm
 from butools.map import *
@@ -445,14 +445,11 @@ def combine_erlangs_lists(data_path, data_sample_name, curr_folder, UB_ratios_li
                         np.random.randint(3, num_groups_max + 1))
 
     t_0 = time.time()
-    ten_mom = compute_first_n_moments(x[ph_size_max,:ph_size_max], x[:ph_size_max,:], 2)
-    print('To compute two moments it took:',  time.time()-t_0)
+    ten_mom = compute_first_n_moments(x[ph_size_max, :ph_size_max], x[:ph_size_max, :], 2)
+    print('To compute two moments it took:', time.time() - t_0)
     print(ten_mom)
 
-
     y_data = compute_y_data_given_folder(x, ph_size_max, tot_prob=70)
-
-
 
     if type(y_data) == np.ndarray:
         np.save(pkl_full_path_x, x)
@@ -504,18 +501,17 @@ def create_final_x_data(s, A, ph_size_max):
         return np.append(np.append(A, s1, axis=0), lam_arr, axis=1).astype(np.float32)
 
 
-def create_gen_ph(ph_size_max, data_path, curr_folder, data_sample_name):
+def create_gen_ph(ph_size_max, data_path, data_sample_name):
+    # now = datetime.now()
+    #
+    # current_time = now.strftime("%H_%M_%S") + str(np.random.randint(1, 1000000, 1)[0])
+    # pkl_name_xdat = 'xdat_' + data_sample_name + current_time
+    # pkl_name_ydat = 'ydat_' + data_sample_name + current_time
+    #
+    # pkl_full_path_x = os.path.join(data_path, pkl_name_xdat)
+    # pkl_full_path_y = os.path.join(data_path, pkl_name_ydat)
 
-    now = datetime.now()
-
-    current_time = now.strftime("%H_%M_%S") + str(np.random.randint(1, 1000000, 1)[0])
-    pkl_name_xdat = 'xdat_' + data_sample_name + current_time
-    pkl_name_ydat = 'ydat_' + data_sample_name + current_time
-
-    pkl_full_path_x = os.path.join(data_path, str(curr_folder), pkl_name_xdat)
-    pkl_full_path_y = os.path.join(data_path, str(curr_folder), pkl_name_ydat)
-
-    A_s_lists = [give_A_s_given_size(np.random.randint(2, ph_size_max)) for ind in range(1)]
+    A_s_lists = [give_A_s_given_size(np.random.randint(2, ph_size_max)) for ind in range(10)]
     mom_lists = [compute_first_n_moments(tupl[1], tupl[0]) for tupl in A_s_lists]
     valid_list = [index for index, curr_mom_list in enumerate(mom_lists) if is_all_n_moments_defined(curr_mom_list)]
     normmat_ph_1 = [normalize_matrix(A_s[1], A_s[0]) for ind_A_s, A_s in enumerate(A_s_lists) if ind_A_s in valid_list]
@@ -528,8 +524,9 @@ def create_gen_ph(ph_size_max, data_path, curr_folder, data_sample_name):
         if type(y_data) == np.ndarray:
 
             if type(y_data) == np.ndarray:
-                np.save(pkl_full_path_x, fin_data_reg[0])
-                np.save(pkl_full_path_y, y_data)
+                saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x=False)
+                # np.save(pkl_full_path_x, fin_data_reg[0])
+                # np.save(pkl_full_path_y, y_data)
                 # pkl.dump((fin_data_reg[0], x_y_data), open(pkl_full_path, 'wb'))
             else:
                 print(type(y_data))
@@ -643,7 +640,7 @@ def find_upper_bound_rate_given_n(n, upper_bound):
         return upper_bound + 1
 
 
-def create_mix_erlang_data(df_1, max_ph_size,  max_num_groups=10, ratio_size = 10):
+def create_mix_erlang_data(df_1, max_ph_size, max_num_groups, ratio_size=2):
     ph_sizes = np.linspace(10, max_ph_size, 10).astype(int)
     probs_ph_tot_size = np.array(ph_sizes ** 2 / np.sum(ph_sizes ** 2))
     num_groups = np.random.randint(1, max_num_groups + 1)
@@ -654,18 +651,18 @@ def create_mix_erlang_data(df_1, max_ph_size,  max_num_groups=10, ratio_size = 1
     return (s, A)
 
 
-def create_mix_erlang_data_steady(s, A, data_path, data_sample_name, curr_folder, max_ph_size, num_moms):
-    now = datetime.now()
+def create_mix_erlang_data_steady(s, A, max_ph_size, num_moms):
+    # now = datetime.now()
+    # random.seed()
+    # current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
 
-    current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
-
-    pkl_name_xdat = 'xdat_' + data_sample_name + current_time
-    pkl_name_ydat = 'ydat_' + data_sample_name + current_time
-    pkl_name_moms = 'moms_' +str(num_moms) + data_sample_name + current_time
-
-    pkl_full_path_x = os.path.join(data_path, str(curr_folder), pkl_name_xdat)
-    pkl_full_path_y = os.path.join(data_path, str(curr_folder), pkl_name_ydat)
-    pkl_full_path_moms = os.path.join(data_path, str(curr_folder), pkl_name_moms)
+    # pkl_name_xdat = 'xdat_' + data_sample_name + current_time
+    # pkl_name_ydat = 'ydat_' + data_sample_name + current_time
+    # pkl_name_moms = 'moms_' + str(num_moms) + data_sample_name + current_time
+    #
+    # pkl_full_path_x = os.path.join(data_path, str(curr_folder), pkl_name_xdat)
+    # pkl_full_path_y = os.path.join(data_path, str(curr_folder), pkl_name_ydat)
+    # pkl_full_path_moms = os.path.join(data_path, str(curr_folder), pkl_name_moms)
 
     A, s = normalize_matrix(s, A)
 
@@ -674,8 +671,10 @@ def create_mix_erlang_data_steady(s, A, data_path, data_sample_name, curr_folder
     final_data = create_final_x_data(s, A, max_ph_size)
 
     t_0 = time.time()
-    moms = compute_first_n_moments(s , A,  num_moms)
+    moms = compute_first_n_moments(s, A, num_moms)
     mom_arr = np.concatenate(moms, axis=0)
+
+    mom_arr = np.log(mom_arr)*(-1)
 
     y_dat = compute_y_data_given_folder(final_data, max_ph_size, tot_prob=70)
 
@@ -684,19 +683,17 @@ def create_mix_erlang_data_steady(s, A, data_path, data_sample_name, curr_folder
         print('not dumping')
     else:
 
-        np.save(pkl_full_path_x, final_data) # saving x data
-        np.save(pkl_full_path_y, y_dat) # saving y data
-
-        np.save(pkl_full_path_moms, mom_arr)  # saving x data
-        np.save(pkl_full_path_y, y_dat)  # saving y data
-
+        # np.save(pkl_full_path_x, final_data)  # saving x data
+        # np.save(pkl_full_path_y, y_dat)  # saving y data
+        #
+        # np.save(pkl_full_path_moms, mom_arr)  # saving x data
+        # np.save(pkl_full_path_y, y_dat)  # saving y data
 
         # pkl.dump((final_data, y_dat), open(pkl_full_path, 'wb'))
-        return (final_data, y_dat)
+        return (torch.from_numpy(final_data), torch.from_numpy(mom_arr) ,torch.from_numpy(y_dat))
+
 
 def create_df_ph_bounds(vals_bounds_dict, ratios_rates):
-
-
     all_combs_list_1 = create_rate_phsize_combs(vals_bounds_dict, ratios_rates)
 
     merged_comb_list_1 = list(itertools.chain(*all_combs_list_1))
@@ -720,28 +717,58 @@ def create_df_ph_bounds(vals_bounds_dict, ratios_rates):
 
     pkl.dump(df_1, open('df_bound_ph.pkl', 'wb'))
 
-def create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, curr_folder_name, max_num_groups, folder_size, num_moms ):
 
-    folder_path = os.path.join(data_path,str(curr_folder_name))
+def saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x = False):
+    '''
 
-    if not os.path.exists(folder_path):
-        os.mkdir(folder_path)
+    :param x_y_data: the data is a batch of tuples: ph_input, first num_moms moments and steady-state probs
+    :param data_path: the folder in which we save the data
+    :param data_sample_name: the name of file
+    :param num_moms: number of moments we compute
+    :param save_x: should we save ph_data
+    :return:
+    '''
 
-    while len(os.listdir(folder_path)) < 2*folder_size: #*2 becuase there is x and y np.array
-        s_A_list = [create_mix_erlang_data(df_1,max_ph_size, max_num_groups ) for ind in range(1)]
-        x_y_data = [create_mix_erlang_data_steady(s_A[0], s_A[1], data_path,
-                                                  data_sample_name,curr_folder_name, max_ph_size,
-                                                   num_moms) for s_A in s_A_list]
+    now = datetime.now()
 
-    x_list = [x_y[0] for x_y in x_y_data]
-    y_list = [x_y[1] for x_y in x_y_data]
-    print('stop here')
+    random.seed()
+
+    current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
+
+    if save_x: # should we want to save the x_data
+        x_list = [x_y[0] for x_y in x_y_data if type(x_y) != bool]
+        torch_x = torch.stack(x_list).float()
+        pkl_name_xdat = 'xdat_' + data_sample_name + current_time +'size_'+ str(torch_x.shape[0]) +  '.pkl'
+        full_path_xdat = os.path.join(data_path, pkl_name_xdat)
+        pkl.dump(torch_x, open(full_path_xdat, 'wb'))
+
+    # dumping moments
+    mom_list = [x_y[1] for x_y in x_y_data if type(x_y) != bool]
+    torch_moms = torch.stack(mom_list).float()
+    pkl_name_moms = 'moms_' + str(num_moms) + data_sample_name + current_time + 'size_'+ str(torch_moms.shape[0]) + '.pkl'
+    full_path_moms = os.path.join(data_path, pkl_name_moms)
+    pkl.dump(torch_moms, open(full_path_moms, 'wb'))
 
 
+    # dumping steady_state
+    y_list = [x_y[2] for x_y in x_y_data if type(x_y) != bool]
+    torch_y = torch.stack(y_list).float()
+    pkl_name_ydat = 'ydat_' + data_sample_name + current_time +'size_'+ str(torch_y.shape[0]) + '.pkl'
+    full_path_ydat = os.path.join(data_path, pkl_name_ydat)
+    pkl.dump(torch_y, open(full_path_ydat, 'wb'))
+
+
+
+def create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, max_num_groups, num_moms, batch_size):
+
+    s_A_list = [create_mix_erlang_data(df_1, max_ph_size, max_num_groups) for ind in range(batch_size)]
+    x_y_data = [create_mix_erlang_data_steady(s_A[0], s_A[1],  max_ph_size,
+                                              num_moms) for s_A in s_A_list]
+
+    saving_batch(x_y_data, data_path, data_sample_name, num_moms, True)
 
 
 def monitor_gen_ph(data_path, data_sample_name, max_ph_size, curr_folder_name, folder_size):
-
     folder_path = os.path.join(data_path, str(curr_folder_name))
 
     if not os.path.exists(folder_path):
@@ -750,25 +777,25 @@ def monitor_gen_ph(data_path, data_sample_name, max_ph_size, curr_folder_name, f
     while len(os.listdir(folder_path)) < 2 * folder_size:  # *2 becuase there is x and y np.array
         create_gen_ph(max_ph_size, data_path, curr_folder_name, data_sample_name)
 
-def monitor_erlang_first_edition(data_path, data_sample_name, max_ph_size, curr_folder_name, folder_size):
 
+def monitor_erlang_first_edition(data_path, data_sample_name, max_ph_size, curr_folder_name, folder_size):
     folder_path = os.path.join(data_path, str(curr_folder_name))
 
     if not os.path.exists(folder_path):
         os.mkdir(folder_path)
 
     while len(os.listdir(folder_path)) < 2 * folder_size:  # *2 becuase there is x and y np.array
-        combine_erlangs_lists(data_path, data_sample_name, curr_folder_name,  [1, 300], max_ph_size, UB_rates=1, LB_rates=0.1)
-
-
-
+        combine_erlangs_lists(data_path, data_sample_name, curr_folder_name, [1, 300], max_ph_size, UB_rates=1,
+                              LB_rates=0.1)
 
 
 def main(args):
 
+    random.seed()
+
     ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 16., 32, 64, 100.])
 
-    if sys.platform =='linux':
+    if sys.platform == 'linux':
         vals_bounds_dict = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/vals_bounds.pkl', 'rb'))
         df_1 = pkl.load(
@@ -780,46 +807,46 @@ def main(args):
     else:
         vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
         df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
-        data_path = r'C:\Users\elira\workspace\Research\data\training_data\train'
+        data_path = r'C:\Users\elira\workspace\Research\data\training_batches'
 
-    max_ph_size = 100
+    # max_ph_size = 100
     ratio_size = ratios_rates.shape[0]
 
-    data_sample_name = 'mix_Erlang_tail_service_ratios_' + str(ratio_size) + '_ph_size_' + str(max_ph_size) + '_'
+    data_sample_name = 'mix_Erlang_tail_service_ratios_' + str(ratio_size) + '_ph_size_' + str(args.ph_size_max) + '_'
     num_exmaples = args.num_examples
 
-    try:
-        max_value_folder =  np.max(np.array(os.listdir(data_path)).astype(int))
-    except:
-        print('Data folder it empty')
-        max_value_folder = 3000
 
     if args.data_type == 'Mix_erlang':
-        mix_erlang = [
-            create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, example, max_num_groups=10,
-                                   folder_size=args.folder_size,  num_moms=20) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))]
-        # mix_erlang = [create_erlang_exmaples(df_1, data_path, data_type, max_ph_size, max_num_groups=10) for example in tqdm(range(num_exmaples))]
+        [create_erlang_exmaples(df_1, data_path, data_sample_name, args.ph_size_max, args.max_num_groups,
+                                args.num_moms, args.batch_size) for ind in tqdm(range(args.num_examples))]
 
     if args.data_type == 'Gen_ph':
-        pkl_name = 'gen_ph_sample_size_' + 'max_ph_size_' + str(max_ph_size)
-        gen_ph = [monitor_gen_ph(data_path, data_sample_name, max_ph_size, example,  folder_size = args.folder_size) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))]
+        pkl_name = 'gen_ph_sample_size_' + 'max_ph_size_' + str(args.ph_size_max)
+        create_gen_ph(args.ph_size_max, data_path, data_sample_name)
 
-    if args.data_type == 'mix_Erlang_first':
-
-        file_name = 'mix_Erlang_UB_rates_1_LB_rates_0.1_max_ph_20_service_ratios_1_200_ph_size_' + str(max_ph_size)
-        finlis = [monitor_erlang_first_edition(data_path, data_sample_name, max_ph_size, example, folder_size = args.folder_size) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))][0]
-
+        # gen_ph = [monitor_gen_ph(data_path, data_sample_name, max_ph_size, example, folder_size=args.folder_size) for
+        #           example in tqdm(range(max_value_folder + 1, max_value_folder + 1 + num_exmaples))]
+    #
+    # if args.data_type ==1 'mix_Erlang_first':
+    #     file_name = 'mix_Erlang_UB_rates_1_LB_rates_0.1_max_ph_20_service_ratios_1_200_ph_size_' + str(max_ph_size)
+    #     finlis = \
+    #     [monitor_erlang_first_edition(data_path, data_sample_name, max_ph_size, example, folder_size=args.folder_size)
+    #      for example in tqdm(range(max_value_folder + 1, max_value_folder + 1 + num_exmaples))][0]
 
 
 def parse_arguments(argv):
-
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Mix_erlang')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default = 2)
-    parser.add_argument('--folder_size', type=int, help='number of ph examples in one folder', default=64)
+    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=1)
+    # parser.add_argument('--folder_size', type=int, help='number of ph examples in one folder', default=64)
+    parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
+    parser.add_argument('--num_moms', type=int, help='number of ph folders', default=30)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=16)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=100)
     args = parser.parse_args(argv)
 
     return args
+
 
 if __name__ == "__main__":
     args = parse_arguments(sys.argv[1:])

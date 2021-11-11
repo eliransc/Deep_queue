@@ -1,16 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
 import sys
-sys.path.append(r'C:\Users\elira\Google Drive\butools2\Python')
 sys.path.append('/home/eliransc/projects/def-dkrass/eliransc/butools/Python')
+sys.path.append(r'C:\Users\elira\Google Drive\butools2\Python')
+import os
+
 import pandas as pd
 import argparse
-
-
 from tqdm import tqdm
-from butools.map import *
 from butools.ph import *
+from butools.map import *
 from butools.queues import *
 import time
 from butools.mam import *
@@ -19,16 +18,15 @@ from scipy.linalg import expm, sinm, cosm
 
 from numpy.linalg import matrix_power
 from scipy.stats import rv_discrete
+# import seaborn as sns
 import random
 from scipy.stats import loguniform
 from butools.fitting import *
 from datetime import datetime
-
-import pickle as pkl
-
-# from fastai.vision.all import *
 from fastbook import *
 import itertools
+
+import pickle as pkl
 
 
 def thresh_func(row):
@@ -102,7 +100,7 @@ def create_row_rates(row_ind, is_absorbing, in_rate, non_abrosing_out_rates, ph_
         return finarr
 
 
-def give_A_s_given_size(ph_size):
+def give_s_A_given_size(ph_size):
     potential_vals = np.linspace(0.5, 10, 20000)
     randinds = np.random.randint(potential_vals.shape[0], size=ph_size)
     ser_rates = (potential_vals[randinds]).reshape((1, ph_size))
@@ -148,7 +146,7 @@ def give_A_s_given_size(ph_size):
     s = np.zeros(ph_size)
     s[inds_of_not_zero_probs] = non_zero_probs
 
-    return A, s
+    return (s, A)
 
 
 def chunks(lst, n):
@@ -301,25 +299,25 @@ def thresh_func(row):
         return False
 
 
-def create_gen_erlang(sequenc, max_ph_size):
-    ph_size = np.random.randint(3, max_ph_size + 1)
-    num_samples_groups = min(ph_size, int(np.random.randint(2, ph_size) / 2))
-    v = np.sort(np.random.choice(ph_size, num_samples_groups, replace=False))
-    if v.shape[0] > 0:
-        diff_list = np.array([give_diff(v, i, ph_size) for i in range(len(v) + 1)])
-        diff_list = diff_list[diff_list > 0]
-
-        erlang_list = [generate_erlang(ind, ph_size, sequenc[ind]) for ind, ph_size in enumerate(diff_list)]
-        final_a = np.zeros((ph_size, ph_size))
-        final_s = np.zeros(ph_size)
-        rand_probs = np.random.dirichlet(np.random.rand(diff_list.shape[0]), 1)
-        for ind in range(diff_list.shape[0]):
-            final_s[np.sum(diff_list[:ind])] = rand_probs[0][ind]  # 1/diff_list.shape[0]
-            final_a[np.sum(diff_list[:ind]):np.sum(diff_list[:ind]) + diff_list[ind],
-            np.sum(diff_list[:ind]):np.sum(diff_list[:ind]) + diff_list[ind]] = erlang_list[ind][1]
-        return increase_size_of_matrix(final_s, final_a, max_ph_size)
-    else:
-        print('Not valid')
+# def create_gen_erlang(sequenc, max_ph_size):
+#     ph_size = np.random.randint(3, max_ph_size + 1)
+#     num_samples_groups = min(ph_size, int(np.random.randint(2, ph_size) / 2))
+#     v = np.sort(np.random.choice(ph_size, num_samples_groups, replace=False))
+#     if v.shape[0] > 0:
+#         diff_list = np.array([give_diff(v, i, ph_size) for i in range(len(v) + 1)])
+#         diff_list = diff_list[diff_list > 0]
+#
+#         erlang_list = [generate_erlang(ind, ph_size, sequenc[ind]) for ind, ph_size in enumerate(diff_list)]
+#         final_a = np.zeros((ph_size, ph_size))
+#         final_s = np.zeros(ph_size)
+#         rand_probs = np.random.dirichlet(np.random.rand(diff_list.shape[0]), 1)
+#         for ind in range(diff_list.shape[0]):
+#             final_s[np.sum(diff_list[:ind])] = rand_probs[0][ind]  # 1/diff_list.shape[0]
+#             final_a[np.sum(diff_list[:ind]):np.sum(diff_list[:ind]) + diff_list[ind],
+#             np.sum(diff_list[:ind]):np.sum(diff_list[:ind]) + diff_list[ind]] = erlang_list[ind][1]
+#         return increase_size_of_matrix(final_s, final_a, max_ph_size)
+#     else:
+#         print('Not valid')
 
 
 def compute_cdf_within_range(x_vals, s, A):
@@ -342,7 +340,7 @@ def recursion_group_size(group_left, curr_vector, phases_left):
     if group_left == 1:
         return np.append(phases_left, curr_vector)
     else:
-        #         print(phases_left, group_left)
+
         if phases_left + 1 - group_left == 1:
             curr_size = 1
         else:
@@ -384,7 +382,6 @@ def find_when_cdf_cross_1(x, y):
 
 
 def find_normalizing_const(s, A, x, itera=0, thrsh=0.9999):
-    #     print(itera)
     if itera > 50:
         return False
     curr_cdf = compute_cdf(x, s, A).flatten()[0]
@@ -424,50 +421,37 @@ def ser_mean(alph, T):
         return False
 
 
-def combine_erlangs_lists(data_path, data_sample_name, curr_folder, UB_ratios_limits, ph_size_max, UB_rates, LB_rates):
+def combine_erlangs_lists(data_path, pkl_name, UB_ratios_limits, ph_size_max, UB_rates=1, LB_rates=0.1,
+                          num_examples_each_settings=500):
     now = datetime.now()
 
-    current_time = now.strftime("%H_%M_%S") + str(np.random.randint(1, 1000000, 1)[0])
-    pkl_name_xdat = 'xdat_' + data_sample_name + current_time
-    pkl_name_ydat = 'ydat_' + data_sample_name + current_time
+    current_time = now.strftime("%H:%M:%S") + str(np.random.randint(1, 1000000, 1)[0]) + '.pkl'
+    pkl_name = pkl_name + current_time
 
-    pkl_full_path_x = os.path.join(data_path, str(curr_folder), pkl_name_xdat)
-    pkl_full_path_y = os.path.join(data_path, str(curr_folder), pkl_name_ydat)
+    pkl_full_path = os.path.join(data_path, pkl_name)
 
     UB_ratios = np.random.randint(UB_ratios_limits[0], UB_ratios_limits[1])
-    # UB_rates = 1
-    # LB_rates = 0.1
-
+    UB_rates = 1
+    LB_rates = 0.1
     num_groups_max = int(ph_size_max / 2)
 
     x = generate_mix_ph(ph_size_max, np.random.randint(max(3, int(UB_ratios / 2)), max(4, UB_ratios)),
                         np.random.uniform(UB_rates, 2 * UB_rates), LB_rates,
                         np.random.randint(3, num_groups_max + 1))
 
-    t_0 = time.time()
-    ten_mom = compute_first_n_moments(x[ph_size_max,:ph_size_max], x[:ph_size_max,:], 2)
-    print('To compute two moments it took:',  time.time()-t_0)
-    print(ten_mom)
+    y_data = compute_y_data_given_folder(x, max_ph_size, tot_prob=70)
 
+    x_y_data = (x, y_data)
 
-    y_data = compute_y_data_given_folder(x, ph_size_max, tot_prob=70)
+    pkl.dump(x_y_data, open(pkl_full_path, 'wb'))
 
-
-
-    if type(y_data) == np.ndarray:
-        np.save(pkl_full_path_x, x)
-        np.save(pkl_full_path_y, y_data)
-        # x_y_data = (x, y_data)
-        # pkl.dump(x_y_data, open(pkl_full_path, 'wb'))
-    else:
-        print(type(y_data))
-
-    # return 1
+    return x_y_data
 
 
 def generate_mix_ph(ph_size_max, UB_ratios, UB_rates, LB_rates, num_groups_max):
     num_groups = np.random.randint(2, num_groups_max + 1)
     ph_size = np.random.randint(num_groups, ph_size_max + 1)
+    #     lam_arr = np.zeros((max_ph_size+1,1))
 
     group_sizes = recursion_group_size(num_groups, np.array([]), ph_size).astype(int)
 
@@ -491,7 +475,7 @@ def generate_mix_ph(ph_size_max, UB_ratios, UB_rates, LB_rates, num_groups_max):
 
 
 def create_final_x_data(s, A, ph_size_max):
-    lam_arr = np.zeros((ph_size_max + 1, 1))
+    lam_arr = np.zeros((A.shape[0] + 1, 1))
 
     s1 = s.reshape((1, s.shape[0]))
     expect_ser = ser_moment_n(s, A, 1)
@@ -501,19 +485,15 @@ def create_final_x_data(s, A, ph_size_max):
         lam = lam * 0.95
         lam_arr[0, 0] = lam
 
+
         return np.append(np.append(A, s1, axis=0), lam_arr, axis=1).astype(np.float32)
 
 
-def create_gen_ph(ph_size_max, data_path, curr_folder, data_sample_name):
-
+def create_gewn_ph(ph_size_max, pkl_name, data_path):
     now = datetime.now()
 
-    current_time = now.strftime("%H_%M_%S") + str(np.random.randint(1, 1000000, 1)[0])
-    pkl_name_xdat = 'xdat_' + data_sample_name + current_time
-    pkl_name_ydat = 'ydat_' + data_sample_name + current_time
-
-    pkl_full_path_x = os.path.join(data_path, str(curr_folder), pkl_name_xdat)
-    pkl_full_path_y = os.path.join(data_path, str(curr_folder), pkl_name_ydat)
+    current_time = now.strftime("%H:%M:%S") + str(np.random.randint(1, 1000000, 1)[0]) + '.pkl'
+    pkl_name = pkl_name + current_time
 
     A_s_lists = [give_A_s_given_size(np.random.randint(2, ph_size_max)) for ind in range(1)]
     mom_lists = [compute_first_n_moments(tupl[1], tupl[0]) for tupl in A_s_lists]
@@ -524,17 +504,13 @@ def create_gen_ph(ph_size_max, data_path, curr_folder, data_sample_name):
     max_size_ph_1 = [increase_size_of_matrix(ph_dist[1], ph_dist[0], ph_size_max) for ph_dist in normmat_ph_1a]
     fin_data_reg = [create_final_x_data(ph_dist[0], ph_dist[1], ph_size_max) for ph_dist in max_size_ph_1]
     if len(fin_data_reg) > 0:
-        y_data = compute_y_data_given_folder(fin_data_reg[0], ph_size_max, tot_prob=70)
-        if type(y_data) == np.ndarray:
+        x_y_data = compute_y_data_given_folder(fin_data_reg[0], ph_size_max, tot_prob=70)
+        if type(x_y_data) == np.ndarray:
+            pkl_full_path = os.path.join(data_path, pkl_name)
+            pkl.dump((fin_data_reg[0], x_y_data), open(pkl_full_path, 'wb'))
 
-            if type(y_data) == np.ndarray:
-                np.save(pkl_full_path_x, fin_data_reg[0])
-                np.save(pkl_full_path_y, y_data)
-                # pkl.dump((fin_data_reg[0], x_y_data), open(pkl_full_path, 'wb'))
-            else:
-                print(type(y_data))
+            return (fin_data_reg[0], x_y_data)
 
-            # return 1
 
 
 def compute_y_data_given_folder(x, ph_size_max, tot_prob=70, eps=0.0001):
@@ -608,7 +584,7 @@ def give_rates_given_Er_sizes(df_, sizes, ratio_size):
     return rates
 
 
-def create_rate_phsize_combs(vals_bound, ratios_rates):
+def create_rate_phsize_combs(vals_bound):
     all_combs_list = []
     for size in vals_bound.keys():
         curr_list = [(size, vals_bound[size] * ratios_rates[ind_rate]) for ind_rate, rate in enumerate(ratios_rates)]
@@ -631,6 +607,7 @@ def create_gen_erlang_given_sizes(group_sizes, rates, probs=False):
         final_s[np.sum(group_sizes[:ind])] = rand_probs[0][ind]  # 1/diff_list.shape[0]
         final_a[np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind],
         np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind]] = erlang_list[ind]
+
     return final_s, final_a
 
 
@@ -643,8 +620,8 @@ def find_upper_bound_rate_given_n(n, upper_bound):
         return upper_bound + 1
 
 
-def create_mix_erlang_data(df_1, max_ph_size,  max_num_groups=10, ratio_size = 10):
-    ph_sizes = np.linspace(10, max_ph_size, 10).astype(int)
+def create_mix_erlang_data(max_num_groups=10):
+    ph_sizes = np.linspace(10, 100, 10).astype(int)
     probs_ph_tot_size = np.array(ph_sizes ** 2 / np.sum(ph_sizes ** 2))
     num_groups = np.random.randint(1, max_num_groups + 1)
     group_size = recursion_group_size(num_groups, np.array([]),
@@ -654,18 +631,13 @@ def create_mix_erlang_data(df_1, max_ph_size,  max_num_groups=10, ratio_size = 1
     return (s, A)
 
 
-def create_mix_erlang_data_steady(s, A, data_path, data_sample_name, curr_folder, max_ph_size, num_moms):
+def create_mix_erlang_data_steady(s, A, data_path, data_type, max_ph_size=100):
     now = datetime.now()
 
-    current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
+    current_time = now.strftime("%H:%M:%S") + '_' + str(np.random.randint(1, 1000000, 1)[0]) + '.pkl'
+    pkl_name = data_type + current_time
 
-    pkl_name_xdat = 'xdat_' + data_sample_name + current_time
-    pkl_name_ydat = 'ydat_' + data_sample_name + current_time
-    pkl_name_moms = 'moms_' +str(num_moms) + data_sample_name + current_time
-
-    pkl_full_path_x = os.path.join(data_path, str(curr_folder), pkl_name_xdat)
-    pkl_full_path_y = os.path.join(data_path, str(curr_folder), pkl_name_ydat)
-    pkl_full_path_moms = os.path.join(data_path, str(curr_folder), pkl_name_moms)
+    pkl_full_path = os.path.join(data_path, pkl_name)
 
     A, s = normalize_matrix(s, A)
 
@@ -673,150 +645,251 @@ def create_mix_erlang_data_steady(s, A, data_path, data_sample_name, curr_folder
 
     final_data = create_final_x_data(s, A, max_ph_size)
 
-    t_0 = time.time()
-    moms = compute_first_n_moments(s , A,  num_moms)
-    mom_arr = np.concatenate(moms, axis=0)
-
     y_dat = compute_y_data_given_folder(final_data, max_ph_size, tot_prob=70)
 
     if type(y_dat) == bool:
         return False
         print('not dumping')
     else:
-
-        np.save(pkl_full_path_x, final_data) # saving x data
-        np.save(pkl_full_path_y, y_dat) # saving y data
-
-        np.save(pkl_full_path_moms, mom_arr)  # saving x data
-        np.save(pkl_full_path_y, y_dat)  # saving y data
+        pkl.dump((final_data, y_dat), open(pkl_full_path, 'wb'))
+        return 1
 
 
-        # pkl.dump((final_data, y_dat), open(pkl_full_path, 'wb'))
-        return (final_data, y_dat)
+def find_when_cdf_cross_0_999(s, A, x, itera=0, thrsh=0.9995):
+    curr_cdf = compute_cdf(x, s, A).flatten()[0]
+    if itera > 50:
+        if curr_cdf > 0.999:
+            return x
+        else:
+            return False
 
-def create_df_ph_bounds(vals_bounds_dict, ratios_rates):
-
-
-    all_combs_list_1 = create_rate_phsize_combs(vals_bounds_dict, ratios_rates)
-
-    merged_comb_list_1 = list(itertools.chain(*all_combs_list_1))
-
-    df_list_1 = [get_lower_upper_x(phases_rates[0], phases_rates[1]) for phases_rates in tqdm(merged_comb_list_1)]
-
-    lowerlist = []
-    upperlist = []
-    ph_size_list = []
-    rate_list = []
-
-    for item in tqdm(df_list_1):
-        if item:
-            lowerlist.append(item[0])
-            upperlist.append(item[1])
-            ph_size_list.append(item[2])
-            rate_list.append(item[3])
-
-    df_1 = pd.DataFrame(list(zip(lowerlist, upperlist, ph_size_list, rate_list)),
-                        columns=['lower', 'upper', 'phases', 'rate'])
-
-    pkl.dump(df_1, open('df_bound_ph.pkl', 'wb'))
-
-def create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, curr_folder_name, max_num_groups, folder_size, num_moms ):
-
-    folder_path = os.path.join(data_path,str(curr_folder_name))
-
-    if not os.path.exists(folder_path):
-        os.mkdir(folder_path)
-
-    while len(os.listdir(folder_path)) < 2*folder_size: #*2 becuase there is x and y np.array
-        s_A_list = [create_mix_erlang_data(df_1,max_ph_size, max_num_groups ) for ind in range(1)]
-        x_y_data = [create_mix_erlang_data_steady(s_A[0], s_A[1], data_path,
-                                                  data_sample_name,curr_folder_name, max_ph_size,
-                                                   num_moms) for s_A in s_A_list]
-
-    x_list = [x_y[0] for x_y in x_y_data]
-    y_list = [x_y[1] for x_y in x_y_data]
-    print('stop here')
+    if curr_cdf < thrsh:
+        return find_when_cdf_cross_0_999(s, A, x * 2, itera + 1, thrsh)
+    elif (curr_cdf > thrsh) and (curr_cdf < 1.):
+        return x
+    else:
+        return find_when_cdf_cross_0_999(s, A, x / 2, itera + 1, thrsh)
 
 
+def normalize_ph_so_it_1_when_cdf_1(s, A, initial_val=0.5):
+    norm_const = find_when_cdf_cross_0_999(s, A, initial_val)
+    if norm_const == 0:
+        print('Not able to find normalizing constant')
+        return False
+    else:
+        A = A * norm_const
+
+    return (s, A)
 
 
-def monitor_gen_ph(data_path, data_sample_name, max_ph_size, curr_folder_name, folder_size):
+def create_gen_erlang(UB_ratios=300, UB_rates=1, LB_rates=0.1,
+                      ph_size_max=100, num_groups_max=10, ph_size_min=50):
+    num_groups = np.random.randint(2, num_groups_max + 1)
+    ph_size = np.random.randint(ph_size_min, ph_size_max + 1)
+    group_sizes = recursion_group_size(num_groups, np.array([]), ph_size).astype(int)
 
-    folder_path = os.path.join(data_path, str(curr_folder_name))
+    ratios = np.random.randint(1, UB_ratios, num_groups - 1)
+    ratios = np.append(1, ratios)
+    first_rate = np.random.uniform(LB_rates, UB_rates)
+    rates = first_rate * ratios
 
-    if not os.path.exists(folder_path):
-        os.mkdir(folder_path)
+    gen_erlang = create_gen_erlang_given_sizes(group_sizes, rates)
+    curr_mean = ser_moment_n(gen_erlang[0], gen_erlang[1], 1)
 
-    while len(os.listdir(folder_path)) < 2 * folder_size:  # *2 becuase there is x and y np.array
-        create_gen_ph(max_ph_size, data_path, curr_folder_name, data_sample_name)
+    s = gen_erlang[0]
+    norm_const = find_when_cdf_cross_0_999(s, gen_erlang[1], 0.5)
+    if norm_const == 0:
+        print('Not able to find normalizing constant')
+        return False
+    else:
+        A = gen_erlang[1] * norm_const
 
-def monitor_erlang_first_edition(data_path, data_sample_name, max_ph_size, curr_folder_name, folder_size):
+    return (s, A)
 
-    folder_path = os.path.join(data_path, str(curr_folder_name))
+def saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x = False):
+    '''
 
-    if not os.path.exists(folder_path):
-        os.mkdir(folder_path)
+    :param x_y_data: the data is a batch of tuples: ph_input, first num_moms moments and steady-state probs
+    :param data_path: the folder in which we save the data
+    :param data_sample_name: the name of file
+    :param num_moms: number of moments we compute
+    :param save_x: should we save ph_data
+    :return:
+    '''
 
-    while len(os.listdir(folder_path)) < 2 * folder_size:  # *2 becuase there is x and y np.array
-        combine_erlangs_lists(data_path, data_sample_name, curr_folder_name,  [1, 300], max_ph_size, UB_rates=1, LB_rates=0.1)
+    now = datetime.now()
+
+    random.seed()
+
+    current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
+    x_list =  []
+    mom_list = []
+    y_list = []
+
+    for x_y in x_y_data:
+        if type(x_y) != bool:
+            if save_x:
+                x_list.append(torch.from_numpy(x_y[0]))
+            mom_list.append(torch.from_numpy(x_y[1]))
+            y_list.append(torch.from_numpy(x_y[2]))
 
 
+    if save_x: # should we want to save the x_data
+        # x_list = [torch.from_numpy(x_y[0]) for x_y in x_y_data if type(x_y) != bool]
+        # torch_x = torch.stack(x_list).float()
+        pkl_name_xdat = 'xdat_' + data_sample_name + current_time +'size_' + '.pkl' #+ str(torch_x.shape[0]) +
+        full_path_xdat = os.path.join(data_path, pkl_name_xdat)
+        pkl.dump(x_list, open(full_path_xdat, 'wb'))
+
+    # dumping moments
+    # mom_list = [torch.from_numpy(x_y[1]) for x_y in x_y_data if type(x_y) != bool]
+    torch_moms = torch.stack(mom_list).float()
+    pkl_name_moms = 'moms_' + str(num_moms) + data_sample_name + current_time + 'size_'+ str(torch_moms.shape[0]) + '.pkl'
+    full_path_moms = os.path.join(data_path, pkl_name_moms)
+    pkl.dump(torch_moms, open(full_path_moms, 'wb'))
+
+
+    # dumping steady_state
+    # y_list = [torch.from_numpy(x_y[2]) for x_y in x_y_data if type(x_y) != bool]
+    torch_y = torch.stack(y_list).float()
+    pkl_name_ydat = 'ydat_' + data_sample_name + current_time +'size_'+ str(torch_y.shape[0]) + '.pkl'
+    full_path_ydat = os.path.join(data_path, pkl_name_ydat)
+    pkl.dump(torch_y, open(full_path_ydat, 'wb'))
+
+def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path, data_sample_name):
+
+    if num_ind == 1: ## Any arbitrary ph
+        s_A =  give_s_A_given_size(np.random.randint(60, max_ph_size))
+    elif num_ind == 2:
+        s_A = create_gen_erlang()
+    else:
+        s_A = create_shrot_tale_genErlang(df_1)
+    if s_A:
+
+        s_A = normalize_ph_so_it_1_when_cdf_1(s_A[0], s_A[1])
+
+        x = create_final_x_data(s_A[0], s_A[1], max_ph_size)
+        y = compute_y_data_given_folder(x, x.shape[0]-1, tot_prob=70, eps=0.0001)
+        if type(y) == np.ndarray:
+            moms = compute_first_n_moments(s_A[0], s_A[1], num_moms)
+
+            mom_arr = np.concatenate(moms, axis=0)
+            lam = x[0,x.shape[0]-1]
+
+            mom_arr = np.log(mom_arr) * (-1)
+            mom_arr = np.append(lam,mom_arr)
+
+            if not np.any(np.isinf(mom_arr)):
+
+                return (x, mom_arr, y)
+
+def generate_one_ph(batch_size, max_ph_size, df_1, num_moms, data_path, data_sample_name):
+
+    sample_type_arr = np.random.randint(1,4,batch_size)
+    x_y_moms_list = [send_to_the_right_generator(val, max_ph_size, df_1, num_moms, data_path, data_sample_name) for val in sample_type_arr]
+
+
+    ## Clean list
+
+    x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
+
+    saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
+
+    return x_y_moms_list
+
+
+def create_shrot_tale_genErlang(df_1, ratio_size=10):
+
+
+    ph_sizes = np.linspace(10, 100, 10).astype(int)
+    probs_ph_tot_size = np.array(ph_sizes ** 2 / np.sum(ph_sizes ** 2))
+    num_groups = np.random.randint(1, 10)
+    group_size = recursion_group_size(num_groups, np.array([]),
+                                      np.random.choice(ph_sizes, 1, p=probs_ph_tot_size)[0]).astype(int)
+    group_rates = give_rates_given_Er_sizes(df_1, group_size, ratio_size)
+    s, A = create_gen_erlang_given_sizes(group_size, group_rates)
+
+    return (s, A)
 
 
 
 def main(args):
+    random.seed()
 
     ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 16., 32, 64, 100.])
 
-    if sys.platform =='linux':
+    if sys.platform == 'linux':
         vals_bounds_dict = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/vals_bounds.pkl', 'rb'))
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/training_data/train'
+        data_path = '/home/eliransc/scratch/training_data/train/batch_data'
 
 
     else:
         vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
         df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
-        data_path = r'C:\Users\elira\workspace\Research\data\training_data\train'
+        data_path = r'C:\Users\elira\workspace\Research\data\training_batches'
 
-    max_ph_size = 100
-    ratio_size = ratios_rates.shape[0]
+    data_sample_name = 'batch_size_' + str(args.batch_size) + '_num_moms_' + str(args.num_moms)+'_num_max_size_'+str(args.max_num_groups)
+    x_vals = np.linspace(0, 1, 30)
+    # Compute ph_dists
+    x_y_moms_list = [generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name) for ind in tqdm(range(args.num_examples))]
 
-    data_sample_name = 'mix_Erlang_tail_service_ratios_' + str(ratio_size) + '_ph_size_' + str(max_ph_size) + '_'
-    num_exmaples = args.num_examples
-
-    try:
-        max_value_folder =  np.max(np.array(os.listdir(data_path)).astype(int))
-    except:
-        print('Data folder it empty')
-        max_value_folder = 3000
-
-    if args.data_type == 'Mix_erlang':
-        mix_erlang = [
-            create_erlang_exmaples(df_1, data_path, data_sample_name, max_ph_size, example, max_num_groups=10,
-                                   folder_size=args.folder_size,  num_moms=20) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))]
-        # mix_erlang = [create_erlang_exmaples(df_1, data_path, data_type, max_ph_size, max_num_groups=10) for example in tqdm(range(num_exmaples))]
-
-    if args.data_type == 'Gen_ph':
-        pkl_name = 'gen_ph_sample_size_' + 'max_ph_size_' + str(max_ph_size)
-        gen_ph = [monitor_gen_ph(data_path, data_sample_name, max_ph_size, example,  folder_size = args.folder_size) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))]
-
-    if args.data_type == 'mix_Erlang_first':
-
-        file_name = 'mix_Erlang_UB_rates_1_LB_rates_0.1_max_ph_20_service_ratios_1_200_ph_size_' + str(max_ph_size)
-        finlis = [monitor_erlang_first_edition(data_path, data_sample_name, max_ph_size, example, folder_size = args.folder_size) for example in tqdm(range(max_value_folder+1,max_value_folder+1+num_exmaples))][0]
+    # Compute steay_state
 
 
+    # cdf_list = [compute_cdf_within_range(x_vals, s_A[0], s_A[1]) for s_A in tqdm(s_A_list) if s_A]
+
+
+    # sample_size = args.batch_size
+    # max_ph_size = args.ph_size_max
+    # s_A_lists = [give_s_A_given_size(np.random.randint(60, max_ph_size)) for ind in range(sample_size)]
+    #
+    # A_s_lists = [normalize_ph_so_it_1_when_cdf_1(s_A[0], s_A[1]) for s_A in s_A_lists]
+    # x_vals = np.linspace(0, 1, 30)
+    # cdf_list_1 = [compute_cdf_within_range(x_vals, s_A[0], s_A[1]) for s_A in tqdm(A_s_lists) if s_A]
+    #
+    # s_A_list = [create_gen_erlang() for ind in tqdm(range(args.batch_size))]
+    # s_A_list = [s_A for s_A in s_A_list if s_A]
+    #
+    # cdf_list_2 = [compute_cdf_within_range(x_vals, s_A[0], s_A[1]) for s_A in tqdm(s_A_list) if s_A]
+    #
+    # ratio_size = 10
+    #
+    # cdf_list_3 = []
+    # ph_sizes = np.linspace(10, 100, 10).astype(int)
+    # probs_ph_tot_size = np.array(ph_sizes ** 2 / np.sum(ph_sizes ** 2))
+    # for example in tqdm(range(200)):
+    #     num_groups = np.random.randint(1, 10)
+    #     group_size = recursion_group_size(num_groups, np.array([]),
+    #                                       np.random.choice(ph_sizes, 1, p=probs_ph_tot_size)[0]).astype(int)
+    #     group_rates = give_rates_given_Er_sizes(df_1, group_size, ratio_size)
+    #     s, A = create_gen_erlang_given_sizes(group_size, group_rates)
+    #
+    #     pdf_vals = compute_cdf_within_range(x_vals, np.array(s), np.array(A))
+    #     cdf_list_3.append(pdf_vals)
+    #
+    # cdf_list = cdf_list_1+cdf_list_1+cdf_list_2+cdf_list_3
+    # plt.figure()
+    # for cdf_vals in cdf_list:
+    #     plt.plot(x_vals, cdf_vals)
+    # plt.xlim(0, 1)
+    # plt.ylim(0, 1)
+    # plt.show()
+
+
+    print('Finish here')
 
 def parse_arguments(argv):
-
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Mix_erlang')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default = 2)
-    parser.add_argument('--folder_size', type=int, help='number of ph examples in one folder', default=64)
+    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=1000)
+    parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
+    parser.add_argument('--num_moms', type=int, help='number of ph folders', default=40)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=256)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=100)
     args = parser.parse_args(argv)
 
     return args
