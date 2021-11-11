@@ -765,23 +765,25 @@ def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path,
     else:
         s_A = create_shrot_tale_genErlang(df_1)
     if type(s_A) != bool:
+        try:
+            s_A = normalize_ph_so_it_1_when_cdf_1(s_A[0], s_A[1])
 
-        s_A = normalize_ph_so_it_1_when_cdf_1(s_A[0], s_A[1])
+            x = create_final_x_data(s_A[0], s_A[1], max_ph_size)
+            y = compute_y_data_given_folder(x, x.shape[0]-1, tot_prob=70, eps=0.0001)
+            if type(y) == np.ndarray:
+                moms = compute_first_n_moments(s_A[0], s_A[1], num_moms)
 
-        x = create_final_x_data(s_A[0], s_A[1], max_ph_size)
-        y = compute_y_data_given_folder(x, x.shape[0]-1, tot_prob=70, eps=0.0001)
-        if type(y) == np.ndarray:
-            moms = compute_first_n_moments(s_A[0], s_A[1], num_moms)
+                mom_arr = np.concatenate(moms, axis=0)
+                lam = x[0,x.shape[0]-1]
 
-            mom_arr = np.concatenate(moms, axis=0)
-            lam = x[0,x.shape[0]-1]
+                mom_arr = np.log(mom_arr) * (-1)
+                mom_arr = np.append(lam,mom_arr)
 
-            mom_arr = np.log(mom_arr) * (-1)
-            mom_arr = np.append(lam,mom_arr)
+                if not np.any(np.isinf(mom_arr)):
 
-            if not np.any(np.isinf(mom_arr)):
-
-                return (x, mom_arr, y)
+                    return (x, mom_arr, y)
+        except:
+            print('Not able to extract s and A')
 
 def generate_one_ph(batch_size, max_ph_size, df_1, num_moms, data_path, data_sample_name):
 
@@ -885,7 +887,7 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=1000)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=12)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=40)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
