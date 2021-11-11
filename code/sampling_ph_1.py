@@ -797,7 +797,7 @@ def generate_one_ph(batch_size, max_ph_size, df_1, num_moms, data_path, data_sam
 
     saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
 
-    return x_y_moms_list
+    return 1
 
 
 def create_shrot_tale_genErlang(df_1, ratio_size=10):
