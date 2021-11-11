@@ -764,7 +764,7 @@ def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path,
         s_A = create_gen_erlang()
     else:
         s_A = create_shrot_tale_genErlang(df_1)
-    if s_A:
+    if type(s_A) != bool:
 
         s_A = normalize_ph_so_it_1_when_cdf_1(s_A[0], s_A[1])
 
