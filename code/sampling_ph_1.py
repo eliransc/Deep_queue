@@ -481,7 +481,8 @@ def create_final_x_data(s, A, ph_size_max):
     expect_ser = ser_moment_n(s, A, 1)
     if expect_ser:
         #         expect_ser = expect_ser[0][0]
-        lam = np.random.uniform(0, 1 / expect_ser, 1)[0]
+        mu = 1/expect_ser
+        lam = np.random.uniform(0.7*mu, 0.95*mu, 1)[0]
         lam = lam * 0.95
         lam_arr[0, 0] = lam
 
