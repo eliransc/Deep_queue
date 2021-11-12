@@ -827,7 +827,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/training_data/train/batch_data'
+        data_path = '/home/eliransc/scratch/high_util_queues'
 
 
     else:
@@ -888,7 +888,7 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=1000)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=2000)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=40)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
