@@ -482,7 +482,7 @@ def create_final_x_data(s, A, ph_size_max):
     if expect_ser:
         #         expect_ser = expect_ser[0][0]
         mu = 1/expect_ser
-        lam = np.random.uniform(0.7*mu, 0.95*mu, 1)[0]
+        lam = np.random.uniform(0*mu, 0.95*mu, 1)[0]
         lam = lam * 0.95
         lam_arr[0, 0] = lam
 
@@ -775,7 +775,7 @@ def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path,
                 moms = compute_first_n_moments(s_A[0], s_A[1], num_moms)
 
                 mom_arr = np.concatenate(moms, axis=0)
-                lam = x[0,x.shape[0]-1]
+                lam = x[0, x.shape[0]-1]
 
                 mom_arr = np.log(mom_arr) * (-1)
                 mom_arr = np.append(lam,mom_arr)
@@ -796,7 +796,7 @@ def generate_one_ph(batch_size, max_ph_size, df_1, num_moms, data_path, data_sam
 
     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
 
-    saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
+    saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms, True)
 
     return 1
 
@@ -888,7 +888,7 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=2000)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=400)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=40)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
