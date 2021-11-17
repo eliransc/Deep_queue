@@ -827,7 +827,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/high_util_queues'
+        data_path = '/home/eliransc/scratch/test_set_with_x'
 
 
     else:
