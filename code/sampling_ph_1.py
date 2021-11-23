@@ -25,6 +25,7 @@ from butools.fitting import *
 from datetime import datetime
 from fastbook import *
 import itertools
+from scipy.special import factorial
 
 import pickle as pkl
 
@@ -205,11 +206,10 @@ def create_erlang_row(rate, ind, size):
         aa[ind + 1] = rate
     return aa
 
-
 def ser_moment_n(s, A, mom):
     e = np.ones((A.shape[0], 1))
     try:
-        mom = ((-1) ** mom) * np.dot(np.dot(s, matrix_power(A, -mom)), e)
+        mom = ((-1) ** mom) *factorial(mom)*np.dot(np.dot(s, matrix_power(A, -mom)), e)
         if mom > 0:
             return mom
         else:
@@ -796,7 +796,7 @@ def generate_one_ph(batch_size, max_ph_size, df_1, num_moms, data_path, data_sam
 
     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
 
-    saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms, True)
+    saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
 
     return 1
 
@@ -817,6 +817,7 @@ def create_shrot_tale_genErlang(df_1, ratio_size=10):
 
 
 def main(args):
+
     random.seed()
 
     ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 16., 32, 64, 100.])
@@ -827,7 +828,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/test_set_with_x'
+        data_path = '/home/eliransc/scratch/train_set_true_moms'
 
 
     else:
@@ -888,10 +889,10 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=400)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=2000)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
-    parser.add_argument('--num_moms', type=int, help='number of ph folders', default=40)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
+    parser.add_argument('--num_moms', type=int, help='number of ph folders', default=35)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=8)
     parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=100)
     args = parser.parse_args(argv)
 
