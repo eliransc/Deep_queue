@@ -799,7 +799,7 @@ def generate_one_ph(batch_size, max_ph_size, df_1, num_moms, data_path, data_sam
 
     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
 
-    saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
+    saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms, True)
 
     return 1
 
@@ -831,7 +831,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/train_set_true_moms'
+        data_path = '/home/eliransc/scratch/test_set_with_x_true_moments'
 
 
     else:
@@ -892,7 +892,7 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=2000)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=400)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=35)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
