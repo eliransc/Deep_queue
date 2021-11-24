@@ -102,7 +102,7 @@ def create_row_rates(row_ind, is_absorbing, in_rate, non_abrosing_out_rates, ph_
 
 
 def give_s_A_given_size(ph_size):
-    potential_vals = np.linspace(0.5, 10, 20000)
+    potential_vals = np.linspace(0.1, 10, 20000)
     randinds = np.random.randint(potential_vals.shape[0], size=ph_size)
     ser_rates = (potential_vals[randinds]).reshape((1, ph_size))
     w = np.random.rand(ph_size + 1)
@@ -209,9 +209,9 @@ def create_erlang_row(rate, ind, size):
 def ser_moment_n(s, A, mom):
     e = np.ones((A.shape[0], 1))
     try:
-        mom = ((-1) ** mom) *factorial(mom)*np.dot(np.dot(s, matrix_power(A, -mom)), e)
-        if mom > 0:
-            return mom
+        mom_val = ((-1) ** mom) *factorial(mom)*np.dot(np.dot(s, matrix_power(A, -mom)), e)
+        if mom_val > 0:
+            return mom_val
         else:
             return False
     except:
@@ -698,12 +698,13 @@ def create_gen_erlang(UB_ratios=300, UB_rates=1, LB_rates=0.1,
     curr_mean = ser_moment_n(gen_erlang[0], gen_erlang[1], 1)
 
     s = gen_erlang[0]
-    norm_const = find_when_cdf_cross_0_999(s, gen_erlang[1], 0.5)
-    if norm_const == 0:
-        print('Not able to find normalizing constant')
-        return False
-    else:
-        A = gen_erlang[1] * norm_const
+    A = gen_erlang[1]
+    # norm_const = find_when_cdf_cross_0_999(s, gen_erlang[1], 0.5)
+    # if norm_const == 0:
+    #     print('Not able to find normalizing constant')
+    #     return False
+    # else:
+     #A = gen_erlang[1] *norm_const
 
     return (s, A)
 
@@ -767,18 +768,20 @@ def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path,
         s_A = create_shrot_tale_genErlang(df_1)
     if type(s_A) != bool:
         try:
-            s_A = normalize_ph_so_it_1_when_cdf_1(s_A[0], s_A[1])
+            # s_A = normalize_ph_so_it_1_when_cdf_1(s_A[0], s_A[1])
+            A = s_A[1]*compute_first_n_moments(s_A[0], s_A[1], 1)[0][0]
 
-            x = create_final_x_data(s_A[0], s_A[1], max_ph_size)
+            x = create_final_x_data(s_A[0], A, max_ph_size)
             y = compute_y_data_given_folder(x, x.shape[0]-1, tot_prob=70, eps=0.0001)
             if type(y) == np.ndarray:
-                moms = compute_first_n_moments(s_A[0], s_A[1], num_moms)
+                moms = compute_first_n_moments(s_A[0], A, num_moms)
 
                 mom_arr = np.concatenate(moms, axis=0)
                 lam = x[0, x.shape[0]-1]
 
-                mom_arr = np.log(mom_arr) * (-1)
-                mom_arr = np.append(lam,mom_arr)
+                mom_arr = np.log(mom_arr)
+                mom_arr = np.delete(mom_arr, 0)
+                mom_arr = np.append(lam, mom_arr)
 
                 if not np.any(np.isinf(mom_arr)):
 
@@ -820,7 +823,7 @@ def main(args):
 
     random.seed()
 
-    ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 16., 32, 64, 100.])
+    ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 10., 15, 20, 25.])
 
     if sys.platform == 'linux':
         vals_bounds_dict = pkl.load(
