@@ -760,9 +760,9 @@ def saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x = False
 
 def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path, data_sample_name):
 
-    if num_ind == 1: ## Any arbitrary ph
+    if num_ind == 12: ## Any arbitrary ph
         s_A =  give_s_A_given_size(np.random.randint(60, max_ph_size))
-    elif num_ind == 2:
+    elif num_ind > 0:
         s_A = create_gen_erlang()
     else:
         s_A = create_shrot_tale_genErlang(df_1)
@@ -831,7 +831,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/train_set_true_moms'
+        data_path = '/home/eliransc/scratch/large_cdf_begin_train'
 
 
     else:
@@ -892,7 +892,7 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=2000)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=400)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=35)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
