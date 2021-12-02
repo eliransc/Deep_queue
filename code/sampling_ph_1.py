@@ -1007,7 +1007,9 @@ def main(args):
     data_sample_name = 'batch_size_' + str(args.batch_size) + '_num_moms_' + str(args.num_moms)+'_num_max_size_'+str(args.max_num_groups)
     x_vals = np.linspace(0, 1, 30)
     # Compute ph_dists
-    x_y_moms_list = [generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name) for ind in tqdm(range(args.num_examples))]
+    for ind in tqdm(range(args.num_examples)):
+        generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name)
+    # x_y_moms_list = [generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name) for ind in tqdm(range(args.num_examples))]
 
     # Compute steay_state
 
@@ -1057,7 +1059,7 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=400)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=200)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=35)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
