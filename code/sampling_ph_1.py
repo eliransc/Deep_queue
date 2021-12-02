@@ -474,6 +474,7 @@ def generate_mix_ph(ph_size_max, UB_ratios, UB_rates, LB_rates, num_groups_max):
     return final_data
 
 
+
 def create_final_x_data(s, A, ph_size_max):
     lam_arr = np.zeros((A.shape[0] + 1, 1))
 
@@ -483,7 +484,7 @@ def create_final_x_data(s, A, ph_size_max):
         #         expect_ser = expect_ser[0][0]
         mu = 1/expect_ser
         lam = np.random.uniform(0*mu, 0.95*mu, 1)[0]
-        lam = lam * 0.95
+        # lam = lam * 0.95
         lam_arr[0, 0] = lam
 
 
@@ -593,23 +594,23 @@ def create_rate_phsize_combs(vals_bound):
     return all_combs_list
 
 
-def create_gen_erlang_given_sizes(group_sizes, rates, probs=False):
-    ph_size = np.sum(group_sizes)
-    erlang_list = [generate_erlang_given_rates(rates[ind], ph_size) for ind, ph_size in enumerate(group_sizes)]
-    final_a = np.zeros((ph_size, ph_size))
-    final_s = np.zeros(ph_size)
-    if type(probs) == bool:
-        rand_probs = np.random.dirichlet(np.random.rand(group_sizes.shape[0]), 1)
-        rands = np.random.rand(group_sizes.shape[0])
-        rand_probs = rands / np.sum(rands).reshape((1, rand_probs.shape[0]))
-    else:
-        rand_probs = probs
-    for ind in range(group_sizes.shape[0]):
-        final_s[np.sum(group_sizes[:ind])] = rand_probs[0][ind]  # 1/diff_list.shape[0]
-        final_a[np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind],
-        np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind]] = erlang_list[ind]
-
-    return final_s, final_a
+# def create_gen_erlang_given_sizes(group_sizes, rates, probs=False):
+#     ph_size = np.sum(group_sizes)
+#     erlang_list = [generate_erlang_given_rates(rates[ind], ph_size) for ind, ph_size in enumerate(group_sizes)]
+#     final_a = np.zeros((ph_size, ph_size))
+#     final_s = np.zeros(ph_size)
+#     if type(probs) == bool:
+#         rand_probs = np.random.dirichlet(np.random.rand(group_sizes.shape[0]), 1)
+#         rands = np.random.rand(group_sizes.shape[0])
+#         rand_probs = rands / np.sum(rands).reshape((1, rand_probs.shape[0]))
+#     else:
+#         rand_probs = probs
+#     for ind in range(group_sizes.shape[0]):
+#         final_s[np.sum(group_sizes[:ind])] = rand_probs[0][ind]  # 1/diff_list.shape[0]
+#         final_a[np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind],
+#         np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind]] = erlang_list[ind]
+#
+#     return final_s, final_a
 
 
 def find_upper_bound_rate_given_n(n, upper_bound):
@@ -758,26 +759,179 @@ def saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x = False
     full_path_ydat = os.path.join(data_path, pkl_name_ydat)
     pkl.dump(torch_y, open(full_path_ydat, 'wb'))
 
+
+def give_s_A_given__fixed_size(ph_size, scale_low, scale_high):
+    if ph_size > 1:
+        potential_vals = np.linspace(scale_low, scale_high, 20000)
+        randinds = np.random.randint(potential_vals.shape[0], size=ph_size)
+        ser_rates = (potential_vals[randinds]).reshape((1, ph_size))
+        w = np.random.rand(ph_size)
+        numbers = np.arange(0, ph_size + 1)  # an array from 0 to ph_size + 1
+        p0 = 0.9
+        distribution = (w / np.sum(w)) * (1 - p0)  ## creating a pdf from the weights of w
+        distribution = np.append(p0, distribution)
+        random_variable = rv_discrete(values=(numbers, distribution))  ## constructing a python pdf
+        ww = random_variable.rvs(size=1)
+
+        ## choosing the states that are absorbing
+        absorbing_states = np.sort(np.random.choice(ph_size, ww[0], replace=False))
+        non_absorbing = np.setdiff1d(np.arange(ph_size), absorbing_states, assume_unique=True)
+
+        N = ph_size - ww[0]  ## N is the number of non-absorbing states
+        p = np.random.rand()  # the probability that a non absorbing state is fully transient
+        mask_full_trans = np.random.choice([True, False], size=N, p=[p, 1 - p])  # True if row sum to 0
+        if np.sum(mask_full_trans) == mask_full_trans.shape[0]:
+            mask_full_trans = False
+        ser_rates = ser_rates.flatten()
+
+        ## Computing the total out of state rate, if absorbing, remain the same
+        p_outs = np.random.rand(N)  ### this is proportional rate out
+        orig_rates = ser_rates[non_absorbing]  ## saving the original rates
+        new_rates = orig_rates * p_outs  ## Computing the total out rates
+        out_rates = np.where(mask_full_trans, orig_rates, new_rates)  ## Only the full trans remain as the original
+
+        ## Choosing the number of states that will have a postive rate out for every non-absorbing state
+
+        num_trans_states = np.random.randint(1, ph_size, N)
+
+        ## Choosing which states will go from each non-absorbing state
+        trans_states_list = [np.sort(np.random.choice(ph_size - 1, num_trans_states[j], replace=False)) for j in
+                             range(N)]
+        # Computing out rates
+        non_abrosing_out_rates = [gives_rate(trans_states, out_rates[j], ph_size) for j, trans_states in
+                                  enumerate(trans_states_list)]
+        ## Finalizing the matrix
+
+        #     return trans_states_list, absorbing_states, ser_rates, non_abrosing_out_rates
+        lists_rate_mat = [
+            create_row_rates(row_ind, row_ind in absorbing_states, ser_rates[row_ind], non_abrosing_out_rates, ph_size,
+                             non_absorbing) for row_ind in range(ph_size)]
+        A = np.concatenate(lists_rate_mat).reshape((ph_size, ph_size))  ## converting all into one numpy array
+
+        num_of_pos_initial_states = np.random.randint(1, ph_size + 1)
+        non_zero_probs = np.random.dirichlet(np.random.rand(num_of_pos_initial_states), 1)
+        inds_of_not_zero_probs = np.sort(np.random.choice(ph_size, num_of_pos_initial_states, replace=False))
+        s = np.zeros(ph_size)
+        s[inds_of_not_zero_probs] = non_zero_probs
+
+    else:
+        s = np.array([1.])
+        potential_vals = np.linspace(scale_low, scale_high, 20000)
+        randinds = np.random.randint(potential_vals.shape[0], size=ph_size)
+        ser_rates = (potential_vals[randinds]).reshape((1, ph_size))
+        A = -ser_rates
+
+    return (s, A)
+
+
+def create_mix_erlang_ph(scale_low=1, max_scale_high=10, max_ph=1000):
+    erlang_max_size = np.random.randint(int(0.25 * max_ph), int(0.75 * max_ph))
+
+    scale_high = np.random.uniform(2, max_scale_high)
+    ph_size_gen_ph = np.random.randint(5, max_ph - erlang_max_size)
+    num_groups = np.random.randint(2, min(30, ph_size_gen_ph - 1))
+    group_sizes = np.random.randint(1, 25, num_groups)
+
+    group_sizes_gen_ph = (group_sizes * ph_size_gen_ph / np.sum(group_sizes)).astype(int) + 1
+    erlang_list_gen_ph = [give_s_A_given__fixed_size(size, scale_low, scale_high) for size in group_sizes_gen_ph]
+    erlang_list_gen_ph_A = [lis[1] for lis in erlang_list_gen_ph]
+    erlang_list_gen_ph_s = [lis[0] for lis in erlang_list_gen_ph]
+
+    ph_size_erl = np.random.randint(5, erlang_max_size)
+    num_groups = np.random.randint(2, min(30, ph_size_erl - 1))
+    group_sizes = np.random.randint(1, 25, num_groups)
+
+    rates = ((np.ones(num_groups) * np.random.uniform(1, 1.75)) ** np.arange(num_groups))
+    group_sizes_erl = (group_sizes * ph_size_erl / np.sum(group_sizes)).astype(int) + 1
+    erlang_list_erl = [generate_erlang_given_rates(rates[ind], ph_size_erl) for ind, ph_size_erl in
+                       enumerate(group_sizes_erl)]
+    group_sizes = np.append(group_sizes_gen_ph, group_sizes_erl)
+
+    rand_probs = np.random.dirichlet(np.random.rand(group_sizes.shape[0]), 1)
+
+    ph_list = erlang_list_gen_ph_A + erlang_list_erl
+
+    ph_size = np.sum(group_sizes)
+    A = np.zeros((ph_size, ph_size))
+    s = np.zeros(ph_size)
+    for ind in range(group_sizes.shape[0]):
+        if ind < group_sizes_gen_ph.shape[0]:
+            s[np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind]] = rand_probs[0][ind] * \
+                                                                                        erlang_list_gen_ph_s[ind]
+        else:
+            s[np.sum(group_sizes[:ind])] = rand_probs[0][ind]  # 1/diff_list.shape[0]
+        A[np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind],
+        np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind]] = ph_list[ind]
+
+    fst_mom = compute_first_n_moments(s, A, 1)
+    if type(fst_mom[0]) != bool:
+        A = A * fst_mom[0][0]
+        fst_mom = compute_first_n_moments(s, A, 1)
+        if (fst_mom[0] > 0.99999) & (fst_mom[0] < 1.000001):
+            #         A = A*give_cdf_1_1_norm_const(s, A)
+            return (s, A)
+        else:
+            return False
+    else:
+        return False
+
+
+def create_gen_erlang_many_ph(max_ph_size = 1000):
+    ph_size = np.random.randint(31, max_ph_size)
+    num_groups = np.random.randint(2,30)
+    group_sizes = np.random.randint(1,25,num_groups)
+    group_sizes_1 = (group_sizes*ph_size/np.sum(group_sizes)).astype(int)+1
+    rates = ((np.ones(num_groups)*np.random.uniform(1,1.75))**np.arange(num_groups))
+    s,A = create_gen_erlang_given_sizes(group_sizes_1, rates)
+
+    A = A*compute_first_n_moments(s, A, 1)[0][0]
+    return (s,A)
+
+def create_gen_erlang_given_sizes(group_sizes, rates, probs=False):
+    ph_size = np.sum(group_sizes)
+    erlang_list = [generate_erlang_given_rates(rates[ind], ph_size) for ind, ph_size in enumerate(group_sizes)]
+    final_a = np.zeros((ph_size, ph_size))
+    final_s = np.zeros(ph_size)
+    if type(probs) == bool:
+        rand_probs = np.random.dirichlet(np.random.rand(group_sizes.shape[0]), 1)
+        rands = np.random.rand(group_sizes.shape[0])
+        rand_probs = rands / np.sum(rands).reshape((1, rand_probs.shape[0]))
+    else:
+        rand_probs = probs
+    for ind in range(group_sizes.shape[0]):
+        final_s[np.sum(group_sizes[:ind])] = rand_probs[0][ind]  # 1/diff_list.shape[0]
+        final_a[np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind],
+        np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind]] = erlang_list[ind]
+
+    return final_s, final_a
+
+
+
 def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path, data_sample_name):
 
-    if num_ind == 12: ## Any arbitrary ph
-        s_A =  give_s_A_given_size(np.random.randint(60, max_ph_size))
-    elif num_ind > 0:
-        s_A = create_gen_erlang()
+    if num_ind == 1: ## Any arbitrary ph
+        s_A =  create_gen_erlang_many_ph()# give_s_A_given_size(np.random.randint(60, max_ph_size))
+    elif num_ind > 1:
+        s_A = create_mix_erlang_ph()
     else:
         s_A = create_shrot_tale_genErlang(df_1)
     if type(s_A) != bool:
         try:
             # s_A = normalize_ph_so_it_1_when_cdf_1(s_A[0], s_A[1])
-            A = s_A[1]*compute_first_n_moments(s_A[0], s_A[1], 1)[0][0]
+            # A = s_A[1]*compute_first_n_moments(s_A[0], s_A[1], 1)[0][0]
+            s = s_A[0]
+            A = s_A[1]
 
-            x = create_final_x_data(s_A[0], A, max_ph_size)
+            x = create_final_x_data(s, A, max_ph_size)
             y = compute_y_data_given_folder(x, x.shape[0]-1, tot_prob=70, eps=0.0001)
             if type(y) == np.ndarray:
-                moms = compute_first_n_moments(s_A[0], A, num_moms)
+                moms = compute_first_n_moments(s, A, num_moms)
 
                 mom_arr = np.concatenate(moms, axis=0)
+
                 lam = x[0, x.shape[0]-1]
+                # mu = 1 / mom_arr[0]
+                # lam = np.random.uniform(0 * mu, 0.95 * mu, 1)[0]
 
                 mom_arr = np.log(mom_arr)
                 mom_arr = np.delete(mom_arr, 0)
@@ -791,7 +945,7 @@ def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path,
 
 def generate_one_ph(batch_size, max_ph_size, df_1, num_moms, data_path, data_sample_name):
 
-    sample_type_arr = np.random.randint(1,4,batch_size)
+    sample_type_arr = np.random.randint(1, 4, batch_size)
     x_y_moms_list = [send_to_the_right_generator(val, max_ph_size, df_1, num_moms, data_path, data_sample_name) for val in sample_type_arr]
 
 
@@ -823,7 +977,7 @@ def main(args):
 
     random.seed()
 
-    ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 10., 15, 20, 25.])
+    # ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 10., 15, 20, 25.])
 
     if sys.platform == 'linux':
         vals_bounds_dict = pkl.load(
@@ -831,7 +985,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/large_cdf_begin_train'
+        data_path = '/home/eliransc/scratch/train_data_1000_ph/training'
 
 
     else:
@@ -892,10 +1046,10 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=400)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=1)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=35)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=4)
     parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=100)
     args = parser.parse_args(argv)
 
