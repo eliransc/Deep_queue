@@ -824,7 +824,7 @@ def give_s_A_given__fixed_size(ph_size, scale_low, scale_high):
     return (s, A)
 
 
-def create_mix_erlang_ph(scale_low=1, max_scale_high=10, max_ph=1000):
+def create_mix_erlang_ph(scale_low=1, max_scale_high=10, max_ph=500):
     erlang_max_size = np.random.randint(int(0.25 * max_ph), int(0.75 * max_ph))
 
     scale_high = np.random.uniform(2, max_scale_high)
@@ -876,7 +876,7 @@ def create_mix_erlang_ph(scale_low=1, max_scale_high=10, max_ph=1000):
         return False
 
 
-def create_gen_erlang_many_ph(max_ph_size = 1000):
+def create_gen_erlang_many_ph(max_ph_size = 500):
     ph_size = np.random.randint(31, max_ph_size)
     num_groups = np.random.randint(2,30)
     group_sizes = np.random.randint(1,25,num_groups)
