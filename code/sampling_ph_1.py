@@ -733,8 +733,8 @@ def saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x = False
         if type(x_y) != bool:
             if save_x:
                 x_list.append(torch.from_numpy(x_y[0]))
-            mom_list.append(torch.from_numpy(x_y[1]))
-            y_list.append(torch.from_numpy(x_y[2]))
+            mom_list.append(torch.from_numpy(x_y[0]))
+            y_list.append(torch.from_numpy(x_y[1]))
 
 
     if save_x: # should we want to save the x_data
@@ -881,7 +881,7 @@ def create_gen_erlang_many_ph(max_ph_size = 1000):
     num_groups = np.random.randint(2,30)
     group_sizes = np.random.randint(1,25,num_groups)
     group_sizes_1 = (group_sizes*ph_size/np.sum(group_sizes)).astype(int)+1
-    rates = ((np.ones(num_groups)*np.random.uniform(1,1.75))**np.arange(num_groups))
+    rates = ((np.ones(num_groups)*np.random.uniform(1, 1.75))**np.arange(num_groups))
     s,A = create_gen_erlang_given_sizes(group_sizes_1, rates)
 
     A = A*compute_first_n_moments(s, A, 1)[0][0]
@@ -910,11 +910,11 @@ def create_gen_erlang_given_sizes(group_sizes, rates, probs=False):
 def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path, data_sample_name):
 
     if num_ind == 1: ## Any arbitrary ph
-        s_A =  create_gen_erlang_many_ph()# give_s_A_given_size(np.random.randint(60, max_ph_size))
+        s_A =  create_mix_erlang_ph() # give_s_A_given_size(np.random.randint(60, max_ph_size))
     elif num_ind > 1:
-        s_A = create_mix_erlang_ph()
+        s_A = create_gen_erlang_many_ph()
     else:
-        s_A = create_shrot_tale_genErlang(df_1)
+        s_A = create_Erlang_given_ph_size(max_ph_size)
     if type(s_A) != bool:
         try:
             # s_A = normalize_ph_so_it_1_when_cdf_1(s_A[0], s_A[1])
@@ -939,7 +939,7 @@ def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path,
 
                 if not np.any(np.isinf(mom_arr)):
 
-                    return (x, mom_arr, y)
+                    return (mom_arr, y)
         except:
             print('Not able to extract s and A')
 
@@ -947,16 +947,27 @@ def generate_one_ph(batch_size, max_ph_size, df_1, num_moms, data_path, data_sam
 
     sample_type_arr = np.random.randint(1, 4, batch_size)
     x_y_moms_list = [send_to_the_right_generator(val, max_ph_size, df_1, num_moms, data_path, data_sample_name) for val in sample_type_arr]
-
+    x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
+    saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
 
     ## Clean list
 
-    x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
+    # x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
 
-    saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
+    # for batch in range(8):
+    #     x_y_moms_list = [send_to_the_right_generator(-1, batch*args.batch_size+ph_size,df_1, num_moms, data_path, data_sample_name) for ph_size in range(1,args.batch_size+1) if batch*args.batch_size+ph_size <=1000 ]
+    #     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
+    #     saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
 
     return 1
 
+def create_Erlang_given_ph_size(ph_size):
+    s = np.zeros(ph_size)
+    s[0] = 1
+    rate = ph_size
+    A = generate_erlang_given_rates(rate, ph_size)
+    # A = A*compute_first_n_moments(s, A, 1)[0][0]
+    return (s,A)
 
 def create_shrot_tale_genErlang(df_1, ratio_size=10):
 
@@ -985,7 +996,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/train_data_1000_ph/valid'
+        data_path = '/home/eliransc/scratch/train_data_1000_ph/training'
 
 
     else:
@@ -1046,7 +1057,7 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=250)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=400)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=35)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
