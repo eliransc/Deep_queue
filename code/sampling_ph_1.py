@@ -722,7 +722,6 @@ def saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x = False
 
     now = datetime.now()
 
-    random.seed()
 
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
     x_list =  []
@@ -824,7 +823,7 @@ def give_s_A_given__fixed_size(ph_size, scale_low, scale_high):
     return (s, A)
 
 
-def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=500):
+def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=1000):
     erlang_max_size = np.random.randint(int(0.25 * max_ph), int(0.75 * max_ph))
 
     scale_high = np.random.uniform(2, max_scale_high)
@@ -876,7 +875,7 @@ def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=500):
         return False
 
 
-def create_gen_erlang_many_ph(max_ph_size = 500):
+def create_gen_erlang_many_ph(max_ph_size = 1000):
     ph_size = np.random.randint(31, max_ph_size)
     num_groups = np.random.randint(2,20)
     group_sizes = np.random.randint(1,25,num_groups)
@@ -986,7 +985,9 @@ def create_shrot_tale_genErlang(df_1, ratio_size=10):
 
 def main(args):
 
-    random.seed()
+    cur_time = int(time.time())
+    np.random.seed(cur_time)
+    print(cur_time)
 
     # ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 10., 15, 20, 25.])
 
@@ -1059,7 +1060,7 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=200)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=1)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=35)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
