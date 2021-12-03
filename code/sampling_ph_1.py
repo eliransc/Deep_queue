@@ -985,9 +985,7 @@ def create_shrot_tale_genErlang(df_1, ratio_size=10):
 
 def main(args):
 
-    cur_time = int(time.time())
-    np.random.seed(cur_time)
-    print(cur_time)
+
 
     # ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 10., 15, 20, 25.])
 
@@ -1004,6 +1002,10 @@ def main(args):
         vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
         df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
         data_path = r'C:\Users\elira\workspace\Research\data\training_batches'
+
+    cur_time = int(time.time())
+    np.random.seed(cur_time+len(os.listdir(data_path)))
+    print(cur_time)
 
     data_sample_name = 'batch_size_' + str(args.batch_size) + '_num_moms_' + str(args.num_moms)+'_num_max_size_'+str(args.max_num_groups)
     x_vals = np.linspace(0, 1, 30)
