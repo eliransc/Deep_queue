@@ -944,19 +944,19 @@ def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path,
 
 def generate_one_ph(batch_size, max_ph_size, df_1, num_moms, data_path, data_sample_name):
 
-    sample_type_arr = np.random.randint(1, 4, batch_size)
-    x_y_moms_list = [send_to_the_right_generator(val, max_ph_size, df_1, num_moms, data_path, data_sample_name) for val in sample_type_arr]
-    x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
-    saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
+    # sample_type_arr = np.random.randint(1, 4, batch_size)
+    # x_y_moms_list = [send_to_the_right_generator(val, max_ph_size, df_1, num_moms, data_path, data_sample_name) for val in sample_type_arr]
+    # x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
+    # saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
 
     ## Clean list
 
     # x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
 
-    # for batch in range(8):
-    #     x_y_moms_list = [send_to_the_right_generator(-1, batch*args.batch_size+ph_size,df_1, num_moms, data_path, data_sample_name) for ph_size in range(1,args.batch_size+1) if batch*args.batch_size+ph_size <=1000 ]
-    #     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
-    #     saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
+    for batch in range(8):
+        x_y_moms_list = [send_to_the_right_generator(-1, batch*args.batch_size+ph_size,df_1, num_moms, data_path, data_sample_name) for ph_size in range(1,args.batch_size+1) if batch*args.batch_size+ph_size <=1000 ]
+        x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
+        saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
 
     return 1
 
@@ -995,7 +995,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/train_data_1000_ph/test'
+        data_path = '/home/eliransc/scratch/train_data_1000_ph/training'
 
 
     else:
@@ -1010,8 +1010,13 @@ def main(args):
     data_sample_name = 'batch_size_' + str(args.batch_size) + '_num_moms_' + str(args.num_moms)+'_num_max_size_'+str(args.max_num_groups)
     x_vals = np.linspace(0, 1, 30)
     # Compute ph_dists
+
+
     for ind in tqdm(range(args.num_examples)):
         generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name)
+
+    # for ind in tqdm(range(args.num_examples)):
+    #     generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name)
     # x_y_moms_list = [generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name) for ind in tqdm(range(args.num_examples))]
 
     # Compute steay_state
