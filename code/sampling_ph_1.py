@@ -995,7 +995,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/train_data_1000_ph/training'
+        data_path = '/home/eliransc/scratch/train_data_1000_ph/valid1'
 
 
     else:
