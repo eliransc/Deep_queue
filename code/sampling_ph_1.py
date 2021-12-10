@@ -483,7 +483,7 @@ def create_final_x_data(s, A, ph_size_max):
     if expect_ser:
         #         expect_ser = expect_ser[0][0]
         mu = 1/expect_ser
-        lam = np.random.uniform(0*mu, 0.95*mu, 1)[0]
+        lam = np.random.uniform(0.3*mu, 0.9*mu, 1)[0]
         # lam = lam * 0.95
         lam_arr[0, 0] = lam
 
@@ -995,7 +995,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/train_data_1000_ph/valid1'
+        data_path = '/home/eliransc/scratch/train_data_1000_ph/training'
 
 
     else:
