@@ -31,7 +31,7 @@ import torch.nn.functional as F
 
 import torch.optim as optim
 
-
+m = nn.Softmax(dim=1)
 def thresh_func(row):
     if (row['First_moment'] < mom_1_thresh) and (row['Second_moment'] < mom_2_thresh) and (
             row['Third_moment'] < mom_3_thresh):
@@ -775,6 +775,7 @@ def compute_sum_error(valid_dl, model, return_vector, max_err=0.05, display_bad_
 
 
 def compute_max_error(valid_dl, model):
+
     with torch.no_grad():
         bad_cases = {}
         for ind, batch in enumerate(valid_dl):
