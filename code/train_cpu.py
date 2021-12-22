@@ -912,3 +912,7 @@ def main():
                                                                                                                 -1],
                                                                                                             time.time() - t_0))
     torch.save(net.state_dict(), './pytorch_m_g_1_true_moms_1000_new_data_20_moms_400k_data_c.pkl')
+
+if __name__ == "__main__":
+
+    main()
