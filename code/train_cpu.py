@@ -756,7 +756,7 @@ def compute_sum_error(valid_dl, model, return_vector, max_err=0.05, display_bad_
         for ind, batch in enumerate(valid_dl):
 
             xb, yb = batch
-            predictions = m(net(xb[:, :]))
+            predictions = m(model(xb[:, :]))
             #             aa = (xb[:,0]*(torch.exp(xb[:,1]))).reshape((xb.shape[0],1))
             normalizing_const = 1 - yb[:, 0]  # aa.repeat(1,predictions.shape[1])
             predictions = predictions * normalizing_const.reshape((yb.shape[0], 1))
