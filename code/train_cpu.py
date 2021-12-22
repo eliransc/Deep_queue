@@ -825,94 +825,110 @@ def check_loss_increasing(loss_list, n_last_steps=10, failure_rate=0.45):
 
 def main():
 
+    now = datetime.now()
+
+    current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
+
     ## Load data
     m_data_valid = pkl.load(open('/home/eliransc/scratch/pkl_data/valid_m_1000_a.pkl', 'rb'))
     y_data_valid = pkl.load(open('/home/eliransc/scratch/pkl_data/valid_y_1000_a.pkl', 'rb'))
     m_data = pkl.load(open('/home/eliransc/scratch/pkl_data/m_1000_b.pkl', 'rb'))
     y_data = pkl.load(open('/home/eliransc/scratch/pkl_data/y_1000_b.pkl', 'rb'))
 
-    #Construct dataset
-    dset = list(zip(m_data[:, :20], y_data))
-    valid_dset = list(zip(m_data_valid[:, :20], y_data_valid))
-    dl = DataLoader(dset, batch_size=128)
-    valid_dl = DataLoader(valid_dset, batch_size=128)
-    m = nn.Softmax(dim=1)
+    for num_moms in range(2,4):
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    # code made in pytorch3.ipynb with comments
-    class Net(nn.Module):
+        print('Number of moments are: ', num_moms)
 
-        def __init__(self):
-            super().__init__()
-            #         self.fc1 = nn.Linear(20, 50)
-            #         self.fc2 = nn.Linear(50, 70)
-            #         self.fc3 = nn.Linear(70, 85)
-            #         self.fc4 = nn.Linear(85, 100)
+        now = datetime.now()
+
+        current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
+
+        print('curr time: ', current_time)
+
+        #Construct dataset
+        dset = list(zip(m_data[:, :num_moms], y_data))
+        valid_dset = list(zip(m_data_valid[:, :num_moms], y_data_valid))
+        dl = DataLoader(dset, batch_size=128)
+        valid_dl = DataLoader(valid_dset, batch_size=128)
+        m = nn.Softmax(dim=1)
+
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+        # code made in pytorch3.ipynb with comments
+        class Net(nn.Module):
+
+            def __init__(self):
+                super().__init__()
+                #         self.fc1 = nn.Linear(20, 50)
+                #         self.fc2 = nn.Linear(50, 70)
+                #         self.fc3 = nn.Linear(70, 85)
+                #         self.fc4 = nn.Linear(85, 100)
+                #         self.fc5 = nn.Linear(100, 69)
+
+                self.fc1 = nn.Linear(num_moms, 30)
+                self.fc2 = nn.Linear(30, 40)
+                self.fc3 = nn.Linear(40, 50)
+                self.fc4 = nn.Linear(50, 60)
+                self.fc5 = nn.Linear(60, 69)
+
             #         self.fc5 = nn.Linear(100, 69)
 
-            self.fc1 = nn.Linear(20, 30)
-            self.fc2 = nn.Linear(30, 40)
-            self.fc3 = nn.Linear(40, 50)
-            self.fc4 = nn.Linear(50, 60)
-            self.fc5 = nn.Linear(60, 69)
+            def forward(self, x):
+                x = F.relu(self.fc1(x))
+                x = F.relu(self.fc2(x))
+                x = F.relu(self.fc3(x))
+                x = F.relu(self.fc4(x))
+                x = self.fc5(x)
+                return x  # F.log_softmax(x,dim=1)
 
-        #         self.fc5 = nn.Linear(100, 69)
+        net = Net().to(device)
 
-        def forward(self, x):
-            x = F.relu(self.fc1(x))
-            x = F.relu(self.fc2(x))
-            x = F.relu(self.fc3(x))
-            x = F.relu(self.fc4(x))
-            x = self.fc5(x)
-            return x  # F.log_softmax(x,dim=1)
+        curr_lr = 0.01
 
-    net = Net().to(device)
+        dl.to(device)
+        valid_dl.to(device)
+        import time
+        EPOCHS = 5
 
-    curr_lr = 0.01
+        optimizer = optim.Adam(net.parameters(), lr=curr_lr,
+                               weight_decay=1e-4)  # paramters is everything adjustable in model
 
-    dl.to(device)
-    valid_dl.to(device)
-    import time
-    EPOCHS = 10
+        loss_list = []
+        valid_list = []
+        compute_sum_error_list = []
 
-    optimizer = optim.Adam(net.parameters(), lr=curr_lr,
-                           weight_decay=1e-4)  # paramters is everything adjustable in model
+        for epoch in range(EPOCHS):
+            t_0 = time.time()
+            for data in dl:
+                X, y = data
 
-    loss_list = []
-    valid_list = []
-    compute_sum_error_list = []
+                net.zero_grad()
+                output = net(X)
+                loss = queue_loss(X, output, y)  # 1 of two major ways to calculate loss
+                loss.backward()
+                optimizer.step()
+                net.zero_grad()
 
-    for epoch in range(EPOCHS):
-        t_0 = time.time()
-        for data in dl:
-            X, y = data
+            loss_list.append(loss.item())
+            valid_list.append(valid(valid_dl, net).item())
+            compute_sum_error_list.append(compute_sum_error(valid_dl, net, False).item())
 
-            net.zero_grad()
-            output = net(X)
-            loss = queue_loss(X, output, y)  # 1 of two major ways to calculate loss
-            loss.backward()
-            optimizer.step()
-            net.zero_grad()
+            if len(loss_list) > 3:
+                if check_loss_increasing(valid_list):
+                    curr_lr = curr_lr * 0.5
+                    optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-4)
+                    print(curr_lr)
 
-        loss_list.append(loss.item())
-        valid_list.append(valid(valid_dl, net).item())
-        compute_sum_error_list.append(compute_sum_error(valid_dl, net, False).item())
-
-        if len(loss_list) > 3:
-            if check_loss_increasing(valid_list):
-                curr_lr = curr_lr * 0.5
-                optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-4)
-                print(curr_lr)
-
-        print("Epoch: {}, Training: {:.5f}, Validation : {:.5f}, Valid_sum_err: {:.5f},Time: {:.3f}".format(epoch,
-                                                                                                            loss.item(),
-                                                                                                            valid_list[
-                                                                                                                -1],
-                                                                                                            compute_sum_error_list[
-                                                                                                                -1],
-                                                                                                            time.time() - t_0))
-    torch.save(net.state_dict(), './pytorch_m_g_1_true_moms_1000_new_data_20_moms_400k_data_c.pkl')
+            print("Epoch: {}, Training: {:.5f}, Validation : {:.5f}, Valid_sum_err: {:.5f},Time: {:.3f}".format(epoch,
+                                                                                                                loss.item(),
+                                                                                                                valid_list[
+                                                                                                                    -1],
+                                                                                                                compute_sum_error_list[
+                                                                                                                    -1],
+                                                                                                                time.time() - t_0))
+        torch.save(net.state_dict(), './pytorch_m_g_1_true_moms_1000_new_data_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl')
+        pkl.dump((loss_list,valid_list,compute_sum_error_list), open('./losts_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl', 'wb'))
 
 if __name__ == "__main__":
 
