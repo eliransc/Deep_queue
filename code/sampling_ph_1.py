@@ -475,15 +475,16 @@ def generate_mix_ph(ph_size_max, UB_ratios, UB_rates, LB_rates, num_groups_max):
 
 
 
-def create_final_x_data(s, A, ph_size_max):
+def create_final_x_data(s, A, lam):
+
     lam_arr = np.zeros((A.shape[0] + 1, 1))
 
     s1 = s.reshape((1, s.shape[0]))
     expect_ser = ser_moment_n(s, A, 1)
     if expect_ser:
         #         expect_ser = expect_ser[0][0]
-        mu = 1/expect_ser
-        lam = np.random.uniform(0.3*mu, 0.9*mu, 1)[0]
+        # mu = 1/expect_ser
+        # lam = np.random.uniform(0.3*mu, 0.9*mu, 1)[0]
         # lam = lam * 0.95
         lam_arr[0, 0] = lam
 
@@ -823,7 +824,7 @@ def give_s_A_given__fixed_size(ph_size, scale_low, scale_high):
     return (s, A)
 
 
-def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=1000):
+def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=500):
     erlang_max_size = np.random.randint(int(0.25 * max_ph), int(0.75 * max_ph))
 
     scale_high = np.random.uniform(2, max_scale_high)
@@ -875,7 +876,7 @@ def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=1000):
         return False
 
 
-def create_gen_erlang_many_ph(max_ph_size = 1000):
+def create_gen_erlang_many_ph(max_ph_size = 500):
     ph_size = np.random.randint(31, max_ph_size)
     num_groups = np.random.randint(2,20)
     group_sizes = np.random.randint(1,25,num_groups)
@@ -921,33 +922,70 @@ def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path,
             s = s_A[0]
             A = s_A[1]
 
-            x = create_final_x_data(s, A, max_ph_size)
-            y = compute_y_data_given_folder(x, x.shape[0]-1, tot_prob=70, eps=0.0001)
-            if type(y) == np.ndarray:
-                moms = compute_first_n_moments(s, A, num_moms)
+            return (s,A)
 
-                mom_arr = np.concatenate(moms, axis=0)
-
-                lam = x[0, x.shape[0]-1]
-                # mu = 1 / mom_arr[0]
-                # lam = np.random.uniform(0 * mu, 0.95 * mu, 1)[0]
-
-                mom_arr = np.log(mom_arr)
-                mom_arr = np.delete(mom_arr, 0)
-                mom_arr = np.append(lam, mom_arr)
-
-                if not np.any(np.isinf(mom_arr)):
-
-                    return (mom_arr, y)
+            # x = create_final_x_data(s, A, max_ph_size)
+            # y = compute_y_data_given_folder(x, x.shape[0]-1, tot_prob=70, eps=0.0001)
+            # if type(y) == np.ndarray:
+            #     moms = compute_first_n_moments(s, A, num_moms)
+            #
+            #     mom_arr = np.concatenate(moms, axis=0)
+            #
+            #     lam = x[0, x.shape[0]-1]
+            #     # mu = 1 / mom_arr[0]
+            #     # lam = np.random.uniform(0 * mu, 0.95 * mu, 1)[0]
+            #
+            #     mom_arr = np.log(mom_arr)
+            #     mom_arr = np.delete(mom_arr, 0)
+            #     mom_arr = np.append(lam, mom_arr)
+            #
+            #     if not np.any(np.isinf(mom_arr)):
+            #
+            #         return (mom_arr, y)
         except:
             print('Not able to extract s and A')
+
+def compute_y_moms(s,A,num_moms,max_ph_size):
+
+
+    lam_vals = np.random.uniform(0.3, 0.95, 15)
+
+
+    lam_y_list = []
+
+    # mu = 1 / mom_arr[0]
+    # lam = np.random.uniform(0 * mu, 0.95 * mu, 1)[0]
+    for lam in lam_vals:
+        x = create_final_x_data(s, A, lam)
+
+        y = compute_y_data_given_folder(x, x.shape[0] - 1, tot_prob=70, eps=0.0001)
+        if type(y) == np.ndarray:
+            moms = compute_first_n_moments(s, A, num_moms)
+
+            mom_arr = np.concatenate(moms, axis=0)
+
+            lam = x[0, x.shape[0] - 1]
+            # mu = 1 / mom_arr[0]
+            # lam = np.random.uniform(0 * mu, 0.95 * mu, 1)[0]
+
+            mom_arr = np.log(mom_arr)
+            mom_arr = np.delete(mom_arr, 0)
+            mom_arr = np.append(lam, mom_arr)
+
+            if not np.any(np.isinf(mom_arr)):
+
+                lam_y_list.append((mom_arr, y))
+
+    return lam_y_list
+
 
 def generate_one_ph(batch_size, max_ph_size, df_1, num_moms, data_path, data_sample_name):
 
     sample_type_arr = np.random.randint(1, 4, batch_size)
     x_y_moms_list = [send_to_the_right_generator(val, max_ph_size, df_1, num_moms, data_path, data_sample_name) for val in sample_type_arr]
     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
-    saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
+    x_y_moms_lists =  [compute_y_moms(x_y_moms[0],x_y_moms[1], num_moms, max_ph_size) for x_y_moms  in x_y_moms_list]
+    saving_batch(list(itertools.chain(*x_y_moms_lists)), data_path, data_sample_name, num_moms)
 
     ## Clean list
 
@@ -995,7 +1033,7 @@ def main(args):
         df_1 = pkl.load(
             open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
 
-        data_path = '/home/eliransc/scratch/train_data_1000_ph/training'
+        data_path = '/home/eliransc/scratch/train_data_1000_ph/training_mult_lam'
 
 
     else:
@@ -1070,8 +1108,8 @@ def parse_arguments(argv):
     parser.add_argument('--num_examples', type=int, help='number of ph folders', default=500)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=35)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=100)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=64)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=500)
     args = parser.parse_args(argv)
 
     return args
