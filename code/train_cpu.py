@@ -835,7 +835,7 @@ def main():
     m_data = pkl.load(open('/home/eliransc/scratch/pkl_data/m_1000_b.pkl', 'rb'))
     y_data = pkl.load(open('/home/eliransc/scratch/pkl_data/y_1000_b.pkl', 'rb'))
 
-    for num_moms in range(2,4):
+    for num_moms in range(2,5):
 
 
         print('Number of moments are: ', num_moms)
@@ -889,7 +889,7 @@ def main():
         dl.to(device)
         valid_dl.to(device)
         import time
-        EPOCHS = 5
+        EPOCHS = 500
 
         optimizer = optim.Adam(net.parameters(), lr=curr_lr,
                                weight_decay=1e-4)  # paramters is everything adjustable in model
