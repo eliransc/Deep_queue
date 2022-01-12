@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+sys.path.append(r'G:\My Drive\butools2\Python')
+sys.path.append('/home/d/dkrass/eliransc/Python')
 sys.path.append('/home/eliransc/projects/def-dkrass/eliransc/butools/Python')
-sys.path.append(r'C:\Users\elira\Google Drive\butools2\Python')
 import os
 
 import pandas as pd
@@ -686,7 +687,7 @@ def normalize_ph_so_it_1_when_cdf_1(s, A, initial_val=0.5):
 
 
 def create_gen_erlang(UB_ratios=300, UB_rates=1, LB_rates=0.1,
-                      ph_size_max=100, num_groups_max=10, ph_size_min=50):
+                      ph_size_max=40, num_groups_max=10, ph_size_min=30):
     num_groups = np.random.randint(2, num_groups_max + 1)
     ph_size = np.random.randint(ph_size_min, ph_size_max + 1)
     group_sizes = recursion_group_size(num_groups, np.array([]), ph_size).astype(int)
@@ -877,7 +878,7 @@ def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=500):
 
 
 def create_gen_erlang_many_ph(max_ph_size = 500):
-    ph_size = np.random.randint(31, max_ph_size)
+    ph_size = np.random.randint(1, max_ph_size)
     num_groups = np.random.randint(2,20)
     group_sizes = np.random.randint(1,25,num_groups)
     group_sizes_1 = (group_sizes*ph_size/np.sum(group_sizes)).astype(int)+1
@@ -907,7 +908,7 @@ def create_gen_erlang_given_sizes(group_sizes, rates, probs=False):
 
 
 
-def send_to_the_right_generator(num_ind, max_ph_size, df_1, num_moms, data_path, data_sample_name):
+def send_to_the_right_generator(num_ind, max_ph_size,  num_moms, data_path, data_sample_name):
 
     if num_ind == 1: ## Any arbitrary ph
         s_A =  create_mix_erlang_ph() # give_s_A_given_size(np.random.randint(60, max_ph_size))
@@ -979,10 +980,10 @@ def compute_y_moms(s,A,num_moms,max_ph_size):
     return lam_y_list
 
 
-def generate_one_ph(batch_size, max_ph_size, df_1, num_moms, data_path, data_sample_name):
+def generate_one_ph(batch_size, max_ph_size, num_moms, data_path, data_sample_name):
 
     sample_type_arr = np.random.randint(1, 4, batch_size)
-    x_y_moms_list = [send_to_the_right_generator(val, max_ph_size, df_1, num_moms, data_path, data_sample_name) for val in sample_type_arr]
+    x_y_moms_list = [send_to_the_right_generator(val, max_ph_size,  num_moms, data_path, data_sample_name) for val in sample_type_arr]
     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
     x_y_moms_lists =  [compute_y_moms(x_y_moms[0],x_y_moms[1], num_moms, max_ph_size) for x_y_moms  in x_y_moms_list]
     saving_batch(list(itertools.chain(*x_y_moms_lists)), data_path, data_sample_name, num_moms)
@@ -1028,22 +1029,21 @@ def main(args):
     # ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 10., 15, 20, 25.])
 
     if sys.platform == 'linux':
-        vals_bounds_dict = pkl.load(
-            open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/vals_bounds.pkl', 'rb'))
-        df_1 = pkl.load(
-            open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
-
-        data_path = '/home/eliransc/scratch/train_data_1000_ph/training_mult_lam'
-
+    #     vals_bounds_dict = pkl.load(
+    #         open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/vals_bounds.pkl', 'rb'))
+    #     df_1 = pkl.load(
+    #         open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
+    #
+        data_path = '/scratch/eliransc/data/train_data'
 
     else:
-        vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
-        df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
-        data_path = r'C:\Users\elira\workspace\Research\data\training_batches'
+    #     vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
+    #     df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
+        data_path = r'C:\Users\user\workspace\data\training_batches'
 
-    cur_time = int(time.time())
-    np.random.seed(cur_time+len(os.listdir(data_path)))
-    print(cur_time)
+    # cur_time = int(time.time())
+    # np.random.seed(cur_time+len(os.listdir(data_path)))
+    # print(cur_time)
 
     data_sample_name = 'batch_size_' + str(args.batch_size) + '_num_moms_' + str(args.num_moms)+'_num_max_size_'+str(args.max_num_groups)
     x_vals = np.linspace(0, 1, 30)
@@ -1051,7 +1051,7 @@ def main(args):
 
 
     for ind in tqdm(range(args.num_examples)):
-        generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name)
+        generate_one_ph(args.batch_size, args.ph_size_max,  args.num_moms, data_path, data_sample_name)
 
     # for ind in tqdm(range(args.num_examples)):
     #     generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name)
@@ -1105,11 +1105,11 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=500)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=1)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
-    parser.add_argument('--num_moms', type=int, help='number of ph folders', default=35)
+    parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=64)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=500)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=20)
     args = parser.parse_args(argv)
 
     return args
