@@ -1041,9 +1041,9 @@ def main(args):
     #     df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
         data_path = r'C:\Users\user\workspace\data\training_batches'
 
-    # cur_time = int(time.time())
-    # np.random.seed(cur_time+len(os.listdir(data_path)))
-    # print(cur_time)
+    cur_time = int(time.time())
+    np.random.seed(cur_time+len(os.listdir(data_path)))
+    print(cur_time)
 
     data_sample_name = 'batch_size_' + str(args.batch_size) + '_num_moms_' + str(args.num_moms)+'_num_max_size_'+str(args.max_num_groups)
     x_vals = np.linspace(0, 1, 30)
