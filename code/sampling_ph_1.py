@@ -1034,7 +1034,7 @@ def main(args):
     #     df_1 = pkl.load(
     #         open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
     #
-        data_path = '/scratch/eliransc/data/train_data'
+        data_path = '/scratch/eliransc/data_single_arriv_rate'
 
     else:
     #     vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
