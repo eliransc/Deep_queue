@@ -1072,13 +1072,13 @@ def main():
 
     rand_u = np.random.rand(10000)
 
-    s, A = pkl.load(open('G:\My Drive\data\s_A_fittiing_examp.pkl', 'rb'))
+    # s, A = pkl.load(open('G:\My Drive\data\s_A_fittiing_examp.pkl', 'rb'))
 
-    # s,A = pkl.load(open('/home/eliransc/projects/def-dkrass/eliransc/Notebooks/s_A.pkl', 'wb'))
+    s,A = pkl.load(open('/home/eliransc/projects/def-dkrass/eliransc/Notebooks/s_A.pkl', 'wb'))
 
-    samples = [find_inv_cdf(s, A, 2.5, u, 0, 5, itera=0, thrsh=0.0001) for u in tqdm(rand_u[:5])]
+    samples = [find_inv_cdf(s, A, 2.5, u, 0, 5, itera=0, thrsh=0.0001) for u in tqdm(rand_u[:4])]
 
-    pkl.dump(samples, open(r'samples'+str(rand_u[-1])+'.pkl', 'wb'))
+    pkl.dump(samples, open('samples'+str(rand_u[-1])+'.pkl', 'wb'))
 
     print(samples)
 
