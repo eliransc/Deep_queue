@@ -1057,7 +1057,7 @@ def main(args):
     #     generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name)
     # x_y_moms_list = [generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name) for ind in tqdm(range(args.num_examples))]
 
-    # Compute steay_state
+    # Compute steady_state
 
 
     # cdf_list = [compute_cdf_within_range(x_vals, s_A[0], s_A[1]) for s_A in tqdm(s_A_list) if s_A]
@@ -1108,7 +1108,7 @@ def parse_arguments(argv):
     parser.add_argument('--num_examples', type=int, help='number of ph folders', default=120)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=4)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
     parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=20)
     args = parser.parse_args(argv)
 
