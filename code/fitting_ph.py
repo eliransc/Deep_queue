@@ -1071,7 +1071,7 @@ def main():
     np.random.seed(cur_time)
     print(cur_time)
 
-    rand_u = np.random.rand(5000)
+    rand_u = np.random.rand(4000)
 
     # s, A = pkl.load(open('G:\My Drive\data\s_A_fittiing_examp.pkl', 'rb'))
 
