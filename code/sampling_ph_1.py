@@ -1115,5 +1115,7 @@ def parse_arguments(argv):
 
     return args
 
+if __name__ == "__main__":
+
     args = parse_arguments(sys.argv[1:])
     main(args)
