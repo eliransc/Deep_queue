@@ -1,3 +1,26 @@
+import matplotlib.pyplot as plt
+import argparse
+import sys
+# import numpy as np
+# from mpl_toolkits import mplot3d
+import numpy as np
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+import numpy as np
+import sympy
+from sympy import *
+import sys
+sys.path.append(r'G:\My Drive\butools2\Python')
+sys.path.append('/home/d/dkrass/eliransc/Python')
+import pandas as pd
+
+from butools.ph import *
+from butools.map import *
+from butools.queues import *
+from butools.mam import *
+from butools.fitting import *
+import pickle as pkl
+
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -29,6 +52,7 @@ import itertools
 from scipy.special import factorial
 
 import pickle as pkl
+
 
 
 def thresh_func(row):
@@ -674,7 +698,6 @@ def find_when_cdf_cross_0_999(s, A, x, itera=0, thrsh=0.9995):
     else:
         return find_when_cdf_cross_0_999(s, A, x / 2, itera + 1, thrsh)
 
-
 def normalize_ph_so_it_1_when_cdf_1(s, A, initial_val=0.5):
     norm_const = find_when_cdf_cross_0_999(s, A, initial_val)
     if norm_const == 0:
@@ -825,7 +848,7 @@ def give_s_A_given__fixed_size(ph_size, scale_low, scale_high):
     return (s, A)
 
 
-def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=500):
+def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=800):
     erlang_max_size = np.random.randint(int(0.25 * max_ph), int(0.75 * max_ph))
 
     scale_high = np.random.uniform(2, max_scale_high)
@@ -877,7 +900,7 @@ def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=500):
         return False
 
 
-def create_gen_erlang_many_ph(max_ph_size = 500):
+def create_gen_erlang_many_ph(max_ph_size = 1000):
     ph_size = np.random.randint(1, max_ph_size)
     num_groups = np.random.randint(2,20)
     group_sizes = np.random.randint(1,25,num_groups)
@@ -1021,98 +1044,53 @@ def create_shrot_tale_genErlang(df_1, ratio_size=10):
     return (s, A)
 
 
+def find_inv_cdf(s, A, x, target, lower, upper, itera=0, thrsh=0.0001):
+    curr_cdf = compute_cdf(x, s, A).flatten()[0]
+    if itera < 100:
+        if curr_cdf < target - thrsh:
+            lower = x
+            x = (lower + upper) / 2
+            return find_inv_cdf(s, A, x, target, lower, upper, itera + 1)
+        elif curr_cdf > target + thrsh:
+            upper = x
+            x = (lower + upper) / 2
+            return find_inv_cdf(s, A, x, target, lower, upper, itera + 1)
+        else:
 
-def main(args):
-
-
-
-    # ratios_rates = np.array([1., 1.25, 1.5, 2., 4., 8, 10., 15, 20, 25.])
-
-    if sys.platform == 'linux':
-    #     vals_bounds_dict = pkl.load(
-    #         open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/vals_bounds.pkl', 'rb'))
-    #     df_1 = pkl.load(
-    #         open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
-    #
-        data_path = '/scratch/eliransc/data_single_arriv_rate'
-
+            return x
     else:
-    #     vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
-    #     df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
-        data_path = r'C:\Users\user\workspace\data\training_batches'
+        return False
+
+
+
+
+def main():
 
     cur_time = int(time.time())
-    np.random.seed(cur_time+len(os.listdir(data_path)))
+    np.random.seed(cur_time)
     print(cur_time)
 
-    data_sample_name = 'batch_size_' + str(args.batch_size) + '_num_moms_' + str(args.num_moms)+'_num_max_size_'+str(args.max_num_groups)
-    x_vals = np.linspace(0, 1, 30)
-    # Compute ph_dists
+    rand_u = np.random.rand(10000)
+
+    s, A = pkl.load(open('G:\My Drive\data\s_A_fittiing_examp.pkl', 'rb'))
+
+    # s,A = pkl.load(open('/home/eliransc/projects/def-dkrass/eliransc/Notebooks/s_A.pkl', 'wb'))
+
+    samples = [find_inv_cdf(s, A, 2.5, u, 0, 5, itera=0, thrsh=0.0001) for u in tqdm(rand_u[:5])]
+
+    pkl.dump(samples, open(r'samples'+str(rand_u[-1])+'.pkl', 'wb'))
+
+    print(samples)
 
 
-    for ind in tqdm(range(args.num_examples)):
-        generate_one_ph(args.batch_size, args.ph_size_max,  args.num_moms, data_path, data_sample_name)
-
-    # for ind in tqdm(range(args.num_examples)):
-    #     generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name)
-    # x_y_moms_list = [generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name) for ind in tqdm(range(args.num_examples))]
-
-    # Compute steay_state
 
 
-    # cdf_list = [compute_cdf_within_range(x_vals, s_A[0], s_A[1]) for s_A in tqdm(s_A_list) if s_A]
 
 
-    # sample_size = args.batch_size
-    # max_ph_size = args.ph_size_max
-    # s_A_lists = [give_s_A_given_size(np.random.randint(60, max_ph_size)) for ind in range(sample_size)]
-    #
-    # A_s_lists = [normalize_ph_so_it_1_when_cdf_1(s_A[0], s_A[1]) for s_A in s_A_lists]
-    # x_vals = np.linspace(0, 1, 30)
-    # cdf_list_1 = [compute_cdf_within_range(x_vals, s_A[0], s_A[1]) for s_A in tqdm(A_s_lists) if s_A]
-    #
-    # s_A_list = [create_gen_erlang() for ind in tqdm(range(args.batch_size))]
-    # s_A_list = [s_A for s_A in s_A_list if s_A]
-    #
-    # cdf_list_2 = [compute_cdf_within_range(x_vals, s_A[0], s_A[1]) for s_A in tqdm(s_A_list) if s_A]
-    #
-    # ratio_size = 10
-    #
-    # cdf_list_3 = []
-    # ph_sizes = np.linspace(10, 100, 10).astype(int)
-    # probs_ph_tot_size = np.array(ph_sizes ** 2 / np.sum(ph_sizes ** 2))
-    # for example in tqdm(range(200)):
-    #     num_groups = np.random.randint(1, 10)
-    #     group_size = recursion_group_size(num_groups, np.array([]),
-    #                                       np.random.choice(ph_sizes, 1, p=probs_ph_tot_size)[0]).astype(int)
-    #     group_rates = give_rates_given_Er_sizes(df_1, group_size, ratio_size)
-    #     s, A = create_gen_erlang_given_sizes(group_size, group_rates)
-    #
-    #     pdf_vals = compute_cdf_within_range(x_vals, np.array(s), np.array(A))
-    #     cdf_list_3.append(pdf_vals)
-    #
-    # cdf_list = cdf_list_1+cdf_list_1+cdf_list_2+cdf_list_3
-    # plt.figure()
-    # for cdf_vals in cdf_list:
-    #     plt.plot(x_vals, cdf_vals)
-    # plt.xlim(0, 1)
-    # plt.ylim(0, 1)
-    # plt.show()
+if __name__ == "__main__":
+    main()
 
 
-    print('Finish here')
 
-def parse_arguments(argv):
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=120)
-    parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
-    parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=4)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=20)
-    args = parser.parse_args(argv)
 
-    return args
 
-    args = parse_arguments(sys.argv[1:])
-    main(args)
