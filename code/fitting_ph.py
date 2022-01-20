@@ -1071,13 +1071,13 @@ def main():
     np.random.seed(cur_time)
     print(cur_time)
 
-    rand_u = np.random.rand(10000)
+    rand_u = np.random.rand(5000)
 
     # s, A = pkl.load(open('G:\My Drive\data\s_A_fittiing_examp.pkl', 'rb'))
 
-    # s,A = pkl.load(open('/home/eliransc/projects/def-dkrass/eliransc/Notebooks/s_A.pkl', 'rb'))
+    s,A = pkl.load(open('/home/eliransc/projects/def-dkrass/eliransc/Notebooks/s_A.pkl', 'rb'))
 
-    s,A =  pkl.load(open('/home/d/dkrass/eliransc/notebooks/s_A.pkl', 'rb'))
+    # s,A =  pkl.load(open('/home/d/dkrass/eliransc/notebooks/s_A.pkl', 'rb'))
 
     samples = [find_inv_cdf(s, A, 2.5, u, 0, 5, itera=0, thrsh=0.0001) for u in tqdm(rand_u)]
 
