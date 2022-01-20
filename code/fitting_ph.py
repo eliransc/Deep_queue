@@ -14,16 +14,17 @@ sys.path.append(r'G:\My Drive\butools2\Python')
 sys.path.append('/home/d/dkrass/eliransc/Python')
 import pandas as pd
 
-from butools.ph import *
-from butools.map import *
-from butools.queues import *
-from butools.mam import *
-from butools.fitting import *
+# from butools.ph import *
+# from butools.map import *
+# from butools.queues import *
+# from butools.mam import *
+# from butools.fitting import *
 import pickle as pkl
 
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+
 sys.path.append(r'G:\My Drive\butools2\Python')
 sys.path.append('/home/d/dkrass/eliransc/Python')
 sys.path.append('/home/eliransc/projects/def-dkrass/eliransc/butools/Python')
@@ -32,12 +33,12 @@ import os
 import pandas as pd
 import argparse
 from tqdm import tqdm
-from butools.ph import *
-from butools.map import *
-from butools.queues import *
+# from butools.ph import *
+# from butools.map import *
+# from butools.queues import *
 import time
-from butools.mam import *
-from butools.dph import *
+# from butools.mam import *
+# from butools.dph import *
 from scipy.linalg import expm, sinm, cosm
 
 from numpy.linalg import matrix_power
@@ -45,7 +46,7 @@ from scipy.stats import rv_discrete
 # import seaborn as sns
 import random
 from scipy.stats import loguniform
-from butools.fitting import *
+# from butools.fitting import *
 from datetime import datetime
 from fastbook import *
 import itertools
@@ -1078,7 +1079,7 @@ def main():
 
     s,A =  pkl.load(open('/home/d/dkrass/eliransc/notebooks/s_A.pkl', 'rb'))
 
-    samples = [find_inv_cdf(s, A, 2.5, u, 0, 5, itera=0, thrsh=0.0001) for u in tqdm(rand_u[:4])]
+    samples = [find_inv_cdf(s, A, 2.5, u, 0, 5, itera=0, thrsh=0.0001) for u in tqdm(rand_u)]
 
     pkl.dump(samples, open('samples'+str(rand_u[-1])+'.pkl', 'wb'))
 
