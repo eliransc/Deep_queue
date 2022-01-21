@@ -1052,6 +1052,10 @@ def main(args):
 
 
     for ind in tqdm(range(args.num_examples)):
+        cur_time = int(time.time())
+        np.random.seed(cur_time + len(os.listdir(data_path)))
+        print(cur_time)
+
         generate_one_ph(args.batch_size, args.ph_size_max,  args.num_moms, data_path, data_sample_name)
 
     # for ind in tqdm(range(args.num_examples)):
