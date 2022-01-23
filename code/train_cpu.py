@@ -841,9 +841,9 @@ def main():
     m_data_valid = mdata[1400000:, :]
     y_data_valid = ydata[1400000:, :]
 
-    for num_moms in range(2,3):
+    for num_moms in range(2,10):
 
-        num_moms = 20
+
         print('Number of moments are: ', num_moms)
 
         now = datetime.now()
@@ -929,7 +929,7 @@ def main():
             if len(loss_list) > 3:
                 if check_loss_increasing(valid_list):
                     curr_lr = curr_lr * 0.7
-                    optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-4)
+                    optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-5)
                     print(curr_lr)
 
             print("Epoch: {}, Training: {:.5f}, Validation : {:.5f}, Valid_sum_err: {:.5f},Time: {:.3f}".format(epoch,
