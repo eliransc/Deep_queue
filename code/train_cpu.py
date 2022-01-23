@@ -841,7 +841,7 @@ def main():
     m_data_valid = mdata[1400000:, :]
     y_data_valid = ydata[1400000:, :]
 
-    for num_moms in range(12,17):
+    for num_moms in range(17,20):
 
 
         print('Number of moments are: ', num_moms)
