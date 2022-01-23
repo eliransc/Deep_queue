@@ -856,6 +856,9 @@ def main():
         valid_dset = list(zip(m_data_valid[:, :num_moms], y_data_valid))
         dl = DataLoader(dset, batch_size=128)
         valid_dl = DataLoader(valid_dset, batch_size=128)
+        import torch
+        import torch.nn as nn
+
         m = nn.Softmax(dim=1)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
