@@ -829,16 +829,16 @@ def main():
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
 
     ## Load data
-    m_data = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_3.pkl', 'rb'))
-    y_data = pkl.load(open('/scratch/eliransc/pkl_data/y_data_3.pkl', 'rb'))
+    mdata = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_3.pkl', 'rb'))
+    ydata = pkl.load(open('/scratch/eliransc/pkl_data/y_data_3.pkl', 'rb'))
     # m_data = pkl.load(open('/scratch/eliransc/pkl_data/mom_data.pkl', 'rb'))
     # y_data = pkl.load(open('/scratch/eliransc/pkl_data/y_data.pkl', 'rb'))
 
-    m_data = m_data[:1400000, :]
-    y_data = y_data[:1400000, :]
+    m_data = mdata[:1400000, :]
+    y_data = ydata[:1400000, :]
 
-    m_data_valid = m_data_valid[1400000:, :]
-    y_data_valid = y_data_valid[1400000:, :]
+    m_data_valid = mdata[1400000:, :]
+    y_data_valid = ydata[1400000:, :]
 
     for num_moms in range(2,3):
 
