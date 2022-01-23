@@ -841,7 +841,7 @@ def main():
     m_data_valid = mdata[1400000:, :]
     y_data_valid = ydata[1400000:, :]
 
-    for num_moms in range(17,20):
+    for num_moms in range(19,20):
 
 
         print('Number of moments are: ', num_moms)
@@ -881,7 +881,8 @@ def main():
                 self.fc3 = nn.Linear(40, 50)
                 self.fc4 = nn.Linear(50, 60)
                 self.fc5 = nn.Linear(60, 60)
-                self.fc6 = nn.Linear(60, 69)
+                self.fc6 = nn.Linear(60, 60)
+                self.fc7 = nn.Linear(60, 69)
 
             #         self.fc5 = nn.Linear(100, 69)
 
@@ -891,7 +892,8 @@ def main():
                 x = F.relu(self.fc3(x))
                 x = F.relu(self.fc4(x))
                 x = F.relu(self.fc5(x))
-                x = self.fc6(x)
+                x = F.relu(self.fc6(x))
+                x = self.fc7(x)
                 return x  # F.log_softmax(x,dim=1)
 
         net = Net().to(device)
@@ -901,7 +903,7 @@ def main():
         dl.to(device)
         valid_dl.to(device)
         import time
-        EPOCHS = 300
+        EPOCHS = 350
 
         optimizer = optim.Adam(net.parameters(), lr=curr_lr,
                                weight_decay=1e-5)  # paramters is everything adjustable in model
