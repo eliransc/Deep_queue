@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -t 0-20:58
+#SBATCH -t 0-23:58
 #SBATCH -A def-dkrass
 #SBATCH --gpus-per-node=1
 #SBATCH --mem-per-cpu=10000M
