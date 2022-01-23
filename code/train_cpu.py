@@ -12,7 +12,8 @@ from numpy.linalg import matrix_power
 from scipy.stats import rv_discrete
 from scipy.linalg import expm, sinm, cosm
 from numpy.linalg import matrix_power
-
+import torch
+import torch.nn as nn
 
 import os
 import numpy as np
