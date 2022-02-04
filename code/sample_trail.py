@@ -244,7 +244,7 @@ def create_mix_erlang_ph(ph_size, scale_low=1, max_scale_high=15, max_ph=500):
 
     # group_sizes = recursion_group_size(num_groups, np.array([]), ph_size_erl).astype(int)  #np.random.randint(1, 25, num_groups)
 
-    rates = ((np.ones(num_groups) * np.random.uniform(1, 1.75)) ** np.arange(num_groups))
+    rates = np.random.rand(num_groups)*200   #((np.ones(num_groups) * np.random.uniform(1, 1.75)) ** np.arange(num_groups))
     group_sizes_erl = recursion_group_size(num_groups, np.array([]), ph_size_erl).astype(int) # (group_sizes * ph_size_erl / np.sum(group_sizes)).astype(int) + 1
     erlang_list_erl = [generate_erlang_given_rates(rates[ind], ph_size_erl) for ind, ph_size_erl in
                        enumerate(group_sizes_erl)]
@@ -283,14 +283,14 @@ def create_gen_erlang_many_ph(ph_size):
 
     num_groups = np.random.randint(1,min(20,ph_size))
     group_sizes_1 = recursion_group_size(num_groups, np.array([]), ph_size).astype(int)
-    rates = ((np.ones(num_groups)*np.random.uniform(1, 1.75))**np.arange(num_groups))
+    rates = np.random.rand(num_groups)*10 # ((np.ones(num_groups)*np.random.uniform(1, 1.85))**np.arange(num_groups))
     s,A = create_gen_erlang_given_sizes(group_sizes_1, rates)
 
     A = A*compute_first_n_moments(s, A, 1)[0][0]
     return (s,A)
 
 
-def send_to_the_right_generator(num_ind, ph_size,  num_moms, data_path, data_sample_name):
+def send_to_the_right_generator(num_ind, ph_size):
 
     if num_ind == 1: ## Any arbitrary ph
         s_A =  create_mix_erlang_ph(ph_size) # give_s_A_given_size(np.random.randint(60, max_ph_size))
@@ -308,6 +308,65 @@ def send_to_the_right_generator(num_ind, ph_size,  num_moms, data_path, data_sam
 
         except:
             print('Not able to extract s and A')
+
+
+def kroneker_sum(G,H):
+    size_g = G.shape[0]
+    size_h = H.shape[0]
+    return np.kron(G, np.identity(size_h)) + np.kron( np.identity(size_g),H)
+
+def compute_steady(s_arrival, A_arrival, s_service, A_service, y_size=500, eps=0.000001):
+
+    inter_arrival_expected = ser_moment_n(s_arrival, A_arrival, 1)
+    inter_service_expected = ser_moment_n(s_service, A_service, 1)
+
+    A_service0 = -np.dot(A_service, np.ones((A_service.shape[0], 1)))
+    A_arrival0 = -np.dot(A_arrival, np.ones((A_arrival.shape[0], 1)))
+
+    A0 = A_arrival
+    A1 = np.kron(np.identity(A_arrival.shape[0]), A_service0)
+    A = kroneker_sum(np.zeros(A_arrival.shape), np.dot(A_service0, s_service))
+    B = kroneker_sum(A_arrival, A_service)
+    C = kroneker_sum(np.dot(A_arrival0, s_arrival), np.zeros((A_service.shape[0], A_service.shape[0])))
+    C0 = np.kron(np.dot(A_arrival0, s_arrival), s_service)
+
+    R = QBDFundamentalMatrices(A, B, C, "R")
+
+    rho = (ser_moment_n(s_service, A_service, 1) / ser_moment_n(s_arrival, A_arrival, 1))[0][0]
+
+    A0T = A0.transpose()
+    A1T = A1.transpose()
+    C0T = C0.transpose()
+    BRAT = np.array(B + np.dot(R, A)).transpose()
+
+    eqns = np.concatenate((np.concatenate((A0T, A1T), axis=1), np.concatenate((C0T, BRAT), axis=1)), axis=0)[:-1, :]
+
+    sys_size = \
+    np.concatenate((np.concatenate((A0T, A1T), axis=1), np.concatenate((C0T, BRAT), axis=1)), axis=0)[:-1, :].shape[1]
+    u0_size = A0.shape[0]
+    u0_eq = np.zeros((1, sys_size))
+    u0_eq[0, :u0_size] = 1
+
+    tot_eqns = np.concatenate((eqns, u0_eq), axis=0)
+
+    u0 = 1 - rho
+    B = np.zeros(sys_size)
+    B[-1] = u0
+
+    X = np.linalg.solve(tot_eqns, B)
+
+    steady = np.zeros(y_size)
+    steady[0] = np.sum(X[:A0.shape[0]])
+    steady[1] = np.sum(X[A0.shape[0]:])
+    tot_sum = np.sum(X)
+    for ind in tqdm(range(2, y_size)):
+        steady[ind] = np.sum(np.dot(X[u0_size:], matrix_power(R, ind - 1)))
+        if np.sum(steady) > 1 - eps:
+            break
+
+    return steady
+
+
 
 
 def compute_y_moms(s,A,num_moms,max_ph_size):
@@ -430,7 +489,7 @@ def saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x = False
 
 def generate_one_ph(batch_size, max_ph_size, num_moms, data_path, data_sample_name):
 
-    sample_type_arr = np.random.randint(1, 4, batch_size)
+    sample_type_arr = np.random.randint(1, 3, batch_size)
     x_y_moms_list = [send_to_the_right_generator(val, args.ph_size,  num_moms, data_path, data_sample_name) for val in sample_type_arr]
     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
     x_y_moms_lists =  [compute_y_moms(x_y_moms[0],x_y_moms[1], num_moms, max_ph_size) for x_y_moms  in x_y_moms_list]
@@ -438,6 +497,68 @@ def generate_one_ph(batch_size, max_ph_size, num_moms, data_path, data_sample_na
 
 
     return 1
+
+
+def sample_size(ph_max_size):
+    total = np.random.randint(2,ph_max_size+1)
+    if np.random.rand()>0.5:
+        arrival = np.random.randint(1,max(2,int((total+1)*np.random.rand())))
+        service = int(total/arrival)
+    else:
+        service = np.random.randint(1,max(2,int((total+1)*np.random.rand())))
+        arrival = int(total/service)
+    return (arrival,service)
+
+def manage_batch(batch_size, ph_size_max, num_moms, data_path, data_sample_name):
+    '''
+    batch_size: the batch size we save as a single tensor
+    ph_size_ax: relate to the product of the arrival and service sizes
+    num_moms: which we need to compute for both arrivals and services
+    data_path: the folder in which it is saved
+    data_sample_name: the file name of saved tensor
+    '''
+
+    'looping over a batch, creating BS samples which include 20 arrival moments, 20 service moments and 500 probs.'
+    'In charge of saving batches - creating input tensor of size (BSX40) and output of size (BSX500)'
+
+    mom_output_list = [manage_single_sample(ph_size_max, num_moms) for ind in range(batch_size)]
+
+def manage_single_sample(ph_size_max, num_moms, eps = 0.00001):
+    '''
+    ph_size_max: the maximum number of batch size (product of arrival and service)
+    num_moms: number of save moments
+    '''
+    'sampling arrival and service sizes, then sampling (s,A) for each one'
+    'take the pair (ph_arrival, ph_service) and compute y - i.e., the y values for deep'
+    'compute moments of both arrival and service'
+    'return to manage batch (moms, y)'
+
+    a_size, ser_size = sample_size(ph_size_max)
+
+    s_arrival, A_arrival = send_to_the_right_generator(np.random.randint(1, 3), a_size)
+    s_service, A_service = send_to_the_right_generator(np.random.randint(1, 3), ser_size)
+
+    rho = np.random.uniform(0.3,0.95)
+    A_arrival = A_arrival * rho
+
+    s_arrival = s_arrival.reshape((1, s_arrival.shape[0]))
+    s_service = s_service.reshape((1, s_service.shape[0]))
+
+
+    stead = compute_steady(s_arrival, A_arrival, s_service, A_service)
+
+    if np.sum(stead) > 1-eps: # otherwise don't use it
+
+        arrival_moms = compute_first_n_moments(s_arrival, A_arrival, num_moms)
+        service_moms = compute_first_n_moments(s_service, A_service, num_moms)
+
+        moms_tesnor = torch.cat((torch.tensor(arrival_moms), torch.tensor(service_moms)))
+
+        return (moms_tesnor, stead)
+
+
+
+    print('stop')
 
 
 def main(args):
@@ -455,9 +576,8 @@ def main(args):
     np.random.seed(cur_time + len(os.listdir(data_path)))
     print(cur_time)
 
-    ph_gen_er = create_gen_erlang_many_ph(args.ph_size)
+    manage_single_sample(200, 20)
 
-    Ph_rep = create_mix_erlang_ph(args.ph_size)
 
     data_sample_name = 'batch_size_' + str(args.batch_size) + '_num_moms_' + str(
         args.num_moms) + '_num_max_size_' +'num_phases_'+str(args.ph_size)+'_'+ str(args.max_num_groups)
@@ -481,7 +601,7 @@ def parse_arguments(argv):
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=64)
     parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=20)
-    parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
+    parser.add_argument('--ph_size', type=int, help='ph_size', default=100)
     args = parser.parse_args(argv)
 
     return args
