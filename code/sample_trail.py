@@ -36,7 +36,38 @@ def compute_R(lam, alph, T):
     return np.array(lam * torch.inverse(lam * torch.eye(T.shape[0]) - lam * e @ alph - T))
 
 
+def compute_pdf_within_range(x_vals, s, A):
+    pdf_list = []
+    for x in x_vals:
+        pdf_list.append(compute_pdf(x, s, A).flatten())
 
+    return pdf_list
+
+def compute_cdf_within_range(x_vals, s, A):
+    pdf_list = []
+    for x in x_vals:
+        pdf_list.append(compute_cdf(x, s, A).flatten())
+
+    return pdf_list
+
+def compute_pdf(x, s, A):
+    '''
+    x: the value of pdf
+    s: inital probs
+    A: Generative matrix
+    '''
+    A0 = -np.dot(A, np.ones((A.shape[0], 1)))
+    return np.dot(np.dot(s, expm(A * x)), A0)
+
+
+def compute_cdf(x, s, A):
+    '''
+    x: the value of pdf
+    s: inital probs
+    A: Generative matrix
+    '''
+    A0 = -np.dot(A, np.ones((A.shape[0], 1)))
+    return 1 - np.sum(np.dot(s, expm(A * x)))
 
 
 def steady_i(rho, alph, R, i):
@@ -202,6 +233,14 @@ def give_s_A_given__fixed_size(ph_size, scale_low, scale_high):
 
     return (s, A)
 
+def balance_sizes(sizes):
+    for ind in range(sizes.shape[0]):
+        if sizes[ind] < 3:
+            ind_max = np.argmax(sizes)
+            if sizes[ind_max] >2 :
+                sizes[ind] +=1
+                sizes[ind_max] -=1
+    return sizes
 
 def recursion_group_size(group_left, curr_vector, phases_left):
     if group_left == 1:
@@ -211,41 +250,54 @@ def recursion_group_size(group_left, curr_vector, phases_left):
         if phases_left + 1 - group_left == 1:
             curr_size = 1
         else:
-            curr_size = np.random.randint(1, phases_left + 1 - group_left)
+            curr_size =  1+ np.random.binomial(phases_left + 1 - group_left-1, np.random.uniform(0.1,0.5))
         return recursion_group_size(group_left - 1, np.append(curr_size, curr_vector), phases_left - curr_size)
 
 def create_mix_erlang_ph(ph_size, scale_low=1, max_scale_high=15, max_ph=500):
 
+    if ph_size > 2:
+        ph_size_gen_ph = np.random.randint(2, ph_size)
 
-    ph_size_gen_ph = np.random.randint(2, ph_size)
+    else:
+        return create_gen_erlang_many_ph(ph_size)
 
     erlang_max_size = np.random.randint(int(0.25 * max_ph), int(0.75 * max_ph))
 
     scale_high = np.random.uniform(2, max_scale_high)
     # ph_size_gen_ph = np.random.randint(5, max_ph - erlang_max_size)
-    if int(0.75*ph_size_gen_ph ) > 1:
+    # if int(0.5*ph_size_gen_ph ) > 1:
 
-        num_groups = np.random.randint(1,  int(0.75*ph_size_gen_ph ) )
-    else:
-        num_groups = 1
+    #     num_groups = np.random.randint(1,  int(0.5*ph_size_gen_ph) )
+    # else:
+    #     num_groups = 1
+    num_groups = sample_num_groups(ph_size_gen_ph)
+
 
     # group_sizes = np.random.randint(1, 25, num_groups)
 
     group_sizes_gen_ph = recursion_group_size(num_groups, np.array([]), ph_size_gen_ph) #(group_sizes * ph_size_gen_ph / np.sum(group_sizes)).astype(int) + 1
+    if np.random.rand()>0.01:
+        group_sizes_gen_ph = balance_sizes(group_sizes_gen_ph)
     erlang_list_gen_ph = [give_s_A_given__fixed_size(size, scale_low, scale_high) for size in group_sizes_gen_ph.astype(int)]
     erlang_list_gen_ph_A = [lis[1] for lis in erlang_list_gen_ph]
     erlang_list_gen_ph_s = [lis[0] for lis in erlang_list_gen_ph]
 
     ph_size_erl = ph_size - ph_size_gen_ph #np.random.randint(5, erlang_max_size)
-    if ph_size_erl > 2:
-        num_groups = np.random.randint(1, min(30, ph_size_erl - 1))
-    else:
-        num_groups = 1
+    # if ph_size_erl > 2:
+    #     num_groups = np.random.randint(1, min(7, ph_size_erl - 1))
+    # else:
+    #     num_groups = 1
+    num_groups = sample_num_groups(ph_size_erl)
+
 
     # group_sizes = recursion_group_size(num_groups, np.array([]), ph_size_erl).astype(int)  #np.random.randint(1, 25, num_groups)
-
-    rates = np.random.rand(num_groups)*200   #((np.ones(num_groups) * np.random.uniform(1, 1.75)) ** np.arange(num_groups))
+    if np.random.rand() > 0.8:
+        rates = np.random.rand(num_groups)*200   #((np.ones(num_groups) * np.random.uniform(1, 1.75)) ** np.arange(num_groups))
+    else:
+        rates = np.random.uniform(1, 1.75) ** (np.random.rand(num_groups) * 10)
     group_sizes_erl = recursion_group_size(num_groups, np.array([]), ph_size_erl).astype(int) # (group_sizes * ph_size_erl / np.sum(group_sizes)).astype(int) + 1
+    if np.random.rand()>0.01:
+        group_sizes_erl = balance_sizes(group_sizes_erl)
     erlang_list_erl = [generate_erlang_given_rates(rates[ind], ph_size_erl) for ind, ph_size_erl in
                        enumerate(group_sizes_erl)]
     group_sizes = np.append(group_sizes_gen_ph, group_sizes_erl)
@@ -270,25 +322,46 @@ def create_mix_erlang_ph(ph_size, scale_low=1, max_scale_high=15, max_ph=500):
     if type(fst_mom[0]) != bool:
         A = A * fst_mom[0][0]
         fst_mom = compute_first_n_moments(s, A, 1)
-        if (fst_mom[0] > 0.99999) & (fst_mom[0] < 1.000001):
-            #         A = A*give_cdf_1_1_norm_const(s, A)
-            return (s, A)
-        else:
-            return False
+        return (s, A)
+
     else:
         return False
+
+
 
 def create_gen_erlang_many_ph(ph_size):
     # ph_size = np.random.randint(1, max_ph_size)
 
-    num_groups = np.random.randint(1,min(20,ph_size))
+    num_groups = sample_num_groups(ph_size)
+
+
+    # if ph_size > 1:
+    #     num_groups = np.random.randint(2,min(8,ph_size))
+    # else:
+    #     num_groups = 1
     group_sizes_1 = recursion_group_size(num_groups, np.array([]), ph_size).astype(int)
-    rates = np.random.rand(num_groups)*10 # ((np.ones(num_groups)*np.random.uniform(1, 1.85))**np.arange(num_groups))
+    if np.random.rand()>0.01:
+        group_sizes_1 = balance_sizes(group_sizes_1)
+    rates = np.random.uniform(1, 1.75)**(np.random.rand(num_groups)*10) # ((np.ones(num_groups)*np.random.uniform(1, 1.85))**np.arange(num_groups))
     s,A = create_gen_erlang_given_sizes(group_sizes_1, rates)
 
     A = A*compute_first_n_moments(s, A, 1)[0][0]
     return (s,A)
 
+def sample_num_groups(n, thresh =0.98):
+    if np.random.rand()>thresh:
+        num = 1+np.random.binomial(n-1, np.random.uniform(0.2,0.99))
+    elif np.random.rand()>0.9:
+        num = 1+np.random.binomial(int(n*0.1), np.random.uniform(0.3,0.87))
+    else:
+        if n<10:
+            portion = 0.3
+        else:
+            portion = 0.8
+        num = 1+np.random.binomial(min(10,int(n-1)*portion), np.random.uniform(0.1,0.9))
+    if (num==1) & (n>1 ) &(np.random.rand()>0.4):
+        num +=1
+    return num
 
 def send_to_the_right_generator(num_ind, ph_size):
 
@@ -400,6 +473,7 @@ def compute_y_moms(s,A,num_moms,max_ph_size):
     return lam_y_list
 
 def compute_y_data_given_folder(x, ph_size_max, tot_prob=70, eps=0.0001):
+
     try:
         lam = x[0, ph_size_max].item()
         A = x[:ph_size_max, :ph_size_max]
@@ -429,10 +503,7 @@ def create_final_x_data(s, A, lam):
     s1 = s.reshape((1, s.shape[0]))
     expect_ser = ser_moment_n(s, A, 1)
     if expect_ser:
-        #         expect_ser = expect_ser[0][0]
-        # mu = 1/expect_ser
-        # lam = np.random.uniform(0.3*mu, 0.9*mu, 1)[0]
-        # lam = lam * 0.95
+
         lam_arr[0, 0] = lam
 
 
@@ -509,6 +580,34 @@ def sample_size(ph_max_size):
         arrival = int(total/service)
     return (arrival,service)
 
+def saving_batch_g_g_1(torch_moms, torch_y, data_path, data_sample_name, num_moms, save_x = False):
+    '''
+
+    :param x_y_data: the data is a batch of tuples: ph_input, first num_moms moments and steady-state probs
+    :param data_path: the folder in which we save the data
+    :param data_sample_name: the name of file
+    :param num_moms: number of moments we compute
+    :param save_x: should we save ph_data
+    :return:
+    '''
+
+    now = datetime.now()
+
+
+    current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 10000000, 1)[0])
+
+    pkl_name_moms = 'moms_' + str(num_moms) + data_sample_name + current_time + 'size_'+ str(torch_moms.shape[0]) + '.pkl'
+    full_path_moms = os.path.join(data_path, pkl_name_moms)
+    pkl.dump(torch_moms, open(full_path_moms, 'wb'))
+
+
+    # dumping steady_state
+
+    pkl_name_ydat = 'ydat_' + data_sample_name + current_time +'size_'+ str(torch_y.shape[0]) + '.pkl'
+    full_path_ydat = os.path.join(data_path, pkl_name_ydat)
+    pkl.dump(torch_y, open(full_path_ydat, 'wb'))
+
+
 def manage_batch(batch_size, ph_size_max, num_moms, data_path, data_sample_name):
     '''
     batch_size: the batch size we save as a single tensor
@@ -522,8 +621,20 @@ def manage_batch(batch_size, ph_size_max, num_moms, data_path, data_sample_name)
     'In charge of saving batches - creating input tensor of size (BSX40) and output of size (BSX500)'
 
     mom_output_list = [manage_single_sample(ph_size_max, num_moms) for ind in range(batch_size)]
+    mom_output_list = [pair for pair in mom_output_list if pair]
 
-def manage_single_sample(ph_size_max, num_moms, eps = 0.00001):
+    mom_list = []
+    y_list = []
+    for pair in mom_output_list:
+        mom_list.append(pair[0])
+        y_list.append(pair[1])
+
+    torch_moms = torch.stack(mom_list).float()
+    torch_y =  torch.stack(y_list).float()
+    saving_batch_g_g_1(torch_moms, torch_y, data_path, data_sample_name, num_moms)
+
+
+def sampling_examples(ph_size_max, num_moms, eps = 0.05):
     '''
     ph_size_max: the maximum number of batch size (product of arrival and service)
     num_moms: number of save moments
@@ -535,8 +646,57 @@ def manage_single_sample(ph_size_max, num_moms, eps = 0.00001):
 
     a_size, ser_size = sample_size(ph_size_max)
 
-    s_arrival, A_arrival = send_to_the_right_generator(np.random.randint(1, 3), a_size)
-    s_service, A_service = send_to_the_right_generator(np.random.randint(1, 3), ser_size)
+    flag = True
+    while flag: #sample until it is valid
+        arrival_result = send_to_the_right_generator(np.random.randint(1, 3), a_size)
+        if arrival_result:
+            s_arrival, A_arrival = arrival_result
+            flag = False
+
+    flag = True
+    while flag:  # sample until it is valid
+        service_result = send_to_the_right_generator(np.random.randint(1, 3), ser_size)
+        if service_result:
+            s_service, A_service = service_result
+            flag = False
+
+
+    rho = np.random.uniform(0.3,0.95)
+    A_arrival = A_arrival * rho
+
+    s_arrival = s_arrival.reshape((1, s_arrival.shape[0]))
+    s_service = s_service.reshape((1, s_service.shape[0]))
+
+    return (s_arrival, A_arrival, s_service, A_service)
+
+def manage_single_sample(ph_size_max, num_moms, eps = 0.05):
+    '''
+    ph_size_max: the maximum number of batch size (product of arrival and service)
+    num_moms: number of save moments
+    '''
+    'sampling arrival and service sizes, then sampling (s,A) for each one'
+    'take the pair (ph_arrival, ph_service) and compute y - i.e., the y values for deep'
+    'compute moments of both arrival and service'
+    'return to manage batch (moms, y)'
+
+    a_size, ser_size = sample_size(ph_size_max)
+    print(a_size, ser_size, a_size*ser_size)
+
+
+    flag = True
+    while flag: #sample until it is valid
+        arrival_result = send_to_the_right_generator(np.random.randint(1, 3), a_size)
+        if arrival_result:
+            s_arrival, A_arrival = arrival_result
+            flag = False
+
+    flag = True
+    while flag:  # sample until it is valid
+        service_result = send_to_the_right_generator(np.random.randint(1, 3), ser_size)
+        if service_result:
+            s_service, A_service = service_result
+            flag = False
+
 
     rho = np.random.uniform(0.3,0.95)
     A_arrival = A_arrival * rho
@@ -545,20 +705,21 @@ def manage_single_sample(ph_size_max, num_moms, eps = 0.00001):
     s_service = s_service.reshape((1, s_service.shape[0]))
 
 
+
+
     stead = compute_steady(s_arrival, A_arrival, s_service, A_service)
 
-    if np.sum(stead) > 1-eps: # otherwise don't use it
+    if np.sum(stead) > 1-eps:  # otherwise don't use it
 
         arrival_moms = compute_first_n_moments(s_arrival, A_arrival, num_moms)
         service_moms = compute_first_n_moments(s_service, A_service, num_moms)
 
-        moms_tesnor = torch.cat((torch.tensor(arrival_moms), torch.tensor(service_moms)))
+        arrival_moms = torch.log(torch.tensor(np.array(arrival_moms).flatten()))
+        service_moms = torch.log(torch.tensor(np.array(service_moms).flatten()))[1:]
 
-        return (moms_tesnor, stead)
+        moms_tesnor = torch.cat((arrival_moms,service_moms))
 
-
-
-    print('stop')
+        return (moms_tesnor, torch.tensor(stead))
 
 
 def main(args):
@@ -570,13 +731,49 @@ def main(args):
 
     else:
 
-        data_path = r'C:\Users\user\workspace\data\training_batches'
+        data_path = r'C:\Users\user\workspace\data\deep_gg1'
 
     cur_time = int(time.time())
     np.random.seed(cur_time + len(os.listdir(data_path)))
     print(cur_time)
 
-    manage_single_sample(200, 20)
+    # ph_rep_list = [sampling_examples(args.ph_size_max, args.num_moms) for ind in range(12)]
+    #
+    # x_vals = np.linspace(0,1,25)
+    # y_vals_arri = []
+    # y_vals_ser = []
+    # for ph_rep in tqdm(ph_rep_list):
+    #     s_arri = ph_rep[0]
+    #     A_arri = ph_rep[1]
+    #     s_ser = ph_rep[2]
+    #     A_ser = ph_rep[3]
+    #     # y_vals_arri.append(compute_pdf_within_range(x_vals,s_arri,A_arri))
+    #     y_vals_ser.append(compute_pdf_within_range(x_vals, s_ser, A_ser))
+    #
+    #
+    # plt.figure()
+    # for yval in y_vals_arri:
+    #     plt.plot(x_vals, yval)
+    # plt.title('Arrivals')
+    # plt.ylim(0, 3)
+    # plt.savefig('arrivals.png')
+    #
+    # plt.show()
+    #
+    # plt.figure()
+    # for yval in y_vals_ser:
+    #     plt.plot(x_vals, yval)
+    # plt.title('services')
+    # plt.ylim(0, 6)
+    # plt.savefig('services.png')
+    # plt.show()
+
+
+
+
+
+
+    # vals = manage_single_sample(200, 20)
 
 
     data_sample_name = 'batch_size_' + str(args.batch_size) + '_num_moms_' + str(
@@ -590,18 +787,19 @@ def main(args):
         np.random.seed(cur_time + len(os.listdir(data_path)))
         print(cur_time)
 
-        generate_one_ph(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name)
+        manage_batch(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name)
+
 
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=10)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=2)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=64)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=20)
-    parser.add_argument('--ph_size', type=int, help='ph_size', default=100)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=4)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=2000)
+    parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
     args = parser.parse_args(argv)
 
     return args
