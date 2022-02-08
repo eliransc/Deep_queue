@@ -26,6 +26,7 @@ from scipy.stats import loguniform
 # from butools.fitting import *
 from datetime import datetime
 # from fastbook import *
+import torch
 import itertools
 from scipy.special import factorial
 import pickle as pkl
