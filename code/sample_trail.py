@@ -730,7 +730,7 @@ def main(args):
 
     if sys.platform == 'linux':
 
-        data_path = '/scratch/eliransc/training/gg1'
+        data_path = '/scratch/d/dkrass/eliransc/training/gg1'
 
     else:
 
