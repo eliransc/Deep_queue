@@ -608,7 +608,7 @@ def saving_batch_g_g_1(torch_moms, torch_y, data_path, data_sample_name, num_mom
     pkl.dump(torch_y, open(full_path_ydat, 'wb'))
 
 
-def manage_batch(batch_size, ph_size_max, num_moms, data_path, data_sample_name):
+def manage_batch(batch_size, ph_size_max, num_moms, data_path, data_sample_name, max_util):
     '''
     batch_size: the batch size we save as a single tensor
     ph_size_ax: relate to the product of the arrival and service sizes
@@ -620,7 +620,7 @@ def manage_batch(batch_size, ph_size_max, num_moms, data_path, data_sample_name)
     'looping over a batch, creating BS samples which include 20 arrival moments, 20 service moments and 500 probs.'
     'In charge of saving batches - creating input tensor of size (BSX40) and output of size (BSX500)'
 
-    mom_output_list = [manage_single_sample(ph_size_max, num_moms) for ind in range(batch_size)]
+    mom_output_list = [manage_single_sample(ph_size_max, num_moms, max_util) for ind in range(batch_size)]
     mom_output_list = [pair for pair in mom_output_list if pair]
 
     mom_list = []
@@ -669,7 +669,7 @@ def sampling_examples(ph_size_max, num_moms, eps = 0.05):
 
     return (s_arrival, A_arrival, s_service, A_service)
 
-def manage_single_sample(ph_size_max, num_moms, eps = 0.05):
+def manage_single_sample(ph_size_max, num_moms, max_util,eps = 0.05):
     '''
     ph_size_max: the maximum number of batch size (product of arrival and service)
     num_moms: number of save moments
@@ -680,7 +680,6 @@ def manage_single_sample(ph_size_max, num_moms, eps = 0.05):
     'return to manage batch (moms, y)'
 
     a_size, ser_size = sample_size(ph_size_max)
-    print(a_size, ser_size, a_size*ser_size)
 
 
     flag = True
@@ -698,7 +697,7 @@ def manage_single_sample(ph_size_max, num_moms, eps = 0.05):
             flag = False
 
 
-    rho = np.random.uniform(0.3,0.95)
+    rho = np.random.uniform(0.3,max_util)
     A_arrival = A_arrival * rho
 
     s_arrival = s_arrival.reshape((1, s_arrival.shape[0]))
@@ -727,7 +726,7 @@ def main(args):
 
     if sys.platform == 'linux':
 
-        data_path = '/scratch/eliransc/ph_size_experiment'
+        data_path = '/scratch/eliransc/training/gg1'
 
     else:
 
@@ -777,7 +776,7 @@ def main(args):
 
 
     data_sample_name = 'batch_size_' + str(args.batch_size) + '_num_moms_' + str(
-        args.num_moms) + '_num_max_size_' +'num_phases_'+str(args.ph_size)+'_'+ str(args.max_num_groups)
+        args.num_moms) + '_num_max_size_' +'num_phases_'+str(args.ph_size_max)+'_'+ str(args.max_utilization)
     x_vals = np.linspace(0, 1, 30)
 
     # Compute ph_dists
@@ -787,19 +786,20 @@ def main(args):
         np.random.seed(cur_time + len(os.listdir(data_path)))
         print(cur_time)
 
-        manage_batch(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name)
+        manage_batch(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name, args.max_utilization)
 
 
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=2)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=3)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=4)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=2000)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=400)
     parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
+    parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.95)
     args = parser.parse_args(argv)
 
     return args
