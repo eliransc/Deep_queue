@@ -725,6 +725,8 @@ def manage_single_sample(ph_size_max, num_moms, max_util,eps = 0.05):
 
 def main(args):
 
+    print(os.getcwd())
+
 
     if sys.platform == 'linux':
 
