@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+
 import sys
 sys.path.append(r'G:\My Drive\butools2\Python')
 sys.path.append('/home/d/dkrass/eliransc/Python')
@@ -17,6 +17,7 @@ import time
 from butools.mam import *
 from butools.dph import *
 from scipy.linalg import expm, sinm, cosm
+import matplotlib.pyplot as plt
 
 from numpy.linalg import matrix_power
 from scipy.stats import rv_discrete
