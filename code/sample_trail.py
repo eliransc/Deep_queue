@@ -741,9 +741,7 @@ def main(args):
 
         data_path = r'C:\Users\user\workspace\data\deep_gg1'
 
-    cur_time = int(time.time())
-    np.random.seed(cur_time + len(os.listdir(data_path)))
-    print(cur_time)
+
 
     # ph_rep_list = [sampling_examples(args.ph_size_max, args.num_moms) for ind in range(12)]
     #
@@ -792,8 +790,9 @@ def main(args):
 
     for ind in tqdm(range(args.num_examples)):
         cur_time = int(time.time())
-        np.random.seed(cur_time + len(os.listdir(data_path)))
-        print(cur_time)
+        seed = cur_time + len(os.listdir(data_path))+np.random.randint(1,1000)
+        np.random.seed(seed)
+        print(seed)
 
         manage_batch(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name, args.max_utilization)
 
