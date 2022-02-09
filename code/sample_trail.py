@@ -793,8 +793,11 @@ def main(args):
         seed = cur_time + len(os.listdir(data_path))+np.random.randint(1,1000)
         np.random.seed(seed)
         print(seed)
-
-        manage_batch(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name, args.max_utilization)
+        if ind == 0:
+            manage_batch(2, args.ph_size_max, args.num_moms, data_path, data_sample_name,
+                         args.max_utilization)
+        else:
+            manage_batch(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name, args.max_utilization)
 
 
 
@@ -804,8 +807,8 @@ def parse_arguments(argv):
     parser.add_argument('--num_examples', type=int, help='number of ph folders', default=120)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=50)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 2000)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=64)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 4000)
     parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
     parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.95)
     args = parser.parse_args(argv)
