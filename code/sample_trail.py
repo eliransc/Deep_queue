@@ -648,6 +648,10 @@ def sampling_examples(ph_size_max, num_moms, eps = 0.05):
 
     a_size, ser_size = sample_size(ph_size_max)
 
+    ser_size = np.random.randint(250,450)
+    print(ser_size)
+    a_size = 1
+
     flag = True
     while flag: #sample until it is valid
         arrival_result = send_to_the_right_generator(np.random.randint(1, 3), a_size)
@@ -743,18 +747,18 @@ def main(args):
 
 
 
-    # ph_rep_list = [sampling_examples(args.ph_size_max, args.num_moms) for ind in range(12)]
-    #
-    # x_vals = np.linspace(0,1,25)
-    # y_vals_arri = []
-    # y_vals_ser = []
-    # for ph_rep in tqdm(ph_rep_list):
-    #     s_arri = ph_rep[0]
-    #     A_arri = ph_rep[1]
-    #     s_ser = ph_rep[2]
-    #     A_ser = ph_rep[3]
-    #     # y_vals_arri.append(compute_pdf_within_range(x_vals,s_arri,A_arri))
-    #     y_vals_ser.append(compute_pdf_within_range(x_vals, s_ser, A_ser))
+    ph_rep_list = [sampling_examples(args.ph_size_max, args.num_moms) for ind in range(25)]
+
+    x_vals = np.append(np.linspace(0,1,105),np.linspace(1,3,45))
+    y_vals_arri = []
+    y_vals_ser = []
+    for ph_rep in tqdm(ph_rep_list):
+        s_arri = ph_rep[0]
+        A_arri = ph_rep[1]
+        s_ser = ph_rep[2]
+        A_ser = ph_rep[3]
+        # y_vals_arri.append(compute_pdf_within_range(x_vals,s_arri,A_arri))
+        y_vals_ser.append(compute_pdf_within_range(x_vals, s_ser, A_ser))
     #
     #
     # plt.figure()
@@ -763,16 +767,18 @@ def main(args):
     # plt.title('Arrivals')
     # plt.ylim(0, 3)
     # plt.savefig('arrivals.png')
-    #
-    # plt.show()
-    #
-    # plt.figure()
-    # for yval in y_vals_ser:
-    #     plt.plot(x_vals, yval)
-    # plt.title('services')
-    # plt.ylim(0, 6)
-    # plt.savefig('services.png')
-    # plt.show()
+
+    plt.show()
+
+    plt.figure()
+    for yval in y_vals_ser:
+        plt.plot(x_vals, yval)
+    plt.title('Different service distributions')
+    plt.xlabel('Service time')
+    plt.ylabel('Pdf')
+    plt.ylim(0, 5)
+    plt.savefig('services5.png')
+    plt.show()
 
 
 
@@ -788,16 +794,16 @@ def main(args):
 
     # Compute ph_dists
 
-    for ind in tqdm(range(args.num_examples)):
-        cur_time = int(time.time())
-        seed = cur_time + len(os.listdir(data_path))+np.random.randint(1,1000)
-        np.random.seed(seed)
-        print(seed)
-        if ind == 0:
-            manage_batch(2, args.ph_size_max, args.num_moms, data_path, data_sample_name,
-                         args.max_utilization)
-        else:
-            manage_batch(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name, args.max_utilization)
+    # for ind in tqdm(range(args.num_examples)):
+    #     cur_time = int(time.time())
+    #     seed = cur_time + len(os.listdir(data_path))+np.random.randint(1,1000)
+    #     np.random.seed(seed)
+    #     print(seed)
+    #     if ind == 0:
+    #         manage_batch(2, args.ph_size_max, args.num_moms, data_path, data_sample_name,
+    #                      args.max_utilization)
+    #     else:
+    #         manage_batch(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name, args.max_utilization)
 
 
 
@@ -807,7 +813,7 @@ def parse_arguments(argv):
     parser.add_argument('--num_examples', type=int, help='number of ph folders', default=120)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=50)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=40)
     parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 2000)
     parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
     parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.95)
