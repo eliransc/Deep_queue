@@ -572,6 +572,17 @@ def generate_one_ph(batch_size, max_ph_size, num_moms, data_path, data_sample_na
     return 1
 
 
+def sample_size_1(ph_max_size):
+    root = int(ph_max_size ** 0.5)
+    weight = np.random.uniform(0.5, 1)
+    if np.random.rand() > 0.5:
+        arrival = int(ph_max_size / (root * weight))
+        service = int(root * weight)
+    else:
+        service = int(ph_max_size / (root * weight))
+        arrival = int(root * weight)
+    return (arrival,service)
+
 def sample_size(ph_max_size):
     total = np.random.randint(2,ph_max_size+1)
     if np.random.rand()>0.5:
@@ -648,7 +659,7 @@ def sampling_examples(ph_size_max, num_moms, eps = 0.05):
 
     a_size, ser_size = sample_size(ph_size_max)
 
-    ser_size = np.random.randint(250,450)
+    ser_size = np.random.randint(250,1000)
     print(ser_size)
     a_size = 1
 
@@ -685,7 +696,7 @@ def manage_single_sample(ph_size_max, num_moms, max_util,eps = 0.05):
     'compute moments of both arrival and service'
     'return to manage batch (moms, y)'
 
-    a_size, ser_size = sample_size(ph_size_max)
+    a_size, ser_size = sample_size_1(ph_size_max)
 
 
     flag = True
@@ -739,7 +750,7 @@ def main(args):
 
             data_path = '/scratch/d/dkrass/eliransc/training/gg1'
         else:
-            data_path = '/scratch/eliransc/training/gg1'
+            data_path = '/scratch/eliransc/training/gg1_large_both'
 
     else:
 
@@ -747,9 +758,9 @@ def main(args):
 
 
 
-    # ph_rep_list = [sampling_examples(args.ph_size_max, args.num_moms) for ind in range(25)]
-    #
-    # x_vals = np.append(np.linspace(0,1,105),np.linspace(1,3,45))
+    # ph_rep_list = [sampling_examples(args.ph_size_max, args.num_moms) for ind in range(50)]
+
+    # x_vals = np.append(np.linspace(0,1,105),np.linspace(1,3,50))
     # y_vals_arri = []
     # y_vals_ser = []
     # for ph_rep in tqdm(ph_rep_list):
@@ -776,8 +787,8 @@ def main(args):
     # plt.title('Different service distributions')
     # plt.xlabel('Service time')
     # plt.ylabel('Pdf')
-    # plt.ylim(0, 5)
-    # plt.savefig('services5.png')
+    # plt.ylim(0, 3)
+    # plt.savefig('services6.png')
     # plt.show()
 
 
@@ -813,8 +824,8 @@ def parse_arguments(argv):
     parser.add_argument('--num_examples', type=int, help='number of ph folders', default=120)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=40)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 2000)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=1)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 15000)
     parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
     parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.95)
     args = parser.parse_args(argv)
