@@ -811,7 +811,7 @@ def main(args):
         np.random.seed(seed)
         print(seed)
         if ind == 0:
-            manage_batch(2, args.ph_size_max, args.num_moms, data_path, data_sample_name,
+            manage_batch(1, args.ph_size_max, args.num_moms, data_path, data_sample_name,
                          args.max_utilization)
         else:
             manage_batch(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name, args.max_utilization)
