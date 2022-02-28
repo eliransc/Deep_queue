@@ -833,6 +833,8 @@ def main():
     mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
     y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
 
+    print(mom_data_.shape)
+
     m_data = torch.cat((mom_data_[:1200000, :], mom_data_[-500:, :]), 0)
     y_data = torch.cat((y_data_[:1200000, :], y_data_[-500:, :]), 0)
 
