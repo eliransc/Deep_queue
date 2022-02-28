@@ -825,10 +825,11 @@ def check_loss_increasing(loss_list, n_last_steps=10, failure_rate=0.45):
 
 
 def main():
+
     now = datetime.now()
 
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
-
+    import torch
     ## Load data
     mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
     y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
