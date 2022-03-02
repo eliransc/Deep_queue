@@ -825,7 +825,7 @@ def parse_arguments(argv):
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=1)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 10000)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 8000)
     parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
     parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.95)
     args = parser.parse_args(argv)
