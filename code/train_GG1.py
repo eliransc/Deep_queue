@@ -874,10 +874,17 @@ def main():
                 super().__init__()
 
 
+                # self.fc1 = nn.Linear(2 * num_moms - 1, 30)
+                # self.fc2 = nn.Linear(30, 50)
+                # self.fc3 = nn.Linear(50, 100)
+                # self.fc4 = nn.Linear(100, 200)
+                # self.fc5 = nn.Linear(200, 350)
+                # self.fc6 = nn.Linear(350, 499)
                 self.fc1 = nn.Linear(2 * num_moms - 1, 30)
                 self.fc2 = nn.Linear(30, 50)
                 self.fc3 = nn.Linear(50, 100)
                 self.fc4 = nn.Linear(100, 200)
+                self.fc4 = nn.Linear(200, 200)
                 self.fc5 = nn.Linear(200, 350)
                 self.fc6 = nn.Linear(350, 499)
 
@@ -888,7 +895,8 @@ def main():
                 x = F.relu(self.fc3(x))
                 x = F.relu(self.fc4(x))
                 x = F.relu(self.fc5(x))
-                x = self.fc6(x)
+                x = F.relu(self.fc6(x))
+                x = self.fc7(x)
                 return x  # F.log_softmax(x,dim=1)
 
         net = Net().to(device)
@@ -898,7 +906,7 @@ def main():
         dl.to(device)
         valid_dl.to(device)
         import time
-        EPOCHS = 350
+        EPOCHS = 400
 
         optimizer = optim.Adam(net.parameters(), lr=curr_lr,
                                weight_decay=1e-5)  # paramters is everything adjustable in model
