@@ -842,7 +842,7 @@ def main():
     m_data_valid = mom_data_[1200000:-500, :]
     y_data_valid = y_data_[1200000:-500, :]
 
-    for num_moms in range(10,11):
+    for num_moms in range(2,4):
 
 
         print('Number of moments are: ', num_moms)
@@ -898,7 +898,7 @@ def main():
         dl.to(device)
         valid_dl.to(device)
         import time
-        EPOCHS = 450
+        EPOCHS = 350
 
         optimizer = optim.Adam(net.parameters(), lr=curr_lr,
                                weight_decay=1e-5)  # paramters is everything adjustable in model
