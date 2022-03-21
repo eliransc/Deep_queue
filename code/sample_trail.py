@@ -1,5 +1,4 @@
 import numpy as np
-
 import sys
 sys.path.append(r'G:\My Drive\butools2\Python')
 sys.path.append('/home/d/dkrass/eliransc/Python')
