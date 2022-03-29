@@ -954,7 +954,7 @@ def send_to_the_right_generator(num_ind, max_ph_size,  num_moms, data_path, data
 def compute_y_moms(s,A,num_moms,max_ph_size):
 
 
-    lam_vals = np.random.uniform(0.95, 0.99, 1)
+    lam_vals = np.random.uniform(0.8, 0.99, 1)
 
 
     lam_y_list = []
