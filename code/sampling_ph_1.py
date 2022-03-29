@@ -1025,8 +1025,8 @@ def create_shrot_tale_genErlang(df_1, ratio_size=10):
 
 def generate_erlangs(batch_size, max_ph_size, num_moms, data_path, data_sample_name):
 
-
-    x_y_moms_list = [create_Erlang_given_ph_size(ph_size) for ph_size in range(3,max_ph_size)]
+    sizes = np.random.randint(3,max_ph_size,batch_size)
+    x_y_moms_list = [create_Erlang_given_ph_size(ph_size) for ph_size in sizes]
     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
     x_y_moms_lists = [compute_y_moms(x_y_moms[0],x_y_moms[1], num_moms, max_ph_size) for x_y_moms  in x_y_moms_list]
     saving_batch(list(itertools.chain(*x_y_moms_lists)), data_path, data_sample_name, num_moms)
@@ -1130,10 +1130,10 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=1)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=20)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=5)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=256)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=64)
     parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=800)
     args = parser.parse_args(argv)
 
