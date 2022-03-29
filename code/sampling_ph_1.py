@@ -981,12 +981,13 @@ def compute_y_moms(s,A,num_moms,max_ph_size):
     return lam_y_list
 
 
+
 def generate_one_ph(batch_size, max_ph_size, num_moms, data_path, data_sample_name):
 
     sample_type_arr = np.random.randint(1, 4, batch_size)
     x_y_moms_list = [send_to_the_right_generator(val, max_ph_size,  num_moms, data_path, data_sample_name) for val in sample_type_arr]
     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
-    x_y_moms_lists =  [compute_y_moms(x_y_moms[0],x_y_moms[1], num_moms, max_ph_size) for x_y_moms  in x_y_moms_list]
+    x_y_moms_lists = [compute_y_moms(x_y_moms[0],x_y_moms[1], num_moms, max_ph_size) for x_y_moms  in x_y_moms_list]
     saving_batch(list(itertools.chain(*x_y_moms_lists)), data_path, data_sample_name, num_moms)
 
     ## Clean list
@@ -1022,6 +1023,25 @@ def create_shrot_tale_genErlang(df_1, ratio_size=10):
     return (s, A)
 
 
+def generate_erlangs(batch_size, max_ph_size, num_moms, data_path, data_sample_name):
+
+
+    x_y_moms_list = [create_Erlang_given_ph_size(ph_size) for ph_size in range(3,max_ph_size)]
+    x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
+    x_y_moms_lists = [compute_y_moms(x_y_moms[0],x_y_moms[1], num_moms, max_ph_size) for x_y_moms  in x_y_moms_list]
+    saving_batch(list(itertools.chain(*x_y_moms_lists)), data_path, data_sample_name, num_moms)
+
+    ## Clean list
+
+    # x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
+
+    # for batch in range(8):
+    #     x_y_moms_list = [send_to_the_right_generator(-1, batch*args.batch_size+ph_size,df_1, num_moms, data_path, data_sample_name) for ph_size in range(1,args.batch_size+1) if batch*args.batch_size+ph_size <=1000 ]
+    #     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
+    #     saving_batch(x_y_moms_list, data_path, data_sample_name, num_moms)
+
+    return 1
+
 
 def main(args):
 
@@ -1035,12 +1055,12 @@ def main(args):
     #     df_1 = pkl.load(
     #         open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
     #
-        data_path = '/scratch/eliransc/new_gg1_data'
+        data_path = '/scratch/eliransc/erlang_data'
 
     else:
     #     vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
     #     df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
-        data_path = r'C:\Users\user\workspace\data\training_batches'
+        data_path = r'C:\Users\user\workspace\data\erlang'
 
     cur_time = int(time.time())
     np.random.seed(cur_time+len(os.listdir(data_path)))
@@ -1055,8 +1075,8 @@ def main(args):
         cur_time = int(time.time())
         np.random.seed(cur_time + len(os.listdir(data_path)))
         print(cur_time)
-
-        generate_one_ph(args.batch_size, args.ph_size_max,  args.num_moms, data_path, data_sample_name)
+        generate_erlangs(args.batch_size, args.ph_size_max,  args.num_moms, data_path, data_sample_name)
+        # generate_one_ph(args.batch_size, args.ph_size_max,  args.num_moms, data_path, data_sample_name)
 
     # for ind in tqdm(range(args.num_examples)):
     #     generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name)
@@ -1112,9 +1132,9 @@ def parse_arguments(argv):
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
     parser.add_argument('--num_examples', type=int, help='number of ph folders', default=1)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
-    parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=1)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=20)
+    parser.add_argument('--num_moms', type=int, help='number of ph folders', default=5)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=256)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=800)
     args = parser.parse_args(argv)
 
     return args
