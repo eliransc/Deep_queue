@@ -830,18 +830,12 @@ def main():
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
 
     ## Load data
-    mdata = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_3.pkl', 'rb'))
-    ydata = pkl.load(open('/scratch/eliransc/pkl_data/y_data_3.pkl', 'rb'))
-    # m_data = pkl.load(open('/scratch/eliransc/pkl_data/mom_data.pkl', 'rb'))
-    # y_data = pkl.load(open('/scratch/eliransc/pkl_data/y_data.pkl', 'rb'))
+    m_data = pkl.load(open('/scratch/eliransc/pkl_data/mom_data__with_erlang.pkl', 'wb'))
+    y_data = pkl.load(open('/scratch/eliransc/pkl_data/y_data_with_erlang.pkl', 'wb'))
+    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/mom_data__with_erlang_valid.pkl', 'wb'))
+    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/y_data_with_erlang_valid.pkl', 'wb'))
 
-    m_data = mdata[:1400000, :]
-    y_data = ydata[:1400000, :]
-
-    m_data_valid = mdata[1400000:, :]
-    y_data_valid = ydata[1400000:, :]
-
-    for num_moms in range(19,20):
+    for num_moms in range(5, 6):
 
 
         print('Number of moments are: ', num_moms)
@@ -941,7 +935,7 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-        torch.save(net.state_dict(), './pytorch_m_g_1_true_moms_1000_new_data_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl')
+        torch.save(net.state_dict(), './pytorch_m_g_1_true_moms_1000_with_erlang_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl')
         pkl.dump((loss_list,valid_list,compute_sum_error_list), open('./losts_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl', 'wb'))
 
 if __name__ == "__main__":
