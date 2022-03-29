@@ -518,7 +518,7 @@ def create_gewn_ph(ph_size_max, pkl_name, data_path):
 
 
 
-def compute_y_data_given_folder(x, ph_size_max, tot_prob=300, eps=0.00001):
+def compute_y_data_given_folder(x, ph_size_max, tot_prob=500, eps=0.00001):
     try:
         lam = x[0, ph_size_max].item()
         A = x[:ph_size_max, :ph_size_max]
@@ -964,7 +964,7 @@ def compute_y_moms(s,A,num_moms,max_ph_size):
     for lam in lam_vals:
         x = create_final_x_data(s, A, lam)
 
-        y = compute_y_data_given_folder(x, x.shape[0] - 1, tot_prob=300, eps=0.0001)
+        y = compute_y_data_given_folder(x, x.shape[0] - 1, tot_prob=500, eps=0.0001)
         if type(y) == np.ndarray:
             moms = compute_first_n_moments(s, A, num_moms)
 
@@ -1059,7 +1059,7 @@ def main(args):
     #     df_1 = pkl.load(
     #         open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
     #
-        data_path = '/scratch/eliransc/erlang_data'
+        data_path = '/scratch/eliransc/larger_util'
 
     else:
     #     vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
@@ -1134,11 +1134,11 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=20)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=40)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=5)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=16)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=800)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=64)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default=400)
     args = parser.parse_args(argv)
 
     return args
