@@ -518,7 +518,7 @@ def create_gewn_ph(ph_size_max, pkl_name, data_path):
 
 
 
-def compute_y_data_given_folder(x, ph_size_max, tot_prob=70, eps=0.0001):
+def compute_y_data_given_folder(x, ph_size_max, tot_prob=300, eps=0.00001):
     try:
         lam = x[0, ph_size_max].item()
         A = x[:ph_size_max, :ph_size_max]
@@ -530,12 +530,16 @@ def compute_y_data_given_folder(x, ph_size_max, tot_prob=70, eps=0.0001):
             R = compute_R(lam, s, A)
 
             steady_state = np.array([1 - rho])
-            for i in range(1, tot_prob):
+            for i in range(1, tot_prob-1):
                 steady_state = np.append(steady_state, np.sum(steady_i(rho, s, R, i)))
-            if np.sum(steady_state) > 1 - eps:
-                return steady_state
-            else:
-                return False
+
+            print(1-np.sum(steady_state), rho)
+            steady_state = np.append(steady_state, 1-np.sum(steady_state))
+            return steady_state
+            # if np.sum(steady_state) > 1 - eps:
+            #     return steady_state
+            # else:
+            #     return False
 
     except:
         print("x is not valid")
@@ -950,7 +954,7 @@ def send_to_the_right_generator(num_ind, max_ph_size,  num_moms, data_path, data
 def compute_y_moms(s,A,num_moms,max_ph_size):
 
 
-    lam_vals = np.random.uniform(0.3, 0.95, 1)
+    lam_vals = np.random.uniform(0.95, 0.99, 1)
 
 
     lam_y_list = []
@@ -960,7 +964,7 @@ def compute_y_moms(s,A,num_moms,max_ph_size):
     for lam in lam_vals:
         x = create_final_x_data(s, A, lam)
 
-        y = compute_y_data_given_folder(x, x.shape[0] - 1, tot_prob=70, eps=0.0001)
+        y = compute_y_data_given_folder(x, x.shape[0] - 1, tot_prob=300, eps=0.0001)
         if type(y) == np.ndarray:
             moms = compute_first_n_moments(s, A, num_moms)
 
@@ -1060,7 +1064,7 @@ def main(args):
     else:
     #     vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
     #     df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
-        data_path = r'C:\Users\user\workspace\data\erlang'
+        data_path = r'C:\Users\user\workspace\data\large_util'
 
     cur_time = int(time.time())
     np.random.seed(cur_time+len(os.listdir(data_path)))
@@ -1075,8 +1079,8 @@ def main(args):
         cur_time = int(time.time())
         np.random.seed(cur_time + len(os.listdir(data_path)))
         print(cur_time)
-        generate_erlangs(args.batch_size, args.ph_size_max,  args.num_moms, data_path, data_sample_name)
-        # generate_one_ph(args.batch_size, args.ph_size_max,  args.num_moms, data_path, data_sample_name)
+        # generate_erlangs(args.batch_size, args.ph_size_max,  args.num_moms, data_path, data_sample_name)
+        generate_one_ph(args.batch_size, args.ph_size_max,  args.num_moms, data_path, data_sample_name)
 
     # for ind in tqdm(range(args.num_examples)):
     #     generate_one_ph(args.batch_size, args.ph_size_max, df_1, args.num_moms, data_path, data_sample_name)
