@@ -831,10 +831,10 @@ def main():
 
     ## Load data
 
-    m_data = pkl.load( open('/scratch/eliransc/pkl_data/mom_data_with_large_util.pkl', 'wb'))
-    y_data = pkl.load( open('/scratch/eliransc/pkl_data/y_data_with_large_util.pkl', 'wb'))
-    m_data_valid =  pkl.load( open('/scratch/eliransc/pkl_data/mom_data_with_large_util_valid.pkl', 'wb'))
-    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/y_data_with_large_util_valid.pkl', 'wb'))
+    m_data = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_with_large_util.pkl', 'rb'))
+    y_data = pkl.load(open('/scratch/eliransc/pkl_data/y_data_with_large_util.pkl', 'rb'))
+    m_data_valid =  pkl.load(open('/scratch/eliransc/pkl_data/mom_data_with_large_util_valid.pkl', 'rb'))
+    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/y_data_with_large_util_valid.pkl', 'rb'))
 
 
 
