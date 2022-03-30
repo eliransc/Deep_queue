@@ -938,8 +938,8 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-        torch.save(net.state_dict(), './pytorch_m_g_1_true_moms_1000_with_erlang_high_util_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl')
-        pkl.dump((loss_list,valid_list,compute_sum_error_list), open('./losts_with_erlang_erlang_high_util_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl', 'wb'))
+            torch.save(net.state_dict(), './pytorch_m_g_1_true_moms_1000_with_erlang_high_util_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl')
+            pkl.dump((loss_list,valid_list,compute_sum_error_list), open('./losts_with_erlang_erlang_high_util_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl', 'wb'))
 
 if __name__ == "__main__":
 
