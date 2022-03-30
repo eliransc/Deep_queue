@@ -873,13 +873,21 @@ def main():
                 #         self.fc4 = nn.Linear(85, 100)
                 #         self.fc5 = nn.Linear(100, 69)
 
+                # self.fc1 = nn.Linear(num_moms, 30)
+                # self.fc2 = nn.Linear(30, 40)
+                # self.fc3 = nn.Linear(40, 50)
+                # self.fc4 = nn.Linear(50, 100)
+                # self.fc5 = nn.Linear(100, 200)
+                # self.fc6 = nn.Linear(200, 350)
+                # self.fc7 = nn.Linear(350, 499)
+
                 self.fc1 = nn.Linear(num_moms, 30)
                 self.fc2 = nn.Linear(30, 40)
                 self.fc3 = nn.Linear(40, 50)
                 self.fc4 = nn.Linear(50, 100)
                 self.fc5 = nn.Linear(100, 200)
-                self.fc6 = nn.Linear(200, 350)
-                self.fc7 = nn.Linear(350, 499)
+                self.fc6 = nn.Linear(200, 200)
+                self.fc7 = nn.Linear(200, 499)
 
             #         self.fc5 = nn.Linear(100, 69)
 
