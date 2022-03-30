@@ -830,10 +830,13 @@ def main():
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
 
     ## Load data
-    m_data = pkl.load(open('/scratch/eliransc/pkl_data/mom_data__with_erlang.pkl', 'rb'))
-    y_data = pkl.load(open('/scratch/eliransc/pkl_data/y_data_with_erlang.pkl', 'rb'))
-    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/mom_data__with_erlang_valid.pkl', 'rb'))
-    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/y_data_with_erlang_valid.pkl', 'rb'))
+
+    m_data = pkl.load( open('/scratch/eliransc/pkl_data/mom_data_with_large_util.pkl', 'wb'))
+    y_data = pkl.load( open('/scratch/eliransc/pkl_data/y_data_with_large_util.pkl', 'wb'))
+    m_data_valid =  pkl.load( open('/scratch/eliransc/pkl_data/mom_data_with_large_util_valid.pkl', 'wb'))
+    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/y_data_with_large_util_valid.pkl', 'wb'))
+
+
 
     for num_moms in range(5, 6):
 
@@ -873,10 +876,10 @@ def main():
                 self.fc1 = nn.Linear(num_moms, 30)
                 self.fc2 = nn.Linear(30, 40)
                 self.fc3 = nn.Linear(40, 50)
-                self.fc4 = nn.Linear(50, 60)
-                self.fc5 = nn.Linear(60, 60)
-                self.fc6 = nn.Linear(60, 60)
-                self.fc7 = nn.Linear(60, 69)
+                self.fc4 = nn.Linear(50, 100)
+                self.fc5 = nn.Linear(100, 200)
+                self.fc6 = nn.Linear(200, 350)
+                self.fc7 = nn.Linear(350, 499)
 
             #         self.fc5 = nn.Linear(100, 69)
 
@@ -935,8 +938,8 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-        torch.save(net.state_dict(), './pytorch_m_g_1_true_moms_1000_with_erlang_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl')
-        pkl.dump((loss_list,valid_list,compute_sum_error_list), open('./losts_with_erlang_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl', 'wb'))
+        torch.save(net.state_dict(), './pytorch_m_g_1_true_moms_1000_with_erlang_high_util_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl')
+        pkl.dump((loss_list,valid_list,compute_sum_error_list), open('./losts_with_erlang_erlang_high_util_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl', 'wb'))
 
 if __name__ == "__main__":
 
