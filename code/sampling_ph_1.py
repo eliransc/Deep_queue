@@ -1059,12 +1059,12 @@ def main(args):
     #     df_1 = pkl.load(
     #         open('/home/eliransc/projects/def-dkrass/eliransc/deep_queueing/fastbook/rates_diff_areas_df.pkl', 'rb'))
     #
-        data_path = '/scratch/eliransc/larger_util'
+        data_path = '/scratch/eliransc/larger_util_2'
 
     else:
     #     vals_bounds_dict = pkl.load(open(r'C:\Users\elira\workspace\Research\data\vals_bounds.pkl', 'rb'))
     #     df_1 = pkl.load(open('df_bound_ph.pkl', 'rb'))
-        data_path = r'C:\Users\user\workspace\data\larger_util_2'
+        data_path = r'C:\Users\user\workspace\data\larger_util'
 
     cur_time = int(time.time())
     np.random.seed(cur_time+len(os.listdir(data_path)))
