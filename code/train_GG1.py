@@ -842,7 +842,7 @@ def main():
     m_data_valid = mom_data_[1200000:-500, :]
     y_data_valid = y_data_[1200000:-500, :]
 
-    for num_moms in range(5,6):
+    for num_moms in range(10,11):
 
 
         print('Number of moments are: ', num_moms)
@@ -884,9 +884,9 @@ def main():
                 self.fc2 = nn.Linear(30, 50)
                 self.fc3 = nn.Linear(50, 100)
                 self.fc4 = nn.Linear(100, 200)
-                self.fc4 = nn.Linear(200, 200)
-                self.fc5 = nn.Linear(200, 350)
-                self.fc6 = nn.Linear(350, 499)
+                self.fc5 = nn.Linear(200, 200)
+                self.fc6 = nn.Linear(200, 350)
+                self.fc7 = nn.Linear(350, 499)
 
 
             def forward(self, x):
