@@ -842,7 +842,7 @@ def main():
     m_data_valid = mom_data_[1200000:-500, :]
     y_data_valid = y_data_[1200000:-500, :]
 
-    for num_moms in range(5, 6):
+    for num_moms in range(10, 15):
 
 
         print('Number of moments are: ', num_moms)
@@ -944,10 +944,10 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-        torch.save(net.state_dict(), './pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_1_2M_data' + str(
-            current_time) + '.pkl')
-        pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                 open('./losts_' + str(num_moms) + '_moms_1_2M_data' + str(current_time) + '.pkl', 'wb'))
+            torch.save(net.state_dict(), './pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_1_2M_data' + str(
+                current_time) + '.pkl')
+            pkl.dump((loss_list, valid_list, compute_sum_error_list),
+                     open('./losts_' + str(num_moms) + '_moms_1_2M_data' + str(current_time) + '.pkl', 'wb'))
 
 if __name__ == "__main__":
 

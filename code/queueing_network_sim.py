@@ -84,9 +84,6 @@ def main(args):
 
         max_ph_size = 100
 
-
-
-
         # service1 = send_to_the_right_generator(np.random.randint(1,3), max_ph_size)
 
         aa = np.array([0.5,0.5])
