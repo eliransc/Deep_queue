@@ -364,6 +364,14 @@ def sample_num_groups(n, thresh =0.98):
         num +=1
     return num
 
+def create_Erlang_given_ph_size(ph_size):
+    s = np.zeros(ph_size)
+    s[0] = 1
+    rate = ph_size
+    A = generate_erlang_given_rates(rate, ph_size)
+    # A = A*compute_first_n_moments(s, A, 1)[0][0]
+    return (s,A)
+
 def send_to_the_right_generator(num_ind, ph_size):
 
     if num_ind == 1: ## Any arbitrary ph
@@ -642,7 +650,7 @@ def manage_batch(batch_size, ph_size_max, num_moms, data_path, data_sample_name,
         y_list.append(pair[1])
 
     torch_moms = torch.stack(mom_list).float()
-    torch_y =  torch.stack(y_list).float()
+    torch_y = torch.stack(y_list).float()
     saving_batch_g_g_1(torch_moms, torch_y, data_path, data_sample_name, num_moms)
 
 
@@ -697,17 +705,20 @@ def manage_single_sample(ph_size_max, num_moms, max_util,eps = 0.05):
 
     a_size, ser_size = sample_size_1(ph_size_max)
 
-
+    elements = [0, 1, 2]
+    probabilities = [0.1, 0.4, 0.5]
     flag = True
+
     while flag: #sample until it is valid
-        arrival_result = send_to_the_right_generator(np.random.randint(1, 3), a_size)
+
+        arrival_result = send_to_the_right_generator(np.random.choice(elements, 1, p=probabilities)[0], a_size)
         if arrival_result:
             s_arrival, A_arrival = arrival_result
             flag = False
 
     flag = True
     while flag:  # sample until it is valid
-        service_result = send_to_the_right_generator(np.random.randint(1, 3), ser_size)
+        service_result = send_to_the_right_generator(np.random.choice(elements, 1, p=probabilities)[0], ser_size)
         if service_result:
             s_service, A_service = service_result
             flag = False
@@ -749,7 +760,7 @@ def main(args):
 
             data_path = '/scratch/d/dkrass/eliransc/training/gg1'
         else:
-            data_path = '/scratch/eliransc/training/gg1_large_both'
+            data_path = '/scratch/eliransc/training/gg1_with_erlang'
 
     else:
 
@@ -823,8 +834,8 @@ def parse_arguments(argv):
     parser.add_argument('--num_examples', type=int, help='number of ph folders', default=120)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=8)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 4000)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=4)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 3000)
     parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
     parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.95)
     args = parser.parse_args(argv)
