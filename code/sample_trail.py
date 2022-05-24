@@ -441,10 +441,13 @@ def compute_steady(s_arrival, A_arrival, s_service, A_service, y_size=500, eps=0
     steady[0] = np.sum(X[:A0.shape[0]])
     steady[1] = np.sum(X[A0.shape[0]:])
     tot_sum = np.sum(X)
-    for ind in tqdm(range(2, y_size)):
+    for ind in tqdm(range(2, y_size-1)):
         steady[ind] = np.sum(np.dot(X[u0_size:], matrix_power(R, ind - 1)))
         if np.sum(steady) > 1 - eps:
             break
+
+    steady = np.append(steady, 1 - np.sum(steady))
+
 
     return steady
 
@@ -760,7 +763,7 @@ def main(args):
 
             data_path = '/scratch/d/dkrass/eliransc/training/gg1'
         else:
-            data_path = '/scratch/eliransc/training/gg1_with_erlang'
+            data_path = '/scratch/eliransc/training/gg1_with_erlang_1'
 
     else:
 
@@ -800,10 +803,6 @@ def main(args):
     # plt.ylim(0, 3)
     # plt.savefig('services6.png')
     # plt.show()
-
-
-
-
 
 
     # vals = manage_single_sample(200, 20)
