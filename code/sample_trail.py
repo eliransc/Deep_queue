@@ -457,7 +457,7 @@ def compute_steady(s_arrival, A_arrival, s_service, A_service, y_size=500, eps=0
 def compute_y_moms(s,A,num_moms,max_ph_size):
 
 
-    lam_vals = np.random.uniform(0.3, 0.95, 1)
+    lam_vals = np.random.uniform(0.8, 0.99, 1)
 
 
     lam_y_list = []
@@ -499,10 +499,14 @@ def compute_y_data_given_folder(x, ph_size_max, tot_prob=70, eps=0.0001):
             steady_state = np.array([1 - rho])
             for i in range(1, tot_prob):
                 steady_state = np.append(steady_state, np.sum(steady_i(rho, s, R, i)))
-            if np.sum(steady_state) > 1 - eps:
-                return steady_state
-            else:
-                return False
+
+            steady_state = np.append(steady_state, 1 - np.sum(steady_state))
+            return steady_state
+
+            # if np.sum(steady_state) > 1 - eps:
+            #     return steady_state
+            # else:
+            #     return False
 
     except:
         print("x is not valid")
@@ -727,7 +731,7 @@ def manage_single_sample(ph_size_max, num_moms, max_util,eps = 0.05):
             flag = False
 
 
-    rho = np.random.uniform(0.3,max_util)
+    rho = np.random.uniform(0.8,max_util)
     A_arrival = A_arrival * rho
 
     s_arrival = s_arrival.reshape((1, s_arrival.shape[0]))
@@ -814,6 +818,7 @@ def main(args):
 
     # Compute ph_dists
 
+
     for ind in tqdm(range(args.num_examples)):
         cur_time = int(time.time())
         seed = cur_time + len(os.listdir(data_path))+np.random.randint(1,1000)
@@ -836,7 +841,7 @@ def parse_arguments(argv):
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=4)
     parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 3000)
     parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
-    parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.95)
+    parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.99)
     args = parser.parse_args(argv)
 
     return args
