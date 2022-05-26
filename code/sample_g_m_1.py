@@ -768,9 +768,9 @@ def main(args):
 
         if os.getcwd() =='/gpfs/fs0/scratch/d/dkrass/eliransc/Deep_queue/code':
 
-            data_path = '/scratch/d/dkrass/eliransc/training/gg1'
+            data_path = '/scratch/d/dkrass/eliransc/training/gm1'
         else:
-            data_path = '/scratch/eliransc/training/gg1_with_erlang_1'
+            data_path = '/scratch/eliransc/training/gm1_with_erlang'
 
     else:
 
