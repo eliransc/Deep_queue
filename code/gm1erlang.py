@@ -97,6 +97,20 @@ def find_sigma(theta, k):
 
 
 def main():
+    print('The current path is:')
+    print(os.getcwd())
+
+    if sys.platform == 'linux':
+
+        if os.getcwd() == '/gpfs/fs0/scratch/d/dkrass/eliransc/Deep_queue/code':
+
+            data_path = '/scratch/d/dkrass/eliransc/training/gm1'
+        else:
+            data_path = '/scratch/eliransc/training/gm1_gamma'
+
+    else:
+
+        data_path = r'C:\Users\user\workspace\data\deep_gm1'
 
     data_sample_name = 'batch_size_128_gamma_gm1_'
 
