@@ -831,14 +831,14 @@ def main():
 
     ## Load data
 
-    m_data = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_with_large_util.pkl', 'rb'))
-    y_data = pkl.load(open('/scratch/eliransc/pkl_data/y_data_with_large_util.pkl', 'rb'))
-    m_data_valid =  pkl.load(open('/scratch/eliransc/pkl_data/mom_data_with_large_util_valid.pkl', 'rb'))
-    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/y_data_with_large_util_valid.pkl', 'rb'))
+    m_data = pkl.load(open('/scratch/eliransc/pkl_data/gm1_mom_train.pkl', 'rb'))
+    y_data = pkl.load(open('/scratch/eliransc/pkl_data/gm1_mom_train.pkl', 'rb'))
+    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gm1_mom_train.pkl', 'rb'))
+    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gm1_mom_valid.pkl', 'rb'))
 
 
 
-    for num_moms in range(5, 6):
+    for num_moms in range(5, 12):
 
 
         print('Number of moments are: ', num_moms)
@@ -946,7 +946,7 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-            torch.save(net.state_dict(), './pytorch_m_g_1_true_moms_1000_with_erlang_high_util_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl')
+            torch.save(net.state_dict(), './pytorch_g_m_1_true_moms_1000_with_erlang_high_util_'+str(num_moms)+'_moms_14000k_data_c'+ str(current_time) +'.pkl')
             pkl.dump((loss_list,valid_list,compute_sum_error_list), open('./losts_with_erlang_erlang_high_util_'+str(num_moms)+'_moms_400k_data_c'+ str(current_time) +'.pkl', 'wb'))
 
 if __name__ == "__main__":
