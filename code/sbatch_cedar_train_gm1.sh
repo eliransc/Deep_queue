@@ -6,3 +6,4 @@
 source /home/eliransc/projects/def-dkrass/eliransc/queues/bin/activate
 python /home/eliransc/projects/def-dkrass/eliransc/Deep_queue/code/train_gm1.py
 
+
