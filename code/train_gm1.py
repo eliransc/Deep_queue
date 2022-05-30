@@ -834,8 +834,8 @@ def main():
     ## Load data
 
     m_data = pkl.load(open('/scratch/eliransc/pkl_data/gm1_mom_train.pkl', 'rb'))
-    y_data = pkl.load(open('/scratch/eliransc/pkl_data/gm1_mom_train.pkl', 'rb'))
-    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gm1_y_train.pkl', 'rb'))
+    y_data = pkl.load(open('/scratch/eliransc/pkl_data/gm1_y_train.pkl', 'rb'))
+    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gm1_mom_valid.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gm1_y_valid.pkl', 'rb'))
 
 
