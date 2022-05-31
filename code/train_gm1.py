@@ -846,7 +846,7 @@ def main():
 
 
 
-    for num_moms in range(5, 12):
+    for num_moms in range(6, 7):
 
 
         print('Number of moments are: ', num_moms)
