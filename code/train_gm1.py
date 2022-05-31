@@ -7,12 +7,12 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import pickle as pkl
-import torch
+
 from numpy.linalg import matrix_power
 from scipy.stats import rv_discrete
 from scipy.linalg import expm, sinm, cosm
 from numpy.linalg import matrix_power
-import torch
+
 import torch.nn as nn
 
 import os
@@ -837,6 +837,11 @@ def main():
     y_data = pkl.load(open('/scratch/eliransc/pkl_data/gm1_y_train.pkl', 'rb'))
     m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gm1_mom_valid.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gm1_y_valid.pkl', 'rb'))
+
+    m_data = m_data.to(torch.float)
+    y_data = y_data.to(torch.float)
+    m_data_valid = m_data_valid.to(torch.float)
+    y_data_valid = y_data_valid.to(torch.float)
 
 
 
