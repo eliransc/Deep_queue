@@ -826,6 +826,7 @@ def check_loss_increasing(loss_list, n_last_steps=10, failure_rate=0.45):
 
 def main():
 
+    import torch
     print('check')
     now = datetime.now()
 
