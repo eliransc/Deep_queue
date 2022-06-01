@@ -846,7 +846,7 @@ def main():
 
 
 
-    for num_moms in range(6, 7):
+    for num_moms in range(2, 5):
 
 
         print('Number of moments are: ', num_moms)
@@ -916,7 +916,7 @@ def main():
         dl.to(device)
         valid_dl.to(device)
         import time
-        EPOCHS = 350
+        EPOCHS = 250
 
         optimizer = optim.Adam(net.parameters(), lr=curr_lr,
                                weight_decay=1e-5)  # paramters is everything adjustable in model
