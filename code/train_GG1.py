@@ -764,8 +764,8 @@ def compute_sum_error(valid_dl, model, return_vector, max_err=0.05, display_bad_
             predictions = predictions * normalizing_const.reshape((yb.shape[0], 1))
             curr_errors = torch.sum(torch.abs((predictions - yb[:, 1:])), axis=1)
             bad_dists_inds = (curr_errors > max_err).nonzero(as_tuple=True)[0]
-            if display_bad_images:
-                print_bad_examples(bad_dists_inds, predictions, yb)
+            # if display_bad_images:
+            #     print_bad_examples(bad_dists_inds, predictions, yb)
             if ind == 0:
                 sum_err_tens = torch.sum(torch.abs((predictions - yb[:, 1:])), axis=1)
             else:
@@ -835,11 +835,20 @@ def main():
     # mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
     # y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
 
-    mom_data = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
-    y_data = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    mom_data =     pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    y_data =       pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
     m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
 
+    for ind in range(mom_data.shape[0]):
+        if ind < 100:
+            print(ind)
+
+    tot_vals = pkl.load(open('/scratch/eliransc/pkl_data/num_moms_vals.pkl', 'rb'))
+    nummom = tot_vals[0]
+    print(nummom)
+    tot_vals = tot_vals[1:]
+    pkl.dump(tot_vals, open('/scratch/eliransc/pkl_data/num_moms_vals.pkl', 'wb'))
 
     # print(mom_data_.shape)
     #
@@ -848,8 +857,7 @@ def main():
     #
     # m_data_valid = mom_data_[1200000:-500, :]
     # y_data_valid = y_data_[1200000:-500, :]
-
-    for num_moms in range(5, 6):
+    for num_moms in range(nummom, nummom+1):
 
 
         print('Number of moments are: ', num_moms)
@@ -913,7 +921,7 @@ def main():
         dl.to(device)
         valid_dl.to(device)
         import time
-        EPOCHS = 400
+        EPOCHS = 200
 
         optimizer = optim.Adam(net.parameters(), lr=curr_lr,
                                weight_decay=1e-5)  # paramters is everything adjustable in model
