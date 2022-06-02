@@ -959,10 +959,10 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-            torch.save(net.state_dict(), './pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_1_2M_data' + str(
+            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_1_2M_data' + str(
                 current_time) + '.pkl')
             pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                     open('./losts_' + str(num_moms) + '_moms_1_2M_data' + str(current_time) + '.pkl', 'wb'))
+                     open('../gg1_models/losts_' + str(num_moms) + '_moms_1_2M_data' + str(current_time) + '.pkl', 'wb'))
 
 if __name__ == "__main__":
 
