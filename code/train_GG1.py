@@ -832,18 +832,24 @@ def main():
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
     import torch
     ## Load data
-    mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
-    y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
+    # mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
+    # y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
 
-    print(mom_data_.shape)
+    mom_data = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    y_data = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
+    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
 
-    m_data = torch.cat((mom_data_[:1200000, :], mom_data_[-500:, :]), 0)
-    y_data = torch.cat((y_data_[:1200000, :], y_data_[-500:, :]), 0)
 
-    m_data_valid = mom_data_[1200000:-500, :]
-    y_data_valid = y_data_[1200000:-500, :]
+    # print(mom_data_.shape)
+    #
+    # m_data = torch.cat((mom_data_[:1200000, :], mom_data_[-500:, :]), 0)
+    # y_data = torch.cat((y_data_[:1200000, :], y_data_[-500:, :]), 0)
+    #
+    # m_data_valid = mom_data_[1200000:-500, :]
+    # y_data_valid = y_data_[1200000:-500, :]
 
-    for num_moms in range(10, 15):
+    for num_moms in range(5, 6):
 
 
         print('Number of moments are: ', num_moms)
