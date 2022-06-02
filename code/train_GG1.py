@@ -828,15 +828,15 @@ def check_loss_increasing(loss_list, n_last_steps=10, failure_rate=0.45):
 def main():
 
     now = datetime.now()
-
+    print('Start training')
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
     import torch
     ## Load data
     # mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
     # y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
 
-    m_data =     pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
-    y_data =       pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    m_data = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    y_data = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
     m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
 
@@ -872,6 +872,7 @@ def main():
         current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
         print('curr time: ', current_time)
 
+
         # Construct dataset
         dset = list(zip(torch.cat((m_data[:, :num_moms], m_data[:, 20:20 + num_moms - 1]), 1), y_data))
         valid_dset = list(
@@ -892,13 +893,6 @@ def main():
             def __init__(self):
                 super().__init__()
 
-
-                # self.fc1 = nn.Linear(2 * num_moms - 1, 30)
-                # self.fc2 = nn.Linear(30, 50)
-                # self.fc3 = nn.Linear(50, 100)
-                # self.fc4 = nn.Linear(100, 200)
-                # self.fc5 = nn.Linear(200, 350)
-                # self.fc6 = nn.Linear(350, 499)
                 self.fc1 = nn.Linear(2 * num_moms - 1, 30)
                 self.fc2 = nn.Linear(30, 50)
                 self.fc3 = nn.Linear(50, 100)
