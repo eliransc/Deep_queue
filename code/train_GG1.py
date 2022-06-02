@@ -31,7 +31,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 import torch.optim as optim
-
+from datetime import datetime
 m = nn.Softmax(dim=1)
 
 def thresh_func(row):
@@ -840,6 +840,11 @@ def main():
     m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
 
+    m_data = m_data.to(torch.float)
+    y_data = y_data.to(torch.float)
+    m_data_valid = m_data_valid.to(torch.float)
+    y_data_valid = y_data_valid.to(torch.float)
+
     for ind in range(m_data.shape[0]):
         if ind < 100:
             print(ind)
@@ -880,7 +885,6 @@ def main():
         m = nn.Softmax(dim=1)
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 
         # code made in pytorch3.ipynb with comments
         class Net(nn.Module):
