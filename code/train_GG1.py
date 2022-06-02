@@ -835,12 +835,12 @@ def main():
     # mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
     # y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
 
-    mom_data =     pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    m_data =     pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
     y_data =       pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
     m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
 
-    for ind in range(mom_data.shape[0]):
+    for ind in range(m_data.shape[0]):
         if ind < 100:
             print(ind)
 
