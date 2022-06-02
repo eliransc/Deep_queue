@@ -840,10 +840,10 @@ def main():
     m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
 
-    m_data = m_data.to(torch.float)
-    y_data = y_data.to(torch.float)
-    m_data_valid = m_data_valid.to(torch.float)
-    y_data_valid = y_data_valid.to(torch.float)
+    m_data = m_data.float()
+    y_data = y_data.float()
+    m_data_valid = m_data_valid.float()
+    y_data_valid = y_data_valid.float()
 
     for ind in range(m_data.shape[0]):
         if ind < 100:
