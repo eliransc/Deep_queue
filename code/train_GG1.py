@@ -827,6 +827,7 @@ def check_loss_increasing(loss_list, n_last_steps=10, failure_rate=0.45):
 
 def main():
 
+    batch_size = 128
     now = datetime.now()
     print('Start training')
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
@@ -877,8 +878,8 @@ def main():
         dset = list(zip(torch.cat((m_data[:, :num_moms], m_data[:, 20:20 + num_moms - 1]), 1), y_data))
         valid_dset = list(
             zip(torch.cat((m_data_valid[:, :num_moms], m_data_valid[:, 20:20 + num_moms - 1]), 1), y_data_valid))
-        dl = DataLoader(dset, batch_size=128)
-        valid_dl = DataLoader(valid_dset, batch_size=128)
+        dl = DataLoader(dset, batch_size=batch_size)
+        valid_dl = DataLoader(valid_dset, batch_size=batch_size)
 
         import torch
         import torch.nn as nn
@@ -919,7 +920,7 @@ def main():
         dl.to(device)
         valid_dl.to(device)
         import time
-        EPOCHS = 200
+        EPOCHS = 250
 
         optimizer = optim.Adam(net.parameters(), lr=curr_lr,
                                weight_decay=1e-5)  # paramters is everything adjustable in model
@@ -960,7 +961,7 @@ def main():
             torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_1_2M_data' + str(
                 current_time) + '.pkl')
             pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                     open('../gg1_models/losts_' + str(num_moms) + '_moms_1_2M_data' + str(current_time) + '.pkl', 'wb'))
+                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data'+ 'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
 
 if __name__ == "__main__":
 
