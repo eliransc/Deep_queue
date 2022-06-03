@@ -692,7 +692,7 @@ def sampling_examples(ph_size_max, num_moms, eps = 0.05):
             flag = False
 
 
-    rho = np.random.uniform(0.3,0.95)
+    rho = np.random.uniform(0.3,0.8)
     A_arrival = A_arrival * rho
 
     s_arrival = s_arrival.reshape((1, s_arrival.shape[0]))
@@ -841,7 +841,7 @@ def parse_arguments(argv):
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=4)
     parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 3000)
     parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
-    parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.99)
+    parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.8)
     args = parser.parse_args(argv)
 
     return args
