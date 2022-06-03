@@ -767,7 +767,7 @@ def main(args):
 
             data_path = '/scratch/d/dkrass/eliransc/training/gg1'
         else:
-            data_path = '/scratch/eliransc/training/gg1_with_erlang_1'
+            data_path = '/scratch/eliransc/training/gg1_with_erlang_4'
 
     else:
 
