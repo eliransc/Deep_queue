@@ -835,7 +835,7 @@ def check_loss_increasing(loss_list, n_last_steps=10, failure_rate=0.45):
 
 def main():
 
-    batch_size = 128
+    batch_size = 64
     now = datetime.now()
     print('Start training')
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
@@ -938,7 +938,7 @@ def main():
         dl.to(device)
         valid_dl.to(device)
         import time
-        EPOCHS = 270
+        EPOCHS = 300
 
         optimizer = optim.Adam(net.parameters(), lr=curr_lr,
                                weight_decay=1e-5)  # paramters is everything adjustable in model
