@@ -735,6 +735,14 @@ def queue_loss(x, predictions, targes):
         (targes.shape[0], 1))  # Normalizing the data such that it will sum to rho
     return (torch.abs(predictions - targes[:, 1:])).sum() + torch.max(torch.abs(predictions - targes[:, 1:]))
 
+def queue_loss1(x, predictions, targes):
+    predictions = m(predictions)
+    #     aa = (x[:,0]*(torch.exp(x[:,1]))).reshape((x.shape[0],1))
+    normalizing_const = 1 - targes[:, 0]
+    predictions = predictions * normalizing_const.reshape(
+        (targes.shape[0], 1))  # Normalizing the data such that it will sum to rho
+    return ((torch.abs(predictions - targes[:, 1:]))**0.5).sum() + torch.max((torch.abs(predictions - targes[:, 1:]))**0.5)
+
 
 def valid_loss(dset_val, model):
     with torch.no_grad():
@@ -944,7 +952,7 @@ def main():
 
                 net.zero_grad()
                 output = net(X)
-                loss = queue_loss(X, output, y)  # 1 of two major ways to calculate loss
+                loss = queue_loss1(X, output, y)  # 1 of two major ways to calculate loss
                 loss.backward()
                 optimizer.step()
                 net.zero_grad()
@@ -966,10 +974,10 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_1_2M_data' + str(
+            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_2M_data'+ 'new_archi' + str(
                 current_time) + '.pkl')
             pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data'+ 'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
+                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data'+ 'new_archi'+ 'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
 
 if __name__ == "__main__":
 
