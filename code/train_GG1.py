@@ -954,7 +954,7 @@ def main():
 
                 net.zero_grad()
                 output = net(X)
-                loss = queue_loss1(X, output, y)  # 1 of two major ways to calculate loss
+                loss = queue_loss(X, output, y)  # 1 of two major ways to calculate loss
                 loss.backward()
                 optimizer.step()
                 net.zero_grad()
