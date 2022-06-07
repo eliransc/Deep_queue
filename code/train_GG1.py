@@ -864,7 +864,7 @@ def main():
     # tot_vals = tot_vals[1:]
     # pkl.dump(tot_vals, open('/scratch/eliransc/pkl_data/num_moms_vals.pkl', 'wb'))
 
-    nummom = 5
+    nummom = 6
 
     # print(mom_data_.shape)
     #
