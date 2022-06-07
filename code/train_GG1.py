@@ -733,7 +733,7 @@ def queue_loss(x, predictions, targes):
     normalizing_const = 1 - targes[:, 0]
     predictions = predictions * normalizing_const.reshape(
         (targes.shape[0], 1))  # Normalizing the data such that it will sum to rho
-    return (torch.abs(predictions - targes[:, 1:])).sum() + torch.max(torch.abs(predictions - targes[:, 1:]))
+    return ((torch.pow(torch.abs(predictions - targes[:, 1:]),1)).sum(axis = 1) + torch.max(torch.pow(torch.abs(predictions - targes[:, 1:]),1),1)[0]).sum()
 
 def queue_loss1(x, predictions, targes):
     predictions = m(predictions)
@@ -835,7 +835,7 @@ def check_loss_increasing(loss_list, n_last_steps=10, failure_rate=0.45):
 
 def main():
 
-    batch_size = 128
+    batch_size = 64
     now = datetime.now()
     print('Start training')
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
@@ -844,8 +844,8 @@ def main():
     # mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
     # y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
 
-    m_data = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
-    y_data = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    m_data = pkl.load(open('/scratch/eliransc/pkl_data/new_gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    y_data = pkl.load(open('/scratch/eliransc/pkl_data/new_gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
     m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
 
@@ -858,11 +858,13 @@ def main():
         if ind < 100:
             print(ind)
 
-    tot_vals = pkl.load(open('/scratch/eliransc/pkl_data/num_moms_vals.pkl', 'rb'))
-    nummom = tot_vals[0]
-    print(nummom)
-    tot_vals = tot_vals[1:]
-    pkl.dump(tot_vals, open('/scratch/eliransc/pkl_data/num_moms_vals.pkl', 'wb'))
+    # tot_vals = pkl.load(open('/scratch/eliransc/pkl_data/num_moms_vals.pkl', 'rb'))
+    # nummom = tot_vals[0]
+    # print(nummom)
+    # tot_vals = tot_vals[1:]
+    # pkl.dump(tot_vals, open('/scratch/eliransc/pkl_data/num_moms_vals.pkl', 'wb'))
+
+    nummom = 5
 
     # print(mom_data_.shape)
     #
@@ -902,21 +904,21 @@ def main():
             def __init__(self):
                 super().__init__()
 
-                # self.fc1 = nn.Linear(2 * num_moms - 1, 30)
-                # self.fc2 = nn.Linear(30, 50)
-                # self.fc3 = nn.Linear(50, 100)
-                # self.fc4 = nn.Linear(100, 200)
-                # self.fc5 = nn.Linear(200, 200)
-                # self.fc6 = nn.Linear(200, 350)
-                # self.fc7 = nn.Linear(350, 499)
-
-                self.fc1 = nn.Linear(2 * num_moms - 1, 50)
-                self.fc2 = nn.Linear(50, 70)
-                self.fc3 = nn.Linear(70, 100)
+                self.fc1 = nn.Linear(2 * num_moms - 1, 30)
+                self.fc2 = nn.Linear(30, 50)
+                self.fc3 = nn.Linear(50, 100)
                 self.fc4 = nn.Linear(100, 200)
                 self.fc5 = nn.Linear(200, 200)
                 self.fc6 = nn.Linear(200, 350)
                 self.fc7 = nn.Linear(350, 499)
+
+                # self.fc1 = nn.Linear(2 * num_moms - 1, 50)
+                # self.fc2 = nn.Linear(50, 70)
+                # self.fc3 = nn.Linear(70, 100)
+                # self.fc4 = nn.Linear(100, 200)
+                # self.fc5 = nn.Linear(200, 200)
+                # self.fc6 = nn.Linear(200, 350)
+                # self.fc7 = nn.Linear(350, 499)
 
 
             def forward(self, x):
@@ -974,10 +976,10 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_2M_data'+ 'new_archi'+'loss_1' + str(
+            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_2M_data'+ 'old_archi'+'loss_1' + str(
                 current_time) + '.pkl')
             pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data'+ 'new_archi'+'loss_1' + 'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
+                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data'+ 'old_archi'+'loss_1' + 'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
 
 if __name__ == "__main__":
 
