@@ -835,7 +835,7 @@ def check_loss_increasing(loss_list, n_last_steps=10, failure_rate=0.45):
 
 def main():
 
-    batch_size = 64
+    batch_size = 128
     now = datetime.now()
     print('Start training')
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
@@ -904,21 +904,21 @@ def main():
             def __init__(self):
                 super().__init__()
 
-                self.fc1 = nn.Linear(2 * num_moms - 1, 30)
-                self.fc2 = nn.Linear(30, 50)
-                self.fc3 = nn.Linear(50, 100)
-                self.fc4 = nn.Linear(100, 200)
-                self.fc5 = nn.Linear(200, 200)
-                self.fc6 = nn.Linear(200, 350)
-                self.fc7 = nn.Linear(350, 499)
-
-                # self.fc1 = nn.Linear(2 * num_moms - 1, 50)
-                # self.fc2 = nn.Linear(50, 70)
-                # self.fc3 = nn.Linear(70, 100)
+                # self.fc1 = nn.Linear(2 * num_moms - 1, 30)
+                # self.fc2 = nn.Linear(30, 50)
+                # self.fc3 = nn.Linear(50, 100)
                 # self.fc4 = nn.Linear(100, 200)
                 # self.fc5 = nn.Linear(200, 200)
                 # self.fc6 = nn.Linear(200, 350)
                 # self.fc7 = nn.Linear(350, 499)
+
+                self.fc1 = nn.Linear(2 * num_moms - 1, 50)
+                self.fc2 = nn.Linear(50, 70)
+                self.fc3 = nn.Linear(70, 100)
+                self.fc4 = nn.Linear(100, 200)
+                self.fc5 = nn.Linear(200, 200)
+                self.fc6 = nn.Linear(200, 350)
+                self.fc7 = nn.Linear(350, 499)
 
 
             def forward(self, x):
@@ -941,7 +941,7 @@ def main():
         EPOCHS = 300
 
         optimizer = optim.Adam(net.parameters(), lr=curr_lr,
-                               weight_decay=1e-5)  # paramters is everything adjustable in model
+                               weight_decay=1e-6)  # paramters is everything adjustable in model
 
         loss_list = []
         valid_list = []
@@ -966,7 +966,11 @@ def main():
             if len(loss_list) > 3:
                 if check_loss_increasing(valid_list):
                     curr_lr = curr_lr * 0.7
-                    optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-5)
+                    optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-6)
+                    print(curr_lr)
+                else:
+                    curr_lr = curr_lr * 0.98
+                    optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-6)
                     print(curr_lr)
 
             print("Epoch: {}, Training: {:.5f}, Validation : {:.5f}, Valid_sum_err: {:.5f},Time: {:.3f}".format(epoch,
