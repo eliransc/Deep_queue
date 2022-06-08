@@ -835,7 +835,7 @@ def check_loss_increasing(loss_list, n_last_steps=10, failure_rate=0.45):
 
 def main():
 
-    batch_size = 128
+    batch_size = 64
     now = datetime.now()
     print('Start training')
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
@@ -912,13 +912,22 @@ def main():
                 # self.fc6 = nn.Linear(200, 350)
                 # self.fc7 = nn.Linear(350, 499)
 
+                # self.fc1 = nn.Linear(2 * num_moms - 1, 50)
+                # self.fc2 = nn.Linear(50, 70)
+                # self.fc3 = nn.Linear(70, 100)
+                # self.fc4 = nn.Linear(100, 200)
+                # self.fc5 = nn.Linear(200, 200)
+                # self.fc6 = nn.Linear(200, 350)
+                # self.fc7 = nn.Linear(350, 499)
+
                 self.fc1 = nn.Linear(2 * num_moms - 1, 50)
                 self.fc2 = nn.Linear(50, 70)
                 self.fc3 = nn.Linear(70, 100)
-                self.fc4 = nn.Linear(100, 200)
-                self.fc5 = nn.Linear(200, 200)
-                self.fc6 = nn.Linear(200, 350)
-                self.fc7 = nn.Linear(350, 499)
+                self.fc4 = nn.Linear(100, 150)
+                self.fc5 = nn.Linear(150, 200)
+                self.fc6 = nn.Linear(200, 200)
+                self.fc7 = nn.Linear(200, 350)
+                self.fc8 = nn.Linear(350, 499)
 
 
             def forward(self, x):
@@ -928,7 +937,8 @@ def main():
                 x = F.relu(self.fc4(x))
                 x = F.relu(self.fc5(x))
                 x = F.relu(self.fc6(x))
-                x = self.fc7(x)
+                x = F.relu(self.fc7(x))
+                x = self.fc8(x)
                 return x  # F.log_softmax(x,dim=1)
 
         net = Net().to(device)
@@ -941,7 +951,7 @@ def main():
         EPOCHS = 300
 
         optimizer = optim.Adam(net.parameters(), lr=curr_lr,
-                               weight_decay=1e-6)  # paramters is everything adjustable in model
+                               weight_decay=1e-5)  # paramters is everything adjustable in model
 
         loss_list = []
         valid_list = []
@@ -966,11 +976,11 @@ def main():
             if len(loss_list) > 3:
                 if check_loss_increasing(valid_list):
                     curr_lr = curr_lr * 0.7
-                    optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-6)
+                    optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-5)
                     print(curr_lr)
                 else:
                     curr_lr = curr_lr * 0.98
-                    optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-6)
+                    optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-5)
                     print(curr_lr)
 
             print("Epoch: {}, Training: {:.5f}, Validation : {:.5f}, Valid_sum_err: {:.5f},Time: {:.3f}".format(epoch,
@@ -980,10 +990,10 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_2M_data'+ 'old_archi' + str(
+            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_2M_data'+ 'archi_2_'+'batch_size'+ str(batch_size) + str(
                 current_time) + '.pkl')
             pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data'+ 'old_archi'+'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
+                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data'+ 'archi_2'+'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
 
 if __name__ == "__main__":
 
