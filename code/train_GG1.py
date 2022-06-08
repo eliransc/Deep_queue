@@ -913,22 +913,22 @@ def main():
                 # self.fc6 = nn.Linear(200, 350)
                 # self.fc7 = nn.Linear(350, 499)
 
-                # self.fc1 = nn.Linear(2 * num_moms - 1, 50)
-                # self.fc2 = nn.Linear(50, 70)
-                # self.fc3 = nn.Linear(70, 100)
-                # self.fc4 = nn.Linear(100, 200)
-                # self.fc5 = nn.Linear(200, 200)
-                # self.fc6 = nn.Linear(200, 350)
-                # self.fc7 = nn.Linear(350, 499)
-
                 self.fc1 = nn.Linear(2 * num_moms - 1, 50)
                 self.fc2 = nn.Linear(50, 70)
                 self.fc3 = nn.Linear(70, 100)
-                self.fc4 = nn.Linear(100, 150)
-                self.fc5 = nn.Linear(150, 200)
-                self.fc6 = nn.Linear(200, 200)
-                self.fc7 = nn.Linear(200, 350)
-                self.fc8 = nn.Linear(350, 499)
+                self.fc4 = nn.Linear(100, 200)
+                self.fc5 = nn.Linear(200, 200)
+                self.fc6 = nn.Linear(200, 350)
+                self.fc7 = nn.Linear(350, 499)
+
+                # self.fc1 = nn.Linear(2 * num_moms - 1, 50)
+                # self.fc2 = nn.Linear(50, 70)
+                # self.fc3 = nn.Linear(70, 100)
+                # self.fc4 = nn.Linear(100, 150)
+                # self.fc5 = nn.Linear(150, 200)
+                # self.fc6 = nn.Linear(200, 200)
+                # self.fc7 = nn.Linear(200, 350)
+                # self.fc8 = nn.Linear(350, 499)
 
 
             def forward(self, x):
@@ -938,8 +938,8 @@ def main():
                 x = F.relu(self.fc4(x))
                 x = F.relu(self.fc5(x))
                 x = F.relu(self.fc6(x))
-                x = F.relu(self.fc7(x))
-                x = self.fc8(x)
+
+                x = self.fc7(x)
                 return x  # F.log_softmax(x,dim=1)
 
         net = Net().to(device)
@@ -991,10 +991,10 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_withoutgm1' + str(num_moms) + '_moms_2M_data'+ 'archi_2_'+'batch_size'+ str(batch_size) + str(
+            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_withoutgm1' + str(num_moms) + '_moms_2M_data'+ 'archi_new_'+'batch_size'+ str(batch_size) + str(
                 current_time) + '.pkl')
             pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data_withoutgm1'+ 'archi_2'+'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
+                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data_withoutgm1'+ 'archi_new'+'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
 
 if __name__ == "__main__":
 
