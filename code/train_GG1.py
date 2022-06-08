@@ -835,7 +835,7 @@ def check_loss_increasing(loss_list, n_last_steps=10, failure_rate=0.45):
 
 def main():
 
-    batch_size = 32
+    batch_size = 128
     now = datetime.now()
     print('Start training')
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
@@ -844,8 +844,8 @@ def main():
     # mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
     # y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
 
-    m_data = pkl.load(open('/scratch/eliransc/pkl_data/new_gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
-    y_data = pkl.load(open('/scratch/eliransc/pkl_data/new_gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    m_data = pkl.load(open('/scratch/eliransc/pkl_data/new1_gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    y_data = pkl.load(open('/scratch/eliransc/pkl_data/new1_gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
     m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
 
@@ -873,6 +873,7 @@ def main():
     #
     # m_data_valid = mom_data_[1200000:-500, :]
     # y_data_valid = y_data_[1200000:-500, :]
+
     for num_moms in range(nummom, nummom+1):
 
 
@@ -990,10 +991,10 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_' + str(num_moms) + '_moms_2M_data'+ 'archi_2_'+'batch_size'+ str(batch_size) + str(
+            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_withoutgm1' + str(num_moms) + '_moms_2M_data'+ 'archi_2_'+'batch_size'+ str(batch_size) + str(
                 current_time) + '.pkl')
             pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data'+ 'archi_2'+'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
+                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data_withoutgm1'+ 'archi_2'+'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
 
 if __name__ == "__main__":
 
