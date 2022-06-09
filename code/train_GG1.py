@@ -905,21 +905,21 @@ def main():
             def __init__(self):
                 super().__init__()
 
-                # self.fc1 = nn.Linear(2 * num_moms - 1, 30)
-                # self.fc2 = nn.Linear(30, 50)
-                # self.fc3 = nn.Linear(50, 100)
-                # self.fc4 = nn.Linear(100, 200)
-                # self.fc5 = nn.Linear(200, 200)
-                # self.fc6 = nn.Linear(200, 350)
-                # self.fc7 = nn.Linear(350, 499)
-
-                self.fc1 = nn.Linear(2 * num_moms - 1, 50)
-                self.fc2 = nn.Linear(50, 70)
-                self.fc3 = nn.Linear(70, 100)
+                self.fc1 = nn.Linear(2 * num_moms - 1, 30)
+                self.fc2 = nn.Linear(30, 50)
+                self.fc3 = nn.Linear(50, 100)
                 self.fc4 = nn.Linear(100, 200)
                 self.fc5 = nn.Linear(200, 200)
                 self.fc6 = nn.Linear(200, 350)
                 self.fc7 = nn.Linear(350, 499)
+
+                # self.fc1 = nn.Linear(2 * num_moms - 1, 50)
+                # self.fc2 = nn.Linear(50, 70)
+                # self.fc3 = nn.Linear(70, 100)
+                # self.fc4 = nn.Linear(100, 200)
+                # self.fc5 = nn.Linear(200, 200)
+                # self.fc6 = nn.Linear(200, 350)
+                # self.fc7 = nn.Linear(350, 499)
 
                 # self.fc1 = nn.Linear(2 * num_moms - 1, 50)
                 # self.fc2 = nn.Linear(50, 70)
@@ -980,7 +980,7 @@ def main():
                     optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-5)
                     print(curr_lr)
                 else:
-                    curr_lr = curr_lr * 0.98
+                    curr_lr = curr_lr * 1
                     optimizer = optim.Adam(net.parameters(), lr=curr_lr, weight_decay=1e-5)
                     print(curr_lr)
 
@@ -991,10 +991,10 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_withoutgm1' + str(num_moms) + '_moms_2M_data'+ 'archi_new_'+'batch_size'+ str(batch_size) + str(
+            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_withoutgm1' + str(num_moms) + '_moms_2M_data'+ 'old_archi_'+'batch_size'+ str(batch_size) + str(
                 current_time) + '.pkl')
             pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data_withoutgm1'+ 'archi_new'+'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
+                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data_withoutgm1'+ 'old_archi'+'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
 
 if __name__ == "__main__":
 
