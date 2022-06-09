@@ -864,6 +864,13 @@ def main():
     # tot_vals = tot_vals[1:]
     # pkl.dump(tot_vals, open('/scratch/eliransc/pkl_data/num_moms_vals.pkl', 'wb'))
 
+    import time
+    cur_time = int(time.time())
+    data_path = '../new_gg1_models'
+    seed = cur_time + len(os.listdir(data_path)) + np.random.randint(1, 1000)
+    np.random.seed(seed)
+    print(seed)
+
     archi = np.random.randint(1, 4, 1)[0]
     bs = np.random.choice([64, 128], size=1, replace=True, p=[0.3, 0.7])[0]
     weight_deacy = np.random.choice([4, 5, 6], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
@@ -885,11 +892,6 @@ def main():
         num_moms_service) + '_lr_first_' + str(lr_first) + '_lr_second_' + str(lr_second)
 
 
-    cur_time = int(time.time())
-    data_path = '../new_gg1_models'
-    seed = cur_time + len(os.listdir(data_path)) + np.random.randint(1, 1000)
-    np.random.seed(seed)
-    print(seed)
 
 
     now = datetime.now()
