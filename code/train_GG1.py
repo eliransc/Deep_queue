@@ -846,8 +846,8 @@ def main():
 
     m_data = pkl.load(open('/scratch/eliransc/pkl_data/new1_gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
     y_data = pkl.load(open('/scratch/eliransc/pkl_data/new1_gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
-    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
-    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
+    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_moms_without08_util.pkl', 'rb'))
+    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_ys_without08_util.pkl', 'rb'))
 
     m_data = m_data.float()
     y_data = y_data.float()
@@ -864,7 +864,7 @@ def main():
     # tot_vals = tot_vals[1:]
     # pkl.dump(tot_vals, open('/scratch/eliransc/pkl_data/num_moms_vals.pkl', 'wb'))
 
-    nummom = 6
+    nummom = 5
 
     # print(mom_data_.shape)
     #
@@ -905,21 +905,21 @@ def main():
             def __init__(self):
                 super().__init__()
 
-                self.fc1 = nn.Linear(2 * num_moms - 1, 30)
-                self.fc2 = nn.Linear(30, 50)
-                self.fc3 = nn.Linear(50, 100)
-                self.fc4 = nn.Linear(100, 200)
-                self.fc5 = nn.Linear(200, 200)
-                self.fc6 = nn.Linear(200, 350)
-                self.fc7 = nn.Linear(350, 499)
-
-                # self.fc1 = nn.Linear(2 * num_moms - 1, 50)
-                # self.fc2 = nn.Linear(50, 70)
-                # self.fc3 = nn.Linear(70, 100)
+                # self.fc1 = nn.Linear(2 * num_moms - 1, 30)
+                # self.fc2 = nn.Linear(30, 50)
+                # self.fc3 = nn.Linear(50, 100)
                 # self.fc4 = nn.Linear(100, 200)
                 # self.fc5 = nn.Linear(200, 200)
                 # self.fc6 = nn.Linear(200, 350)
                 # self.fc7 = nn.Linear(350, 499)
+
+                self.fc1 = nn.Linear(2 * num_moms - 1, 50)
+                self.fc2 = nn.Linear(50, 70)
+                self.fc3 = nn.Linear(70, 100)
+                self.fc4 = nn.Linear(100, 200)
+                self.fc5 = nn.Linear(200, 200)
+                self.fc6 = nn.Linear(200, 350)
+                self.fc7 = nn.Linear(350, 499)
 
                 # self.fc1 = nn.Linear(2 * num_moms - 1, 50)
                 # self.fc2 = nn.Linear(50, 70)
@@ -991,10 +991,10 @@ def main():
                                                                                                                     compute_sum_error_list[
                                                                                                                         -1],
                                                                                                                     time.time() - t_0))
-            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_withoutgm1' + str(num_moms) + '_moms_2M_data'+ 'old_archi_'+'batch_size'+ str(batch_size) + str(
+            torch.save(net.state_dict(), '../gg1_models/pytorch_g_g_1_true_moms_new_data_withoutgm1' + str(num_moms) + '_moms_2M_data'+ 'new_archi_'+'batch_size'+ str(batch_size) + str(
                 current_time) + '.pkl')
             pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data_withoutgm1'+ 'old_archi'+'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
+                     open('../gg1_models/losts_' + str(num_moms) + '_moms_2M_data_withoutgm1'+ 'new_archi'+'batch_size'+ str(batch_size)+ '_' + str(current_time) + '.pkl', 'wb'))
 
 if __name__ == "__main__":
 
