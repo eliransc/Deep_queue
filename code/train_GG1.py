@@ -29,7 +29,7 @@ import torchvision
 from torchvision import transforms, datasets
 import torch.nn as nn
 import torch.nn.functional as F
-
+import time
 import torch.optim as optim
 from datetime import datetime
 m = nn.Softmax(dim=1)
@@ -883,6 +883,13 @@ def main():
     setting_string = 'archi_' + str(archi) + '_bs_' + str(bs) + '_weight_decay_' + str(
         weight_deacy) + '_num_moms_arrival_' + str(num_moms_arrive) + '_num_moms_service_' + str(
         num_moms_service) + '_lr_first_' + str(lr_first) + '_lr_second_' + str(lr_second)
+
+
+    cur_time = int(time.time())
+    data_path = '../new_gg1_models'
+    seed = cur_time + len(os.listdir(data_path)) + np.random.randint(1, 1000)
+    np.random.seed(seed)
+    print(seed)
 
 
     now = datetime.now()
