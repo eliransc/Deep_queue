@@ -846,8 +846,8 @@ def main():
 
     m_data = pkl.load(open('/scratch/eliransc/pkl_data/new1_gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
     y_data = pkl.load(open('/scratch/eliransc/pkl_data/new1_gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
-    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_moms_without08_util.pkl', 'rb'))
-    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_ys_without08_util.pkl', 'rb'))
+    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_moms_without08_util_1.pkl', 'rb'))
+    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_ys_without08_util_1.pkl', 'rb'))
 
     m_data = m_data.float()
     y_data = y_data.float()
@@ -872,12 +872,12 @@ def main():
     print(seed)
 
     archi = np.random.randint(1, 4, 1)[0]
-    bs = np.random.choice([64, 128], size=1, replace=True, p=[0.3, 0.7])[0]
-    weight_deacy = np.random.choice([4, 5, 6], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
-    num_moms_arrive = np.random.choice([5, 6, 7], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
-    num_moms_service = np.random.choice([5, 6, 7], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
-    lr_first = np.random.choice([0.7, 0.75, 0.8], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
-    lr_second = np.random.choice([0.95, 0.98, 1], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
+    bs = np.random.choice([64, 128], size=1, replace=True, p=[0.4, 0.6])[0]
+    weight_deacy = np.random.choice([4, 5, 6], size=1, replace=True, p=[0.05, 0.5, 0.45])[0]
+    num_moms_arrive = np.random.choice([5, 6, 7, 8, 9, 10], size=1, replace=True, p=[0.15, 0.15, 0.15, 0.15, 0.2, 0.2])[0]
+    num_moms_service = np.random.choice([5, 6, 7, 8, 9, 10], size=1, replace=True, p=[0.15, 0.15, 0.15, 0.15, 0.2, 0.2])[0]
+    lr_first = np.random.choice([0.7, 0.75, 0.8], size=1, replace=True, p=[0.2, 0.6, 0.2])[0]
+    lr_second = np.random.choice([0.95, 0.98, 1], size=1, replace=True, p=[0.05, 0.25, 0.7])[0]
 
     print('The archi is: ', archi)
     print('The batch size is: ', bs)
