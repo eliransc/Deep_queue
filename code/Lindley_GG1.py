@@ -128,7 +128,7 @@ def generate_normal(is_arrival):
 
 def main():
 
-    pkl_path = '../pkl/lindlyesgg1.pkl'
+    pkl_path = '/home/eliransc/projects/def-dkrass/eliransc/Deep_queue/pkl/lindlyesgg1_1.pkl'
 
     # pkl_path = r'./lindlyesgg1.pkl'
 
@@ -139,7 +139,7 @@ def main():
         df = pd.DataFrame([], columns = [])
 
     b = 2.230380964364765
-    num_trails = 250000000
+    num_trails = 300000000
     mu = 1
     arrivals = np.random.uniform(0, b, num_trails)  # np.random.exponential(2, num_trails)
     ser = np.random.exponential(mu, num_trails)
@@ -166,6 +166,7 @@ def main():
     df.loc[curr_ind, 'ser_params'] = str(mu)
     df.loc[curr_ind, 'avg_waiting'] = meanwait
     df.loc[curr_ind, 'avg_length'] = mean_l
+    df.loc[curr_ind, 'num_iters'] = num_trails
 
     pkl.dump(df, open(pkl_path, 'wb'))
 
