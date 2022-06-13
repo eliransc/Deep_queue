@@ -139,7 +139,7 @@ def main():
         df = pd.DataFrame([], columns = [])
 
     b = 2.230380964364765
-    num_trails = 300000000
+    num_trails = 250000000
     mu = 1
     arrivals = np.random.uniform(0, b, num_trails)  # np.random.exponential(2, num_trails)
     ser = np.random.exponential(mu, num_trails)
