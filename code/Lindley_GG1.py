@@ -271,7 +271,7 @@ def main(args):
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_trails', type=int, help='The end of the simulation', default=200000)
+    parser.add_argument('--num_trails', type=int, help='The end of the simulation', default=200000000)
     parser.add_argument('--size', type=int, help='the number of stations in the system', default=1)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=2)
     parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl/df_sum_res_sim_gg1_Lindley')
