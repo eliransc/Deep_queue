@@ -133,13 +133,10 @@ def main():
     # pkl_path = r'./lindlyesgg1.pkl'
 
 
-    if os.path.exists(pkl_path):
-        df = pkl.load(open(pkl_path, 'rb'))
-    else:
-        df = pd.DataFrame([], columns = [])
+
 
     b = 2.230380964364765
-    num_trails = 250000000
+    num_trails = 250000
     mu = 1
     arrivals = np.random.uniform(0, b, num_trails)  # np.random.exponential(2, num_trails)
     ser = np.random.exponential(mu, num_trails)
@@ -154,6 +151,12 @@ def main():
         else:
             queueing.append(max(queueing[ind - 1] + ser[ind - 1] - arrivals[ind - 1], 0))
             waiting.append(queueing[ind] + ser[ind])
+
+
+    if os.path.exists(pkl_path):
+        df = pkl.load(open(pkl_path, 'rb'))
+    else:
+        df = pd.DataFrame([], columns = [])
 
     curr_ind = df.shape[0]
 
