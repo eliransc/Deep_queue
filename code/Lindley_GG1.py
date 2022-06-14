@@ -140,8 +140,6 @@ def main(args):
     for exmaples in range(200):
 
 
-
-
         arrival_dist = np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
         ser_dist = np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
 
@@ -196,8 +194,8 @@ def main(args):
                 scale_ser = ser_dist_params[1]
                 ser = np.random.gamma(shape_ser, scale_ser, num_trails)
             else: # if service is normal
-                mu_ser = arrival_dist_params[0]
-                sig_ser = arrival_dist_params[1]
+                mu_ser = ser_dist_params[0]
+                sig_ser = ser_dist_params[1]
                 ser = np.random.normal(mu_ser, sig_ser, num_trails)
                 ser = np.where(ser < 0, 0, ser)  # if we get negative vals
                 print('Number of negatives: ', arrivals[arrivals == 0].shape[0])
@@ -273,7 +271,7 @@ def main(args):
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_trails', type=int, help='The end of the simulation', default=200000000)
+    parser.add_argument('--num_trails', type=int, help='The end of the simulation', default=200000)
     parser.add_argument('--size', type=int, help='the number of stations in the system', default=1)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=2)
     parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl/df_sum_res_sim_gg1_Lindley')
