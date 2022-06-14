@@ -23,15 +23,19 @@ def gamma_lst(s, theta, k):
     return (1 + theta * s) ** (-k)
 
 
-def get_nth_moment(theta, k, n):
+def gamma_mfg(shape, scale, s):
+    return (1-scale*s)**(-shape)
+
+
+def get_nth_moment(shape, scale, n):
     s = Symbol('s')
-    y = gamma_lst(s, theta, k)
+    y = gamma_mfg(shape, scale, s)
     for i in range(n):
         if i == 0:
-            dx = diff(y, s)
+            dx = diff(y,s)
         else:
-            dx = diff(dx, s)
-    return ((-1) ** n) * dx.subs(s, 0)
+            dx = diff(dx,s)
+    return dx.subs(s, 0)
 
 
 def gamma_lst(s, theta, k):
@@ -274,7 +278,7 @@ def parse_arguments(argv):
     parser.add_argument('--num_trails', type=int, help='The end of the simulation', default=200000000)
     parser.add_argument('--size', type=int, help='the number of stations in the system', default=1)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=2)
-    parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl/df_sum_res_sim_gg1_Lindley')
+    parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl_1/df_sum_res_sim_gg1_Lindley')
     args = parser.parse_args(argv)
 
     return args
