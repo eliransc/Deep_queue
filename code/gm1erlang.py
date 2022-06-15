@@ -68,23 +68,20 @@ def get_nth_moment(shape, scale, n):
 def gamma_GM1_sample():
 
     try:
-        # rho = np.random.uniform(0.3,  0.99)
-        # theta = np.random.uniform(0.1, 100)
-        # k = 1/(rho*theta)
 
-        scale = 2
-        shape = 1
-        rho = 1/(shape*scale)
+        rho = np.random.uniform(0.3,  0.99)
+        shape = np.random.uniform(0.1, 100)
+        scale = 1/(rho*shape)
 
-        sigma  = find_sigma(shape, scale)
+        sigma = find_sigma(shape, scale)
         steady_gm1 = [1-rho]
-        for l in range(1,499):
+        for l in range(1, 499):
             steady_gm1.append(rho*(1-sigma)*sigma**(l-1))
         steady_gm1 = np.append(steady_gm1,1-np.sum(np.array(steady_gm1)))
 
 
         moms_arr = np.array([])
-        for mom in range(1,21):
+        for mom in range(1, 21):
             moms_arr = np.append(moms_arr,np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
 
         log_moms_arr  = np.log(moms_arr)
@@ -123,9 +120,9 @@ def main():
 
     data_sample_name = 'batch_size_128_gamma_gm1_'
 
-    for i in range(10):
+    for i in range(1000):
 
-        gm1_examples = [gamma_GM1_sample() for ind in tqdm(range(10))]
+        gm1_examples = [gamma_GM1_sample() for ind in tqdm(range(128))]
 
         gm1_examples = [example for example in gm1_examples if example]
 
