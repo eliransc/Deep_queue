@@ -68,9 +68,9 @@ def get_nth_moment(shape, scale, n):
 def gamma_GM1_sample():
 
     try:
-        rho = np.random.uniform(0.3,  0.99)
-        theta = np.random.uniform(0.1, 100)
-        k = 1/(rho*theta)
+        # rho = np.random.uniform(0.3,  0.99)
+        # theta = np.random.uniform(0.1, 100)
+        # k = 1/(rho*theta)
 
         scale = 2
         shape = 1
@@ -85,7 +85,7 @@ def gamma_GM1_sample():
 
         moms_arr = np.array([])
         for mom in range(1,21):
-            moms_arr = np.append(moms_arr,np.array(N(get_nth_moment(theta, k, mom))).astype(np.float64))
+            moms_arr = np.append(moms_arr,np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
 
         log_moms_arr  = np.log(moms_arr)
 
@@ -150,6 +150,7 @@ def main():
 
         pkl_name_moms = os.path.join(data_path, pkl_name_moms)
         pkl_name_ys = os.path.join(data_path, pkl_name_ys)
+
 
 
         pkl.dump(moms_array, open(pkl_name_moms, 'wb'))
