@@ -844,8 +844,8 @@ def main():
     # mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
     # y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
 
-    m_data = pkl.load(open('/scratch/eliransc/pkl_data/new1_gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
-    y_data = pkl.load(open('/scratch/eliransc/pkl_data/new1_gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    m_data = pkl.load(open('/scratch/eliransc/pkl_data/new2_gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
+    y_data = pkl.load(open('/scratch/eliransc/pkl_data/new2_gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
     m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_moms_without08_util_1.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_ys_without08_util_1.pkl', 'rb'))
 
@@ -1023,10 +1023,10 @@ def main():
                                                                                                             compute_sum_error_list[
                                                                                                                 -1],
                                                                                                             time.time() - t_0))
-        torch.save(net.state_dict(), '../new_gg1_models/pytorch_g_g_1_true_moms_new_data_' + setting_string + '_' + str(
+        torch.save(net.state_dict(), '../new_gg1_models_1/pytorch_g_g_1_true_moms_new_data_' + setting_string + '_' + str(
             current_time) + '.pkl')
         pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                 open('../new_gg1_models/losts_' + '_new_data_' + setting_string + '_' + str(current_time) + '.pkl', 'wb'))
+                 open('../new_gg1_models_1/losts_' + '_new_data_' + setting_string + '_' + str(current_time) + '.pkl', 'wb'))
 
 
 if __name__ == "__main__":
