@@ -66,12 +66,17 @@ def get_nth_moment(shape, scale, n):
     return dx.subs(s, 0)
 
 def gamma_GM1_sample():
+
     try:
-        rho = np.random.uniform(0.3,0.99)
-        theta = np.random.uniform(0.1,100)
+        rho = np.random.uniform(0.3,  0.99)
+        theta = np.random.uniform(0.1, 100)
         k = 1/(rho*theta)
 
-        sigma  = find_sigma(theta, k)
+        scale = 2
+        shape = 1
+        rho = 1/(shape*scale)
+
+        sigma  = find_sigma(shape, scale)
         steady_gm1 = [1-rho]
         for l in range(1,499):
             steady_gm1.append(rho*(1-sigma)*sigma**(l-1))
@@ -84,19 +89,19 @@ def gamma_GM1_sample():
 
         log_moms_arr  = np.log(moms_arr)
 
-        return (theta, k, log_moms_arr, steady_gm1)
+        return (shape, scale, log_moms_arr, steady_gm1)
     except:
         print('Error')
 
 
-def find_sigma(theta, k):
+def find_sigma(shape, scale):
     xvals = np.linspace(0,1,11)
     for val_ind, val in enumerate(xvals):
-        if gamma_lst(1-val,theta, k)<val:
+        if gamma_lst(1-val,shape, scale)<val:
             break
     xvals = np.linspace(xvals[val_ind-1],xvals[val_ind],450000)
     for val_ind, val in enumerate(xvals):
-        if gamma_lst(1-val,theta, k)<val:
+        if gamma_lst(1-val,shape, scale)<val:
             return val
 
 
@@ -120,7 +125,7 @@ def main():
 
     for i in range(10):
 
-        gm1_examples = [gamma_GM1_sample() for ind in tqdm(range(100))]
+        gm1_examples = [gamma_GM1_sample() for ind in tqdm(range(10))]
 
         gm1_examples = [example for example in gm1_examples if example]
 
