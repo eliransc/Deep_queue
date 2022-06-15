@@ -51,15 +51,19 @@ def gamma_pdf(x,theta,k):
 def gamma_lst(s,theta, k):
     return (1+theta*s)**(-k)
 
-def get_nth_moment(theta, k, n):
+def gamma_mfg(shape, scale, s):
+    return (1-scale*s)**(-shape)
+
+
+def get_nth_moment(shape, scale, n):
     s = Symbol('s')
-    y = gamma_lst(s,theta, k)
+    y = gamma_mfg(shape, scale, s)
     for i in range(n):
         if i == 0:
             dx = diff(y,s)
         else:
             dx = diff(dx,s)
-    return ((-1)**n)*dx.subs(s, 0)
+    return dx.subs(s, 0)
 
 def gamma_GM1_sample():
     try:
@@ -114,9 +118,9 @@ def main():
 
     data_sample_name = 'batch_size_128_gamma_gm1_'
 
-    for i in range(100):
+    for i in range(10):
 
-        gm1_examples = [gamma_GM1_sample() for ind in tqdm(range(400))]
+        gm1_examples = [gamma_GM1_sample() for ind in tqdm(range(100))]
 
         gm1_examples = [example for example in gm1_examples if example]
 
@@ -138,6 +142,10 @@ def main():
 
         pkl_name_moms = 'moms_' + str(20) + data_sample_name + current_time  + '.pkl'
         pkl_name_ys = 'y_' + str(20) + data_sample_name + current_time + '.pkl'
+
+        pkl_name_moms = os.path.join(data_path, pkl_name_moms)
+        pkl_name_ys = os.path.join(data_path, pkl_name_ys)
+
 
         pkl.dump(moms_array, open(pkl_name_moms, 'wb'))
         pkl.dump(ys_array,  open(pkl_name_ys, 'wb'))
