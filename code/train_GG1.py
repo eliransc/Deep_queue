@@ -846,8 +846,8 @@ def main():
 
     m_data = pkl.load(open('/scratch/eliransc/pkl_data/new2_gg1_mom_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
     y_data = pkl.load(open('/scratch/eliransc/pkl_data/new2_gg1_y_with_erlang_mg1_gm1_high_util_old_train.pkl', 'rb'))
-    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_moms_without08_util_1.pkl', 'rb'))
-    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_ys_without08_util_1.pkl', 'rb'))
+    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_moms_without08_util_2.pkl', 'rb'))
+    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/valid_ys_without08_util_2.pkl', 'rb'))
 
     m_data = m_data.float()
     y_data = y_data.float()
