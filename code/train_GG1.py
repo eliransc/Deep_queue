@@ -1,5 +1,5 @@
 from fastai.vision.all import *
-from fastbook import *
+# from fastbook import *
 from sklearn.model_selection import train_test_split
 matplotlib.rc('image', cmap='Greys')
 import os
@@ -866,7 +866,7 @@ def main():
 
     import time
     cur_time = int(time.time())
-    data_path = '../new_gg1_models'
+    data_path = '../new_gg1_models_1'
     seed = cur_time + len(os.listdir(data_path)) + np.random.randint(1, 1000)
     np.random.seed(seed)
     print(seed)
