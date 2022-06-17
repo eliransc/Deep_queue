@@ -866,7 +866,7 @@ def main():
 
     import time
     cur_time = int(time.time())
-    data_path = '../new_gg1_models_1'
+    data_path = '../new_gg1_models'
     seed = cur_time + len(os.listdir(data_path)) + np.random.randint(1, 1000)
     np.random.seed(seed)
     print(seed)
