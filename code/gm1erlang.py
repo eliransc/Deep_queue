@@ -137,7 +137,7 @@ def main():
 
     for i in range(1000):
 
-        gm1_examples = [gamma_GM1_sample() for ind in tqdm(range(2))]
+        gm1_examples = [gamma_GM1_sample() for ind in tqdm(range(128))]
 
         gm1_examples = [example for example in gm1_examples if example]
 
