@@ -24,6 +24,7 @@ from scipy.stats import gamma
 import matplotlib.pyplot as plt
 from scipy.special import gamma, factorial
 from datetime import datetime
+import math
 
 def compute_lst(x,prob_arr,ph):
     inv_mat = np.linalg.inv(x * np.identity(ph.shape[0]) - ph)
@@ -86,7 +87,13 @@ def gamma_GM1_sample():
 
         log_moms_arr  = np.log(moms_arr)
 
-        return (shape, scale, log_moms_arr, steady_gm1)
+        exp1_moms_log = []
+        for n in range(1, 21):
+            exp1_moms_log.append(np.log(math.factorial(n)))
+
+        x_data = np.append(log_moms_arr, np.array(exp1_moms_log[1:]))
+
+        return (shape, scale, x_data, steady_gm1)
     except:
         print('Error')
 
@@ -130,7 +137,7 @@ def main():
 
     for i in range(1000):
 
-        gm1_examples = [gamma_GM1_sample() for ind in tqdm(range(128))]
+        gm1_examples = [gamma_GM1_sample() for ind in tqdm(range(2))]
 
         gm1_examples = [example for example in gm1_examples if example]
 
@@ -156,7 +163,8 @@ def main():
         pkl_name_moms = os.path.join(data_path, pkl_name_moms)
         pkl_name_ys = os.path.join(data_path, pkl_name_ys)
 
-
+        moms_array = torch.tensor(moms_array).float()
+        ys_array = torch.tensor(ys_array).float()
 
         pkl.dump(moms_array, open(pkl_name_moms, 'wb'))
         pkl.dump(ys_array,  open(pkl_name_ys, 'wb'))
