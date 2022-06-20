@@ -844,7 +844,7 @@ def parse_arguments(argv):
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
     parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 700)
     parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
-    parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.999)
+    parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.99)
     args = parser.parse_args(argv)
 
     return args

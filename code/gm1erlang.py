@@ -48,8 +48,6 @@ def ser_moment_n(s, A, mom):
 def gamma_pdf(x,theta,k):
     return (1/(gamma(k)))*(1/theta**k)*(np.exp(-x/theta))
 
-def gamma_lst(s,theta, k):
-    return (1+theta*s)**(-k)
 
 def gamma_mfg(shape, scale, s):
     return (1-scale*s)**(-shape)
@@ -70,8 +68,10 @@ def gamma_GM1_sample():
     try:
 
         rho = np.random.uniform(0.3,  0.99)
-        shape = np.random.uniform(0.1, 100)
+        shape = np.random.uniform(0.1, 3)
         scale = 1/(rho*shape)
+
+
 
         sigma = find_sigma(shape, scale)
         steady_gm1 = [1-rho]
@@ -101,6 +101,10 @@ def find_sigma(shape, scale):
         if gamma_lst(1-val,shape, scale)<val:
             return val
 
+def gamma_lst(s,shape, scale):
+    return (1+shape*s)**(-scale)
+
+
 
 def main():
     print('The current path is:')
@@ -112,13 +116,17 @@ def main():
 
             data_path = '/scratch/d/dkrass/eliransc/training/gm1'
         else:
-            data_path = '/scratch/eliransc/training/gm1_gamma'
+            data_path = '/scratch/eliransc/training/gm1_gamma_1'
 
     else:
 
         data_path = r'C:\Users\user\workspace\data\deep_gm1'
 
     data_sample_name = 'batch_size_128_gamma_gm1_'
+
+
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
 
     for i in range(1000):
 
