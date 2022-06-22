@@ -981,7 +981,7 @@ def main():
     dl.to(device)
     valid_dl.to(device)
     import time
-    EPOCHS = 400
+    EPOCHS = 450
 
     optimizer = optim.Adam(net.parameters(), lr=curr_lr,
                            weight_decay=(1 / 10 ** weight_deacy))  # paramters is everything adjustable in model
