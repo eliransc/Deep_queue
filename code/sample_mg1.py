@@ -597,9 +597,9 @@ def sample_size_1(ph_max_size):
         arrival = int(root * weight)
     return (arrival,service)
 
-def sample_size_gm1(ph_max_size):
-    arrival = np.random.randint(2,ph_max_size)
-    return (arrival, 1)
+def sample_size_mg1(ph_max_size):
+    ser = np.random.randint(2,ph_max_size)
+    return (1, ser)
 
 
 def sample_size(ph_max_size):
@@ -715,28 +715,28 @@ def manage_single_sample(ph_size_max, num_moms, max_util,eps = 0.05):
     'compute moments of both arrival and service'
     'return to manage batch (moms, y)'
 
-    a_size, ser_size = sample_size_gm1(ph_size_max)
+    a_size, ser_size = sample_size_mg1(ph_size_max)
 
     elements = [0, 1, 2]
     probabilities = [0.1, 0.4, 0.5]
     flag = True
 
-    while flag: #sample until it is valid
-
-        arrival_result = send_to_the_right_generator(np.random.choice(elements, 1, p=probabilities)[0], a_size)
-        if arrival_result:
-            s_arrival, A_arrival = arrival_result
-            flag = False
-
-    # flag = True
-    # while flag:  # sample until it is valid
-    #     service_result = send_to_the_right_generator(np.random.choice(elements, 1, p=probabilities)[0], ser_size)
-    #     if service_result:
-    #         s_service, A_service = service_result
+    # while flag: #sample until it is valid
+    #
+    #     arrival_result = send_to_the_right_generator(np.random.choice(elements, 1, p=probabilities)[0], a_size)
+    #     if arrival_result:
+    #         s_arrival, A_arrival = arrival_result
     #         flag = False
 
-    s_service = np.array([1.])
-    A_service = np.array([[-1.]])
+    flag = True
+    while flag:  # sample until it is valid
+        service_result = send_to_the_right_generator(np.random.choice(elements, 1, p=probabilities)[0], ser_size)
+        if service_result:
+            s_service, A_service = service_result
+            flag = False
+
+    s_arrival = np.array([1.])
+    A_arrival = np.array([[-1.]])
 
 
     rho = np.random.uniform(0.3,max_util)
@@ -771,9 +771,9 @@ def main(args):
 
         if os.getcwd() =='/gpfs/fs0/scratch/d/dkrass/eliransc/Deep_queue/code':
 
-            data_path = '/scratch/d/dkrass/eliransc/training/gm1_ph_data'
+            data_path = '/scratch/d/dkrass/eliransc/training/mg1_ph_data'
         else:
-            data_path = '/scratch/eliransc/training/gm1_ph_data'
+            data_path = '/scratch/eliransc/training/mg1_ph_data'
 
     else:
 
