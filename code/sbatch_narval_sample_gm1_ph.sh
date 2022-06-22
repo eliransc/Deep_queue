@@ -3,6 +3,6 @@
 #SBATCH -A def-dkrass
 #SBATCH --mem 30000
 source /home/eliransc/projects/def-dkrass/eliransc/queues/bin/activate
-python /home/eliransc/projects/def-dkrass/eliransc/Deep_queue/code/gm1erlang.py
+python /home/eliransc/projects/def-dkrass/eliransc/Deep_queue/code/sample_g_m_1.py
 
 
