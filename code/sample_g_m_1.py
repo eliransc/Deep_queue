@@ -34,7 +34,7 @@ import pickle as pkl
 
 def compute_R(lam, alph, T):
     e = torch.ones((T.shape[0], 1))
-    return np.array(lam * torch.inverse(lam * torch.eye(T.shape[0]) - lam * e @ alph - T))
+    return np.array(lam * torch.inverse(lam * torch.eye(T.shape[0]) - lam * np.dot(e ,alph) - T))
 
 
 def compute_pdf_within_range(x_vals, s, A):
