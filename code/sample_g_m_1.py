@@ -728,12 +728,15 @@ def manage_single_sample(ph_size_max, num_moms, max_util,eps = 0.05):
             s_arrival, A_arrival = arrival_result
             flag = False
 
-    flag = True
-    while flag:  # sample until it is valid
-        service_result = send_to_the_right_generator(np.random.choice(elements, 1, p=probabilities)[0], ser_size)
-        if service_result:
-            s_service, A_service = service_result
-            flag = False
+    # flag = True
+    # while flag:  # sample until it is valid
+    #     service_result = send_to_the_right_generator(np.random.choice(elements, 1, p=probabilities)[0], ser_size)
+    #     if service_result:
+    #         s_service, A_service = service_result
+    #         flag = False
+
+    s_service = np.array([1.])
+    A_service = np.array([[-1.]])
 
 
     rho = np.random.uniform(0.3,max_util)
@@ -748,14 +751,14 @@ def manage_single_sample(ph_size_max, num_moms, max_util,eps = 0.05):
     if np.sum(stead) > 1-eps:  # otherwise don't use it
 
         arrival_moms = compute_first_n_moments(s_arrival, A_arrival, num_moms)
-        # service_moms = compute_first_n_moments(s_service, A_service, 1) # Only one because it is exponential
+        service_moms = compute_first_n_moments(s_service, A_service, num_moms) # Only one because it is exponential
 
         arrival_moms = torch.log(torch.tensor(np.array(arrival_moms).flatten()))
-        # service_moms = torch.log(torch.tensor(np.array(service_moms).flatten()))[1:]
+        service_moms = torch.log(torch.tensor(np.array(service_moms).flatten()))[1:]
 
-        # moms_tesnor = torch.cat((arrival_moms,service_moms))
+        moms_tesnor = torch.cat((arrival_moms,service_moms)).float()
 
-        return (arrival_moms, torch.tensor(stead))
+        return (moms_tesnor, torch.tensor(stead))
 
 
 def main(args):
@@ -770,7 +773,7 @@ def main(args):
 
             data_path = '/scratch/d/dkrass/eliransc/training/gm1'
         else:
-            data_path = '/scratch/eliransc/training/gm1_with_erlang'
+            data_path = '/scratch/eliransc/training/gm1_ph_data'
 
     else:
 
@@ -838,7 +841,7 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=120)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=300)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
