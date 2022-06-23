@@ -871,7 +871,7 @@ def main():
     np.random.seed(seed)
     print(seed)
 
-    archi = np.random.randint(1, 4, 1)[0]
+    archi = np.random.choice([1, 2, 3 ,4], size=1, replace=True, p=[0.0, 0.0, 0.0, 1.0])[0]
     bs = np.random.choice([64, 128], size=1, replace=True, p=[0.4, 0.6])[0]
     weight_deacy = np.random.choice([4, 5, 6], size=1, replace=True, p=[0.00, 0.8, 0.2])[0]
     num_moms_arrive = np.random.choice([2, 3, 4, 5, 6, 7, 8, 9, 10], size=1, replace=True, p=[0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1])[0]
@@ -941,7 +941,7 @@ def main():
                 self.fc6 = nn.Linear(200, 350)
                 self.fc7 = nn.Linear(350, 499)
 
-            else:
+            elif archi == 3:
 
                 self.fc1 = nn.Linear(num_moms_arrive + num_moms_service - 1, 50)
                 self.fc2 = nn.Linear(50, 70)
@@ -951,6 +951,21 @@ def main():
                 self.fc6 = nn.Linear(200, 200)
                 self.fc7 = nn.Linear(200, 350)
                 self.fc8 = nn.Linear(350, 499)
+
+            else:
+
+                self.fc1 = nn.Linear(num_moms_arrive + num_moms_service - 1, 30)
+                self.fc2 = nn.Linear(30, 30)
+                self.fc3 = nn.Linear(30, 30)
+                self.fc4 = nn.Linear(30, 40)
+                self.fc5 = nn.Linear(40, 50)
+                self.fc6 = nn.Linear(50, 70)
+                self.fc7 = nn.Linear(70, 100)
+                self.fc8 = nn.Linear(100, 150)
+                self.fc9 = nn.Linear(150, 200)
+                self.fc10 = nn.Linear(200, 300)
+                self.fc11 = nn.Linear(300, 400)
+                self.fc12 = nn.Linear(400, 499)
 
         def forward(self, x):
             if archi == 3:
@@ -963,6 +978,21 @@ def main():
                 x = F.relu(self.fc7(x))
                 x = self.fc8(x)
                 return x
+
+            elif archi == 4:
+                x = F.relu(self.fc1(x))
+                x = F.relu(self.fc2(x))
+                x = F.relu(self.fc3(x))
+                x = F.relu(self.fc4(x))
+                x = F.relu(self.fc5(x))
+                x = F.relu(self.fc6(x))
+                x = F.relu(self.fc7(x))
+                x = F.relu(self.fc8(x))
+                x = F.relu(self.fc9(x))
+                x = F.relu(self.fc10(x))
+                x = F.relu(self.fc11(x))
+                x = self.fc12(x)
+
 
             else:
                 x = F.relu(self.fc1(x))
