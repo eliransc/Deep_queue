@@ -844,10 +844,10 @@ def main():
     # mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
     # y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
 
-    m_data = pkl.load(open('/scratch/eliransc/pkl_data/new1_gg1_mom_with_erlang_mg1_gamma_gm1_high_util_old_train.pkl', 'rb'))
-    y_data = pkl.load(open('/scratch/eliransc/pkl_data/new1_gg1_y_with_erlang_mg1_gamma_gm1_high_util_old_train.pkl', 'rb'))
-    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mg1_gm1_moms.pkl', 'rb'))
-    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mg1_gm1_ys.pkl', 'rb'))
+    m_data = pkl.load(open('/scratch/eliransc/pkl_data/train_ph_moms.pkl', 'rb'))
+    y_data = pkl.load(open('/scratch/eliransc/pkl_data/train_ph_ys.pkl', 'rb'))
+    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
+    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
 
     m_data = m_data.float()
     y_data = y_data.float()
