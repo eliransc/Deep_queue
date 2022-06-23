@@ -866,7 +866,7 @@ def main():
 
     import time
     cur_time = int(time.time())
-    data_path = '../new_gg1_models_2'
+    data_path = '../new_gg1_models_3'
     seed = cur_time + len(os.listdir(data_path)) + np.random.randint(1, 1000)
     np.random.seed(seed)
     print(seed)
@@ -1023,10 +1023,10 @@ def main():
                                                                                                             compute_sum_error_list[
                                                                                                                 -1],
                                                                                                             time.time() - t_0))
-        torch.save(net.state_dict(), '../new_gg1_models_2/pytorch_g_g_1_true_moms_new_data_' + setting_string + '_' + str(
+        torch.save(net.state_dict(), '../new_gg1_models_3/pytorch_g_g_1_true_moms_new_data_' + setting_string + '_' + str(
             current_time) + '.pkl')
         pkl.dump((loss_list, valid_list, compute_sum_error_list),
-                 open('../new_gg1_models_2/losts_' + '_new_data_' + setting_string + '_' + str(current_time) + '.pkl', 'wb'))
+                 open('../new_gg1_models_3/losts_' + '_new_data_' + setting_string + '_' + str(current_time) + '.pkl', 'wb'))
 
 
 if __name__ == "__main__":
