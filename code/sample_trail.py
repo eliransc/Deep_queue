@@ -731,7 +731,7 @@ def manage_single_sample(ph_size_max, num_moms, max_util,eps = 0.05):
             flag = False
 
 
-    rho = np.random.uniform(0.8,max_util)
+    rho = np.random.uniform(0.3,max_util)
     A_arrival = A_arrival * rho
 
     s_arrival = s_arrival.reshape((1, s_arrival.shape[0]))
@@ -765,9 +765,9 @@ def main(args):
 
         if os.getcwd() =='/gpfs/fs0/scratch/d/dkrass/eliransc/Deep_queue/code':
 
-            data_path = '/scratch/d/dkrass/eliransc/training/gg1'
+            data_path = '/scratch/d/dkrass/eliransc/training/gg1_1'
         else:
-            data_path = '/scratch/eliransc/training/gg1_with_erlang_4'
+            data_path = '/scratch/eliransc/training/gg1_1'
 
     else:
 
@@ -839,7 +839,7 @@ def parse_arguments(argv):
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
     parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=4)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 3000)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 5000)
     parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
     parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.8)
     args = parser.parse_args(argv)
