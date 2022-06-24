@@ -967,7 +967,6 @@ def main():
                 self.fc11 = nn.Linear(300, 400)
                 self.fc12 = nn.Linear(400, 499)
 
-                return x
 
         def forward(self, x):
             if archi == 3:
@@ -994,6 +993,7 @@ def main():
                 x = F.relu(self.fc10(x))
                 x = F.relu(self.fc11(x))
                 x = self.fc12(x)
+                return x
 
 
             else:
