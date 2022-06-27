@@ -849,10 +849,15 @@ def main():
     m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
 
-    m_data = m_data.float()
-    y_data = y_data.float()
-    m_data_valid = m_data_valid.float()
-    y_data_valid = y_data_valid.float()
+    rates_valid = 1 / torch.exp(m_data_valid[:, 0])
+    rates_train = 1 / torch.exp(m_data[:, 0])
+    bool_valid = rates_valid > 0.6
+    bool_train = rates_train > 0.6
+
+    m_data = m_data[bool_train, :].float()
+    y_data = y_data[bool_train, :].float()
+    m_data_valid = m_data_valid[bool_valid, :].float()
+    y_data_valid = y_data_valid[bool_valid, :].float()
 
     for ind in range(m_data.shape[0]):
         if ind < 100:

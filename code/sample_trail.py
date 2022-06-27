@@ -692,7 +692,7 @@ def sampling_examples(ph_size_max, num_moms, eps = 0.05):
             flag = False
 
 
-    rho = np.random.uniform(0.3,0.8)
+    rho = np.random.uniform(0.6,0.8)
     A_arrival = A_arrival * rho
 
     s_arrival = s_arrival.reshape((1, s_arrival.shape[0]))
