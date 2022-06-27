@@ -54,6 +54,9 @@ def gamma_mfg(shape, scale, s):
     return (1-scale*s)**(-shape)
 
 
+def moms_gamma(rate, scale, mom):
+    return rate**(-mom)*math.gamma(mom+scale)/math.gamma(scale)
+
 def get_nth_moment(shape, scale, n):
     s = Symbol('s')
     y = gamma_mfg(shape, scale, s)
@@ -68,13 +71,11 @@ def gamma_GM1_sample():
 
     try:
 
-        rho = np.random.uniform(0.3,  0.99)
-        shape = np.random.uniform(0.1, 3)
-        scale = 1/(rho*shape)
+        rho = np.random.uniform(0.6,0.9)
+        rate =  np.random.uniform(1, 100)
+        scale = rate/rho
 
-
-
-        sigma = find_sigma(shape, scale)
+        sigma = find_sigma(1/rate, scale)
         steady_gm1 = [1-rho]
         for l in range(1, 499):
             steady_gm1.append(rho*(1-sigma)*sigma**(l-1))
@@ -83,17 +84,11 @@ def gamma_GM1_sample():
 
         moms_arr = np.array([])
         for mom in range(1, 21):
-            moms_arr = np.append(moms_arr,np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
+            moms_arr = np.append(moms_arr,np.array(moms_gamma(rate, scale, mom)))
 
         log_moms_arr  = np.log(moms_arr)
 
-        exp1_moms_log = []
-        for n in range(1, 21):
-            exp1_moms_log.append(np.log(math.factorial(n)))
-
-        x_data = np.append(log_moms_arr, np.array(exp1_moms_log[1:]))
-
-        return (shape, scale, x_data, steady_gm1)
+        return (rate, scale, log_moms_arr, steady_gm1)
     except:
         print('Error')
 
@@ -121,7 +116,7 @@ def main():
 
         if os.getcwd() == '/gpfs/fs0/scratch/d/dkrass/eliransc/Deep_queue/code':
 
-            data_path = '/scratch/d/dkrass/eliransc/training/gm1'
+            data_path = '/scratch/d/dkrass/eliransc/training/gm1_gamma_cor_moms'
         else:
             data_path = '/scratch/eliransc/training/gm1_gamma_1'
 
@@ -135,7 +130,7 @@ def main():
     if not os.path.exists(data_path):
         os.makedirs(data_path)
 
-    for i in range(1000):
+    for i in range(200):
 
         gm1_examples = [gamma_GM1_sample() for ind in tqdm(range(128))]
 
