@@ -849,15 +849,15 @@ def main():
     m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
     y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
 
-    rates_valid = 1 / torch.exp(m_data_valid[:, 0])
-    rates_train = 1 / torch.exp(m_data[:, 0])
-    bool_valid = rates_valid > 0.6
-    bool_train = rates_train > 0.6
+    # rates_valid = 1 / torch.exp(m_data_valid[:, 0])
+    # rates_train = 1 / torch.exp(m_data[:, 0])
+    bool_valid = y_data_valid[:, -1] > 0.01
+    # bool_train = rates_train > 0.6
 
-    m_data = m_data[bool_train, :].float()
-    y_data = y_data[bool_train, :].float()
-    m_data_valid = m_data_valid[bool_valid, :].float()
-    y_data_valid = y_data_valid[bool_valid, :].float()
+    m_data = m_data.float()
+    y_data = y_data.float()
+    m_data_valid = m_data_valid[bool_valid,:].float()
+    y_data_valid = y_data_valid[bool_valid,:].float()
 
     for ind in range(m_data.shape[0]):
         if ind < 100:
@@ -878,7 +878,7 @@ def main():
 
     archi = np.random.choice([1, 2, 3 ,4], size=1, replace=True, p=[0.25, 0.25, 0.25, 0.25])[0]
     bs = np.random.choice([64, 128], size=1, replace=True, p=[0.4, 0.6])[0]
-    weight_deacy = np.random.choice([4, 5, 6], size=1, replace=True, p=[0.00, 0.8, 0.2])[0]
+    weight_deacy = np.random.choice([4, 5, 6], size=1, replace=True, p=[0.00, 0.99, 0.01])[0]
     num_moms_arrive = np.random.choice([2, 3, 4, 5, 6, 7, 8, 9, 10], size=1, replace=True, p=[0.0, 0.0, 0.0, 0.5, 0.1, 0.1, 0.1, 0.1, 0.1])[0]
     num_moms_service = np.random.choice([2, 3, 4, 5, 6, 7, 8, 9, 10], size=1, replace=True, p=[0.0, 0.0, 0.0, 0.5, 0.1, 0.1, 0.1, 0.1, 0.1])[0]
     lr_first = np.random.choice([0.7, 0.75, 0.8], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
@@ -1018,7 +1018,7 @@ def main():
     dl.to(device)
     valid_dl.to(device)
     import time
-    EPOCHS = 500
+    EPOCHS = 350
 
     optimizer = optim.Adam(net.parameters(), lr=curr_lr,
                            weight_decay=(1 / 10 ** weight_deacy))  # paramters is everything adjustable in model
