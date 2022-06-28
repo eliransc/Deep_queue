@@ -879,8 +879,8 @@ def main():
     archi = np.random.choice([1, 2, 3 ,4], size=1, replace=True, p=[0.25, 0.25, 0.25, 0.25])[0]
     bs = np.random.choice([64, 128], size=1, replace=True, p=[0.4, 0.6])[0]
     weight_deacy = np.random.choice([4, 5, 6], size=1, replace=True, p=[0.00, 0.99, 0.01])[0]
-    num_moms_arrive = np.random.choice([2, 3, 4, 5, 6, 7, 8, 9, 10], size=1, replace=True, p=[0.0, 0.0, 0.0, 0.5, 0.1, 0.1, 0.1, 0.1, 0.1])[0]
-    num_moms_service = np.random.choice([2, 3, 4, 5, 6, 7, 8, 9, 10], size=1, replace=True, p=[0.0, 0.0, 0.0, 0.5, 0.1, 0.1, 0.1, 0.1, 0.1])[0]
+    num_moms_arrive = np.random.choice([2, 3, 4, 5, 6, 7, 8, 9, 10], size=1, replace=True, p=[0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.1, 0.1])[0]
+    num_moms_service = np.random.choice([2, 3, 4, 5, 6, 7, 8, 9, 10], size=1, replace=True, p=[0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.1, 0.1])[0]
     lr_first = np.random.choice([0.7, 0.75, 0.8], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
     lr_second = np.random.choice([0.95, 0.98, 1], size=1, replace=True, p=[0.00, 0.3, 0.7])[0]
 
