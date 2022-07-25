@@ -283,7 +283,7 @@ def main(args):
             server.append(simpy.Resource(env, capacity=1))
 
 
-        args.end_time = float(100000000 / arrival_rate)
+        args.end_time = float(10000000 / arrival_rate)
 
 
         env.process(gg1.customer_arrivals(env, server, args))
