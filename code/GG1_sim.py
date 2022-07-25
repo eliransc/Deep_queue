@@ -283,7 +283,7 @@ def main(args):
             server.append(simpy.Resource(env, capacity=1))
 
 
-        args.end_time = float(100000 / arrival_rate)
+        args.end_time = float(100000000 / arrival_rate)
 
 
         env.process(gg1.customer_arrivals(env, server, args))
@@ -337,7 +337,7 @@ def parse_arguments(argv):
     parser.add_argument('--p_correct', type=float, help='the prob of external matched customer', default=0.5)
     parser.add_argument('--ser_matched_rate', type=float, help='service rate of matched customers', default=1.2)
     parser.add_argument('--ser_mis_matched_rate', type=float, help='service rate of mismatched customers', default=10.)
-    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=5)
+    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=500)
     parser.add_argument('--case_num', type=int, help='case number in my settings', default=random.randint(0, 100000))
     parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl/df_sum_res_sim_gg1_1.pkl')
     parser.add_argument('--is_corr', type=bool, help='should we keep track on inter departure', default=True)
