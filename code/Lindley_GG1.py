@@ -267,6 +267,21 @@ def main(args):
             df_.loc[ind, 'arrive_moms_'+str(mom)] = arrival_dist_params[2][mom-1]
             df_.loc[ind, 'ser_moms_'+str(mom)] = ser_dist_params[2][mom-1]
 
+        df_.loc[ind, '25_waiting'] = np.percentile(np.array(waiting), 25)
+        df_.loc[ind, '50_waiting'] = np.percentile(np.array(waiting), 50)
+        df_.loc[ind, '75_waiting'] = np.percentile(np.array(waiting), 75)
+        df_.loc[ind, '90_waiting'] = np.percentile(np.array(waiting), 90)
+        df_.loc[ind, '99_waiting'] = np.percentile(np.array(waiting), 99)
+        df_.loc[ind, '99_9_waiting'] = np.percentile(np.array(waiting), 99.9)
+
+        df_.loc[ind, '25_queueing'] = np.percentile(np.array(queueing), 25)
+        df_.loc[ind, '50_queueing'] = np.percentile(np.array(queueing), 50)
+        df_.loc[ind, '75_queueing'] = np.percentile(np.array(queueing), 75)
+        df_.loc[ind, '90_queueing'] = np.percentile(np.array(queueing), 90)
+        df_.loc[ind, '99_queueing'] = np.percentile(np.array(queueing), 99)
+        df_.loc[ind, '99_9_queueing'] = np.percentile(np.array(queueing), 99.9)
+
+
 
         pkl.dump(df_, open(args.df_summ, 'wb'))
 
@@ -275,10 +290,10 @@ def main(args):
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_trails', type=int, help='The end of the simulation', default=200000000)
+    parser.add_argument('--num_trails', type=int, help='The end of the simulation', default=20000)
     parser.add_argument('--size', type=int, help='the number of stations in the system', default=1)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=2)
-    parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl_1/df_sum_res_sim_gg1_Lindley')
+    parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl_1/df_sum_res_sim_gg1_Lindley_1')
     args = parser.parse_args(argv)
 
     return args
