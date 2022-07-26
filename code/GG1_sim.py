@@ -112,7 +112,7 @@ def generate_unif(is_arrival):
 
 def generate_gamma(is_arrival):
     if is_arrival:
-        rho = np.random.uniform(0.5, 0.99)
+        rho = np.random.uniform(0.7, 0.99)
         shape = np.random.uniform(0.1, 100)
         scale = 1 / (rho * shape)
         moms_arr = np.array([])
@@ -130,7 +130,7 @@ def generate_gamma(is_arrival):
 
 def generate_normal(is_arrival):
     if is_arrival:
-        mu = np.random.uniform(1.5, 3)
+        mu = np.random.uniform(1.1, 2.0)
         sig = np.random.uniform(mu / 6, mu / 4)
 
         moms_arr = np.array([])
@@ -283,7 +283,7 @@ def main(args):
             server.append(simpy.Resource(env, capacity=1))
 
 
-        args.end_time = float(10000000 / arrival_rate)
+        args.end_time = float(50000000 / arrival_rate)
 
 
         env.process(gg1.customer_arrivals(env, server, args))
@@ -339,7 +339,7 @@ def parse_arguments(argv):
     parser.add_argument('--ser_mis_matched_rate', type=float, help='service rate of mismatched customers', default=10.)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=500)
     parser.add_argument('--case_num', type=int, help='case number in my settings', default=random.randint(0, 100000))
-    parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl/df_sum_res_sim_gg1_2.pkl')
+    parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl/df_sum_res_sim_gg1_3.pkl')
     parser.add_argument('--is_corr', type=bool, help='should we keep track on inter departure', default=True)
     parser.add_argument('--waiting_pkl_path', type=bool, help='the path of the average waiting time', default='../pkl/waiting_time')
 
