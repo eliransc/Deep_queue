@@ -1,6 +1,6 @@
 import numpy as np
 import sys
-sys.path.append(r'G:\My Drive\butools2\Python')
+sys.path.append(r'C:\Users\user\workspace\butools2\Python')
 sys.path.append('/home/d/dkrass/eliransc/Python')
 sys.path.append('/home/eliransc/projects/def-dkrass/eliransc/butools/Python')
 
@@ -647,7 +647,7 @@ def manage_batch(batch_size, ph_size_max, num_moms, data_path, data_sample_name,
     'looping over a batch, creating BS samples which include 20 arrival moments, 20 service moments and 500 probs.'
     'In charge of saving batches - creating input tensor of size (BSX40) and output of size (BSX500)'
 
-    mom_output_list = [manage_single_sample(ph_size_max, num_moms, max_util) for ind in range(batch_size)]
+    mom_output_list = [manage_single_sample(ph_size_max, num_moms, args) for ind in range(batch_size)]
     mom_output_list = [pair for pair in mom_output_list if pair]
 
     mom_list = []
@@ -692,7 +692,8 @@ def sampling_examples(ph_size_max, num_moms, eps = 0.05):
             flag = False
 
 
-    rho = np.random.uniform(0.6,0.8)
+    rho = np.random.uniform(0.0,0.2)
+    print(rho)
     A_arrival = A_arrival * rho
 
     s_arrival = s_arrival.reshape((1, s_arrival.shape[0]))
@@ -700,7 +701,7 @@ def sampling_examples(ph_size_max, num_moms, eps = 0.05):
 
     return (s_arrival, A_arrival, s_service, A_service)
 
-def manage_single_sample(ph_size_max, num_moms, max_util,eps = 0.05):
+def manage_single_sample(ph_size_max, num_moms, args ,eps = 0.05):
     '''
     ph_size_max: the maximum number of batch size (product of arrival and service)
     num_moms: number of save moments
@@ -731,7 +732,8 @@ def manage_single_sample(ph_size_max, num_moms, max_util,eps = 0.05):
             flag = False
 
 
-    rho = np.random.uniform(0.3,max_util)
+    rho = np.random.uniform(args.min_utilization,args.max_utilization)
+    print(rho)
     A_arrival = A_arrival * rho
 
     s_arrival = s_arrival.reshape((1, s_arrival.shape[0]))
@@ -835,13 +837,14 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_type', type=str, help='mixture erlang or general', default='Gen_ph')
-    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=120)
+    parser.add_argument('--num_examples', type=int, help='number of ph folders', default=100)
     parser.add_argument('--max_num_groups', type=int, help='mixture erlang or general', default=2)
     parser.add_argument('--num_moms', type=int, help='number of ph folders', default=20)
-    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=4)
-    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 5000)
+    parser.add_argument('--batch_size', type=int, help='number of ph examples in one folder', default=128)
+    parser.add_argument('--ph_size_max', type=int, help='number of ph folders', default = 1000)
     parser.add_argument('--ph_size', type=int, help='ph_size', default=1000)
-    parser.add_argument('--max_utilization', type=float, help='limit for large ph', default = 0.8)
+    parser.add_argument('--min_utilization', type=float, help='limit for large ph', default = 0.1)
+    parser.add_argument('--max_utilization', type=float, help='limit for large ph', default=0.6)
     args = parser.parse_args(argv)
 
     return args
