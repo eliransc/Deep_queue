@@ -844,10 +844,17 @@ def main():
     # mom_data_ = pkl.load(open('/scratch/eliransc/pkl_data/mom_data_7.pkl', 'rb'))
     # y_data_ = pkl.load(open('/scratch/eliransc/pkl_data/y_data_7.pkl', 'rb'))
 
-    m_data = pkl.load(open('/scratch/eliransc/pkl_data/train_ph_moms.pkl', 'rb'))
-    y_data = pkl.load(open('/scratch/eliransc/pkl_data/train_ph_ys.pkl', 'rb'))
-    m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
-    y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
+    # m_data = pkl.load(open('/scratch/eliransc/pkl_data/train_ph_moms.pkl', 'rb'))
+    # y_data = pkl.load(open('/scratch/eliransc/pkl_data/train_ph_ys.pkl', 'rb'))
+    # m_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_mom_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
+    # y_data_valid = pkl.load(open('/scratch/eliransc/pkl_data/gg1_y_with_erlang_mg1_gm1_high_util_old_valid.pkl', 'rb'))
+
+    m_data = pkl.load(open(r'C:\Users\user\workspace\data\train_moms_valid_qa.pkl', 'rb'))
+    y_data = pkl.load(open(r'C:\Users\user\workspace\data\train_ys_valid_qa.pkl', 'rb'))
+    m_data_valid = pkl.load(open(r'C:\Users\user\workspace\data\train_moms_valid_qa.pkl', 'rb'))
+    y_data_valid = pkl.load(open(r'C:\Users\user\workspace\data\train_ys_valid_qa.pkl', 'rb'))
+
+
 
     # rates_valid = 1 / torch.exp(m_data_valid[:, 0])
     # rates_train = 1 / torch.exp(m_data[:, 0])
@@ -872,7 +879,7 @@ def main():
     import time
     cur_time = int(time.time())
     data_path = '../new_gg1_models_4'
-    seed = cur_time + len(os.listdir(data_path)) + np.random.randint(1, 1000)
+    seed = cur_time + np.random.randint(1, 1000) # + len(os.listdir(data_path)) +
     np.random.seed(seed)
     print(seed)
 

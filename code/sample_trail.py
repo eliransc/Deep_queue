@@ -441,7 +441,7 @@ def compute_steady(s_arrival, A_arrival, s_service, A_service, y_size=500, eps=0
     steady[0] = np.sum(X[:A0.shape[0]])
     steady[1] = np.sum(X[A0.shape[0]:])
     tot_sum = np.sum(X)
-    for ind in tqdm(range(2, y_size-1)):
+    for ind in range(2, y_size-1):
         steady[ind] = np.sum(np.dot(X[u0_size:], matrix_power(R, ind - 1)))
         if np.sum(steady) > 1 - eps:
             break
@@ -822,15 +822,12 @@ def main(args):
 
 
     for ind in tqdm(range(args.num_examples)):
-        cur_time = int(time.time())
-        seed = cur_time + len(os.listdir(data_path))+np.random.randint(1,1000)
-        np.random.seed(seed)
-        print(seed)
-        if ind == 0:
-            manage_batch(1, args.ph_size_max, args.num_moms, data_path, data_sample_name,
-                         args.max_utilization)
-        else:
-            manage_batch(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name, args.max_utilization)
+        now = datetime.now()
+        current_time = now.strftime("%H_%M_%S")
+        np.random.seed(now.microsecond)
+
+
+        manage_batch(args.batch_size, args.ph_size_max, args.num_moms, data_path, data_sample_name, args.max_utilization)
 
 
 
