@@ -108,25 +108,40 @@ def generate_unif(is_arrival):
         return (a_ser, b_ser, moms_ser)
 
 
+# def generate_gamma(is_arrival):
+#     if is_arrival:
+#         rho = np.random.uniform(0.7, 0.99)
+#         shape = np.random.uniform(0.1, 100)
+#         scale = 1 / (rho * shape)
+#         moms_arr = np.array([])
+#         for mom in range(1, 11):
+#             moms_arr = np.append(moms_arr, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
+#         return (shape, scale, moms_arr)
+#     else:
+#         shape = np.random.uniform(1, 100)
+#         scale = 1 / shape
+#         moms_ser = np.array([])
+#         for mom in range(1, 11):
+#             moms_ser = np.append(moms_ser, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
+#         return (shape, scale, moms_ser)
 
 
-def generate_gamma(is_arrival):
+def generate_gamma(is_arrival, rho = 0.01):
     if is_arrival:
-        rho = np.random.uniform(0.7, 0.99)
-        shape = np.random.uniform(0.1, 100)
-        scale = 1 / (rho * shape)
+        # rho = np.random.uniform(0.7, 0.99)
+        shape = 0.25/rho # 0.25 # np.random.uniform(0.1, 100)
+        scale =  4 #1 / (rho * shape)
         moms_arr = np.array([])
         for mom in range(1, 11):
             moms_arr = np.append(moms_arr, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
         return (shape, scale, moms_arr)
     else:
-        shape = np.random.uniform(1, 100)
+        shape = 0.25 # np.random.uniform(1, 100)
         scale = 1 / shape
         moms_ser = np.array([])
         for mom in range(1, 11):
             moms_ser = np.append(moms_ser, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
         return (shape, scale, moms_ser)
-
 
 def generate_normal(is_arrival):
     if is_arrival:
@@ -241,15 +256,15 @@ def main(args):
     now = datetime.now()
     current_time = now.strftime("%H_%M_%S")
 
-    for ind in range(args.num_iterations):
+    for ind in  range(1): #np.linspace(0.01, 0.96, 20): #range(args.num_iterations):
 
-        arrival_dist = np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
-        ser_dist = np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
+        arrival_dist = 2 # np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
+        ser_dist = 2 # np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
 
         if arrival_dist == 1:
             arrival_dist_params = generate_unif(True)
         elif arrival_dist == 2:
-            arrival_dist_params = generate_gamma(True)
+            arrival_dist_params = generate_gamma(True, 0.71)
         else:
             arrival_dist_params = generate_normal(True)
 
@@ -283,13 +298,15 @@ def main(args):
             server.append(simpy.Resource(env, capacity=1))
 
 
-        args.end_time = float(50000000 / arrival_rate)
+        args.end_time = float(5000000 / arrival_rate)
 
 
         env.process(gg1.customer_arrivals(env, server, args))
         env.run(until=(args.end_time))
 
         steady_state = gg1.num_cust_durations / args.end_time
+
+        print('mean L: ', (np.arange(500)*steady_state).sum())
 
         print(gg1.num_cust_durations[0]/args.end_time, 1-gg1.arrival_rate*gg1.ser_dist_params[2][0], args.end_time)
         print(gg1.num_cust_durations[0] / gg1.last_time,
@@ -318,10 +335,15 @@ def main(args):
             df_summary_result.loc[curr_ind, 'arrive_dist_moms'+str(df_ind)] = arrival_dist_params[2][df_ind-1]
             df_summary_result.loc[curr_ind, 'ser_dist_moms' + str(df_ind)] = ser_dist_params[2][df_ind - 1]
 
-        for df_ind in range(100):
+        for df_ind in range(400):
             df_summary_result.loc[curr_ind, 'steady_probs'+str(df_ind)] = steady_state[df_ind]
 
-        df_summary_result.loc[curr_ind, 'sum_100'] = np.sum(steady_state[:100])
+        df_summary_result.loc[curr_ind, 'sum_400'] = np.sum(steady_state[:400])
+        df_summary_result.loc[curr_ind, 'Mean_L'] =  (np.arange(500)*steady_state).sum()
+        df_summary_result.loc[curr_ind, 'ca2'] = df_summary_result.loc[curr_ind, 'arrive_dist_moms'+str(2)]/(df_summary_result.loc[curr_ind, 'arrive_dist_moms'+str(1)])**2
+        df_summary_result.loc[curr_ind, 'cs2'] = df_summary_result.loc[curr_ind, 'ser_dist_moms' + str(2)]/(df_summary_result.loc[curr_ind, 'ser_dist_moms' + str(1)])**2
+        df_summary_result.loc[curr_ind, 'rho'] = df_summary_result.loc[curr_ind, 'ser_dist_moms' + str(1)]/df_summary_result.loc[curr_ind, 'arrive_dist_moms'+str(1)]
+
 
         pkl.dump(df_summary_result, open(args.df_summ, 'wb'))
 
@@ -339,7 +361,7 @@ def parse_arguments(argv):
     parser.add_argument('--ser_mis_matched_rate', type=float, help='service rate of mismatched customers', default=10.)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=500)
     parser.add_argument('--case_num', type=int, help='case number in my settings', default=random.randint(0, 100000))
-    parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl/df_sum_res_sim_gg1_3.pkl')
+    parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl/df_sum_res_sim_gg1_10.pkl')
     parser.add_argument('--is_corr', type=bool, help='should we keep track on inter departure', default=True)
     parser.add_argument('--waiting_pkl_path', type=bool, help='the path of the average waiting time', default='../pkl/waiting_time')
 

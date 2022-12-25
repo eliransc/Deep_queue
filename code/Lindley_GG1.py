@@ -15,6 +15,37 @@ from sympy import *
 import time
 import datetime
 
+sys.path.append(r'C:\Users\user\workspace\butools2\Python')
+sys.path.append('/home/d/dkrass/eliransc/Python')
+sys.path.append('/home/eliransc/projects/def-dkrass/eliransc/butools/Python')
+
+import os
+
+import pandas as pd
+import argparse
+from tqdm import tqdm
+from butools.ph import *
+from butools.map import *
+from butools.queues import *
+import time
+from butools.mam import *
+from butools.dph import *
+from scipy.linalg import expm, sinm, cosm
+import matplotlib.pyplot as plt
+
+from numpy.linalg import matrix_power
+from scipy.stats import rv_discrete
+# import seaborn as sns
+import random
+from scipy.stats import loguniform
+# from butools.fitting import *
+# from fastbook import *
+import torch
+import itertools
+from scipy.special import factorial
+import pickle as pkl
+
+
 def gamma_pdf(x, theta, k):
     return (1 / (gamma(k))) * (1 / theta ** k) * (np.exp(-x / theta))
 
@@ -97,23 +128,40 @@ def generate_unif(is_arrival):
         return (a_ser, b_ser, moms_ser)
 
 
-def generate_gamma(is_arrival):
+# def generate_gamma(is_arrival):
+#     if is_arrival:
+#         rho = np.random.uniform(0.3, 0.99)
+#         shape = np.random.uniform(0.1, 100)
+#         scale = 1 / (rho * shape)
+#         moms_arr = np.array([])
+#         for mom in range(1, 11):
+#             moms_arr = np.append(moms_arr, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
+#         return (shape, scale, moms_arr)
+#     else:
+#         shape = np.random.uniform(1, 100)
+#         scale = 1 / shape
+#         moms_ser = np.array([])
+#         for mom in range(1, 11):
+#             moms_ser = np.append(moms_ser, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
+#         return (shape, scale, moms_ser)
+
+
+def generate_gamma(is_arrival, rho = 0.01):
     if is_arrival:
-        rho = np.random.uniform(0.3, 0.99)
-        shape = np.random.uniform(0.1, 100)
-        scale = 1 / (rho * shape)
+        # rho = np.random.uniform(0.7, 0.99)
+        shape = 0.25/rho # 0.25 # np.random.uniform(0.1, 100)
+        scale =  4 #1 / (rho * shape)
         moms_arr = np.array([])
         for mom in range(1, 11):
             moms_arr = np.append(moms_arr, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
         return (shape, scale, moms_arr)
     else:
-        shape = np.random.uniform(1, 100)
+        shape = 0.25 # np.random.uniform(1, 100)
         scale = 1 / shape
         moms_ser = np.array([])
         for mom in range(1, 11):
             moms_ser = np.append(moms_ser, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
         return (shape, scale, moms_ser)
-
 
 def generate_normal(is_arrival):
     if is_arrival:
@@ -134,6 +182,15 @@ def generate_normal(is_arrival):
             moms_ser = np.append(moms_ser, np.array(N(nthmomnormal(mu, sig, mom))).astype(np.float64))
         return (mu, sig, moms_ser)
 
+
+def create_Erlang4(lam):
+    s = np.array([[1, 0, 0, 0]])
+
+    A = np.array([[-lam, lam, 0, 0], [0, -lam, lam, 0], [0, 0, -lam, lam], [0, 0, 0, -lam]])
+
+    return (s, A)
+
+
 def main(args):
 
 
@@ -144,13 +201,13 @@ def main(args):
     for exmaples in range(200):
 
 
-        arrival_dist = np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
-        ser_dist = np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
+        arrival_dist = 2 # np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
+        ser_dist = 2 #  np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
 
         if arrival_dist == 1:
             arrival_dist_params = generate_unif(True)
         elif arrival_dist == 2:
-            arrival_dist_params = generate_gamma(True)
+            arrival_dist_params = generate_gamma(False)
         else:
             arrival_dist_params = generate_normal(True)
 
@@ -158,6 +215,8 @@ def main(args):
             ser_dist_params = generate_unif(False)
         elif ser_dist == 2:
             ser_dist_params = generate_gamma(False)
+            ser_dist_params = generate_gamma(True, 1/0.71)
+
         else:
             ser_dist_params = generate_normal(False)
 
@@ -205,7 +264,13 @@ def main(args):
                 print('Number of negatives: ', arrivals[arrivals == 0].shape[0])
 
 
+            s_Arrival, A_arrival = create_Erlang4(4)
 
+            s_Service, A_Service = create_Erlang4(4/0.76)
+
+            arrivals =  SamplesFromPH(ml.matrix(s_Arrival), A_arrival, num_trails)
+
+            ser = SamplesFromPH(ml.matrix(s_Service), A_Service, num_trails)
 
             waiting = []
             queueing = []
@@ -218,7 +283,7 @@ def main(args):
                     waiting.append(queueing[ind] + ser[ind])
 
 
-            meanwait = np.array(waiting[5000:]).mean()
+            meanwait = np.array(waiting[50000:]).mean()
             mean_waiting_list.append(meanwait)
             mean_l = meanwait * arrival_rate
             mean_l_list.append(mean_l)
@@ -290,7 +355,7 @@ def main(args):
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_trails', type=int, help='The end of the simulation', default=20000)
+    parser.add_argument('--num_trails', type=int, help='The end of the simulation', default=800000)
     parser.add_argument('--size', type=int, help='the number of stations in the system', default=1)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=2)
     parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl_1/df_sum_res_sim_gg1_Lindley_1')
