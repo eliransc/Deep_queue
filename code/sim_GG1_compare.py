@@ -351,17 +351,17 @@ def main(args):
 
     import time
     cur_time = int(time.time())
-    data_path = '../new_gg1_models_4'
+
     seed = cur_time + np.random.randint(1, 1000)  # + len(os.listdir(data_path)) +
     np.random.seed(seed)
     print(seed)
-
     rhos = np.linspace(0.01, 0.96, 20)
 
     ind = np.random.randint(0, 20)
 
     rho = rhos[ind]
 
+    rho = 0.76
     print(rho)
 
     df_sum = pd.DataFrame([])
@@ -519,6 +519,9 @@ def main(args):
             df_sum.loc[curr_ind, 'sim_L'] = mean_L
             df_sum.loc[curr_ind, 'sim_W'] = mean_L/rho
 
+            for ind in range(1000):
+                df_sum.loc[curr_ind, 'steady' + str(ind)] = steady_state[ind]
+
             df_sum_full_path = args.df_summ + '_rho_' + str(rho) + '.pkl'
 
             pkl.dump(df_sum, open(df_sum_full_path, 'wb'))
@@ -528,7 +531,7 @@ def main(args):
 def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--sample_size', type=int, help='external arrivals', default=15000000)
+    parser.add_argument('--sample_size', type=int, help='external arrivals', default=5000000)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=2)
     parser.add_argument('--rho', type=float, help='the prob of external matched customer', default=0.01)
     parser.add_argument('--mu', type=np.array, help='service rates', default=np.array([]))
@@ -539,7 +542,7 @@ def parse_arguments(argv):
     parser.add_argument('--ser_mis_matched_rate', type=float, help='service rate of mismatched customers', default=10.)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=500)
     parser.add_argument('--case_num', type=int, help='case number in my settings', default=random.randint(0, 100000))
-    parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl/df_sum_res_sim_gg1_12')
+    parser.add_argument('--df_summ', type=str, help='case number in my settings', default='../pkl2/df_sum_res_sim_gg1_13')
     parser.add_argument('--is_corr', type=bool, help='should we keep track on inter departure', default=True)
     parser.add_argument('--waiting_pkl_path', type=bool, help='the path of the average waiting time', default='../pkl/waiting_time')
 
