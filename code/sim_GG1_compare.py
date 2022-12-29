@@ -361,7 +361,6 @@ def main(args):
 
     rho = rhos[ind]
 
-    rho = 0.76
     print(rho)
 
     df_sum = pd.DataFrame([])
