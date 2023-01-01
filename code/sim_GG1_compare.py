@@ -358,7 +358,7 @@ def main(args):
     rhos = np.linspace(0.01, 0.96, 20)
 
     ind = np.random.randint(0, 20)
-
+    ind = 0
     rho = rhos[ind]
 
     print(rho)
